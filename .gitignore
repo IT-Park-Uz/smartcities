@@ -188,6 +188,8 @@ typings/
 # Gradle:
 .idea/**/gradle.xml
 .idea/**/libraries
+.idea/misc.xml
+.idea/smart_city.iml
 
 # CMake
 cmake-build-debug/
@@ -328,3 +330,4 @@ MailHog
 smart_city/media/
 
 .pytest_cache/
+.env

@@ -1,6 +1,7 @@
 """
 Base settings to build other settings files upon.
 """
+import datetime
 from pathlib import Path
 
 import environ
@@ -82,10 +83,15 @@ THIRD_PARTY_APPS = [
     "rest_framework.authtoken",
     "corsheaders",
     "drf_spectacular",
+    'mptt',
+    'ckeditor',
+    'ckeditor_uploader',
 ]
 
 LOCAL_APPS = [
     "smart_city.users",
+    "smart_city.posts",
+    "smart_city.chats",
     # Your stuff: custom apps go here
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
@@ -202,6 +208,32 @@ FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
 # http://django-crispy-forms.readthedocs.io/en/latest/install.html#template-packs
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+
+# ckeditor settings
+CKEDITOR_UPLOAD_PATH = 'ck-uploads/'
+
+
+def ckeditor_file_generator(f_n):
+    year = datetime.datetime.year
+    month = datetime.datetime.month
+    day = datetime.datetime.day
+    hour = datetime.datetime.hour
+    minute = datetime.datetime.minute
+    result = f"{year}/{month}/{day}/{hour}-{minute}--{f_n}"
+    return result
+
+
+CKEDITOR_FILENAME_GENERATOR = 'ckeditor_file_generator'
+
+CKEDITOR_CONFIGS = {
+    'default':
+        {
+            'toolbar': 'full',
+        },
+}
+
+CKEDITOR_RESTRICT_BY_USER = True
+CKEDITOR_ALLOW_NONIMAGE_FILES = False
 
 # FIXTURES
 # ------------------------------------------------------------------------------

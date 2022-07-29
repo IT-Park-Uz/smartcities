@@ -14,7 +14,7 @@ class News(models.Model):
     view_count = models.IntegerField(default=0)
     like_count = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
-    tags = models.ManyToManyField('Tags')
+    tags = models.ManyToManyField('Tags', null=True, blank=True)
     is_delete = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
 
@@ -40,7 +40,7 @@ class Article(models.Model):
     description = models.TextField(null=True, blank=True)
     view_count = models.IntegerField(default=0)
     like_count = models.IntegerField(default=0)
-    tags = models.ManyToManyField('Tags')
+    tags = models.ManyToManyField('Tags', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     is_delete = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
@@ -64,6 +64,7 @@ class Type_Question(models.IntegerChoices):
     MIDDLE = 2, _('MIDDLE')
     HARD = 3, _('HARD')
 
+
 class Question(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     theme = models.ForeignKey('Theme', on_delete=models.SET_NULL, null=True)
@@ -72,7 +73,7 @@ class Question(models.Model):
     description = models.TextField(null=True, blank=True)
     view_count = models.IntegerField(default=0)
     like_count = models.IntegerField(default=0)
-    tags = models.ManyToManyField('Tags')
+    tags = models.ManyToManyField('Tags', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     is_delete = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
@@ -84,12 +85,17 @@ class Question(models.Model):
         return f"{self.id} | {self.title[:20]}"
 
 
-
 class ImageQuestion(models.Model):
-    name = models.CharField(max_length=255)
-    product = models.ForeignKey(Question, on_delete=models.CASCADE)
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, null=True, blank=True)
     image = models.ImageField(upload_to='QuestionImages')
-    default = models.BooleanField(default=False)
+    default = models.BooleanField(default=True)
+
+    @property
+    def imageURL(self):
+        try:
+            return self.image.url
+        except:
+            return ''
 
     def __str__(self):
         return f"{self.id}"
@@ -103,7 +109,7 @@ class Tags(models.Model):
 
 
 class Theme(MPTTModel):
-    parent = TreeForeignKey('self', on_delete=models.CASCADE, related_name='children', null=True,blank=True)
+    parent = TreeForeignKey('self', on_delete=models.CASCADE, related_name='children', null=True, blank=True)
     name = models.CharField(max_length=50, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
 

@@ -12,13 +12,13 @@ else:
     router = SimpleRouter()
 
 router.register("users", UserViewSet)
-router.register(r'news', NewsApiView, basename='news')
-router.register(r'article', ArticleApiView, basename='article')
-router.register(r'question', QuestionApiView, basename='question')
-router.register(r'question-image', ImageQuestionApiView, basename='question-image')
-router.register(r'tags', TagsApiView, basename='tags')
-router.register(r'theme', ThemeApiView, basename='theme')
-router.register(r'review', ReviewApiView, basename='review')
+router.register('news', NewsApiView, basename='news')
+router.register('article', ArticleApiView, basename='article')
+router.register('question', QuestionApiView, basename='question')
+router.register('question-image', ImageQuestionApiView, basename='question-image')
+router.register('tags', TagsApiView, basename='tags')
+router.register('theme', ThemeApiView, basename='theme')
+router.register('review', ReviewApiView, basename='review')
 
 app_name = "api"
 urlpatterns = router.urls

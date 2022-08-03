@@ -29,6 +29,11 @@ TIME_ZONE = "Asia/Tashkent"
 LANGUAGE_CODE = "en-us"
 # https://docs.djangoproject.com/en/dev/ref/settings/#site-id
 SITE_ID = 1
+
+REST_USE_JWT = True
+# JWT_AUTH_COOKIE = 'users'
+# JWT_AUTH_REFRESH_COOKIE = 'my-refresh-token'
+
 # https://docs.djangoproject.com/en/dev/ref/settings/#use-i18n
 USE_I18N = True
 # https://docs.djangoproject.com/en/dev/ref/settings/#use-l10n
@@ -75,12 +80,26 @@ DJANGO_APPS = [
 THIRD_PARTY_APPS = [
     "crispy_forms",
     "crispy_bootstrap5",
-    "allauth",
-    "allauth.account",
-    "allauth.socialaccount",
     "django_celery_beat",
+
     "rest_framework",
     "rest_framework.authtoken",
+    'dj_rest_auth',
+
+    "allauth",
+    "allauth.account",
+    'dj_rest_auth.registration',
+
+    "allauth.socialaccount",
+    'allauth.socialaccount.providers.facebook',
+    'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.github',
+    'allauth.socialaccount.providers.linkedin_oauth2',
+    'idegovuz',
+
+    # 'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
+    'rest_framework_simplejwt',
+
     "corsheaders",
     "drf_spectacular",
     'mptt',
@@ -343,6 +362,7 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 5,
 
     "DEFAULT_AUTHENTICATION_CLASSES": (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
         "rest_framework.authentication.SessionAuthentication",
         "rest_framework.authentication.TokenAuthentication",
     ),

@@ -28,7 +28,7 @@ class CustomPagination(pagination.PageNumberPagination):
 class NewsApiView(viewsets.ModelViewSet):
     queryset = News.objects.all()
     serializer_class = NewsSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    # permission_classes = [IsAuthenticatedOrReadOnly]
 
     def list(self, request, *args, **kwargs):
         news = self.queryset.filter(is_active=True, is_delete=False)
@@ -64,7 +64,7 @@ class NewsApiView(viewsets.ModelViewSet):
 
 class UserNewsView(ListAPIView):
     queryset = News.objects.all()
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def list(self, request, *args, **kwargs):
         is_active = request.data  # TODO: History(active,passive) is_active True yoki False beriladi
@@ -83,7 +83,7 @@ class UserNewsView(ListAPIView):
 class ArticleApiView(viewsets.ModelViewSet):
     queryset = Article.objects.all()
     serializer_class = ArticleSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    # permission_classes = [IsAuthenticatedOrReadOnly]
 
     def list(self, request, *args, **kwargs):
         articles = self.queryset.filter(is_active=True, is_delete=False)
@@ -117,7 +117,7 @@ class ArticleApiView(viewsets.ModelViewSet):
 
 class UserArticleView(ListAPIView):
     queryset = Article.objects.all()
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def list(self, request, *args, **kwargs):
         is_active = request.data  # TODO: History(active,passive) is_active True yoki False beriladi
@@ -137,7 +137,7 @@ class UserArticleView(ListAPIView):
 class QuestionApiView(viewsets.ModelViewSet):
     queryset = Question.objects.all()
     serializer_class = QuestionSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    # permission_classes = [IsAuthenticatedOrReadOnly]
     pagination_class = CustomPagination
 
     def list(self, request, *args, **kwargs):
@@ -198,7 +198,7 @@ class QuestionApiView(viewsets.ModelViewSet):
 class UserQuestionView(ListAPIView):
     queryset = Question.objects.all()
     http_method_names = ['get']
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def list(self, request, *args, **kwargs):
         is_active = request.data  # TODO: History(active,passive) is_active True yoki False beriladi
@@ -218,13 +218,13 @@ class UserQuestionView(ListAPIView):
 class ImageQuestionApiView(viewsets.ModelViewSet):
     queryset = ImageQuestion.objects.all()
     serializer_class = ImageQuestionSerializer
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
 
 class TagsApiView(viewsets.ModelViewSet):
     queryset = Tags.objects.all()
     serializer_class = TagsSerializer
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     http_method_names = ['get', 'post']
 
 
@@ -243,7 +243,8 @@ class ThemeApiView(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
+
 class ReviewApiView(viewsets.ModelViewSet):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    # permission_classes = [IsAuthenticatedOrReadOnly]

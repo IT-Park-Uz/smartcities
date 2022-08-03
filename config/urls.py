@@ -11,7 +11,8 @@ from rest_framework_simplejwt.views import (TokenObtainPairView, TokenRefreshVie
 )
 
 urlpatterns = [
-    path("", TemplateView.as_view(template_name="pages/home.html"), name="home"),
+    path("", TemplateView.as_view(template_name="pages/landing.html"), name="home"),
+    path("dev/", TemplateView.as_view(template_name="pages/home.html"), name="home"),
     path(
         "about/", TemplateView.as_view(template_name="pages/about.html"), name="about"
     ),
@@ -31,7 +32,7 @@ if settings.DEBUG:
 # API URLS
 urlpatterns += [
     # API base url
-    path("api/", include("config.api_router")),
+    path("v1/", include("config.api_router")),
     # DRF auth token
     path("auth-token/", obtain_auth_token),
     path("api/schema/", SpectacularAPIView.as_view(), name="api-schema"),

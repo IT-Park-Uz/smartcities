@@ -376,7 +376,7 @@ REST_FRAMEWORK = {
 }
 
 # django-cors-headers - https://github.com/adamchainz/django-cors-headers#setup
-CORS_URLS_REGEX = r"^/api/.*$"
+CORS_URLS_REGEX = r"^/v1/.*$"
 
 # By Default swagger ui is available only to admin user(s). You can change permission classes to change that
 # See more configuration options at https://drf-spectacular.readthedocs.io/en/latest/settings.html#settings
@@ -384,10 +384,10 @@ SPECTACULAR_SETTINGS = {
     "TITLE": "Smart City API",
     "DESCRIPTION": "Documentation of API endpoints of Smart City",
     "VERSION": "1.0.0",
-    "SERVE_PERMISSIONS": ["rest_framework.permissions.IsAdminUser"],
+    # "SERVE_PERMISSIONS": ["rest_framework.permissions.IsAdminUser"],
     "SERVERS": [
         {"url": "http://127.0.0.1:8000", "description": "Local Development server"},
-        {"url": "https://smartcities.uz", "description": "Production server"},
+        {"url": "https://api.smartcities.uz", "description": "Production server"},
     ],
 }
 # Your stuff...

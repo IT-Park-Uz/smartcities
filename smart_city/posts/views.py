@@ -6,8 +6,8 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 
 from .serializer import (NewsSerializer, ArticleSerializer, QuestionSerializer, ImageQuestionSerializer,
-                         TagsSerializer, ThemeSerializer, ReviewSerializer)
-from smart_city.posts.models import (News, Article, Question, ImageQuestion, Tags, Theme, Review)
+                         TagsSerializer, ThemeSerializer)
+from smart_city.posts.models import (News, Article, Question, ImageQuestion, Tags, Theme)
 from django.core.serializers import json
 
 
@@ -243,8 +243,3 @@ class ThemeApiView(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
-
-class ReviewApiView(viewsets.ModelViewSet):
-    queryset = Review.objects.all()
-    serializer_class = ReviewSerializer
-    # permission_classes = [IsAuthenticatedOrReadOnly]

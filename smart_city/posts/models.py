@@ -14,7 +14,7 @@ class News(models.Model):
     view_count = models.IntegerField(default=0)
     like_count = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
-    tags = models.ManyToManyField('Tags', null=True, blank=True)
+    tags = models.ManyToManyField('Tags')
     is_delete = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
 
@@ -32,6 +32,14 @@ class News(models.Model):
         return f"{self.id} | {self.title[:20]}"
 
 
+class NewsReview(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    news = models.ForeignKey(News, on_delete=models.CASCADE)
+    comment = RichTextUploadingField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    parent = models.ForeignKey('self', on_delete=models.CASCADE)
+
+
 class Article(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     theme = models.ForeignKey('Theme', on_delete=models.SET_NULL, null=True)
@@ -40,7 +48,7 @@ class Article(models.Model):
     description = models.TextField(null=True, blank=True)
     view_count = models.IntegerField(default=0)
     like_count = models.IntegerField(default=0)
-    tags = models.ManyToManyField('Tags', null=True, blank=True)
+    tags = models.ManyToManyField('Tags')
     created_at = models.DateTimeField(auto_now_add=True)
     is_delete = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
@@ -57,6 +65,14 @@ class Article(models.Model):
 
     def __str__(self):
         return f"{self.id} | {self.title[:20]}"
+
+
+class ArticleReview(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    article = models.ForeignKey(Article, on_delete=models.CASCADE)
+    comment = RichTextUploadingField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    parent = models.ForeignKey('self', on_delete=models.CASCADE)
 
 
 class Type_Question(models.IntegerChoices):
@@ -73,7 +89,7 @@ class Question(models.Model):
     description = models.TextField(null=True, blank=True)
     view_count = models.IntegerField(default=0)
     like_count = models.IntegerField(default=0)
-    tags = models.ManyToManyField('Tags', null=True, blank=True)
+    tags = models.ManyToManyField('Tags')
     created_at = models.DateTimeField(auto_now_add=True)
     is_delete = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
@@ -83,6 +99,14 @@ class Question(models.Model):
 
     def __str__(self):
         return f"{self.id} | {self.title[:20]}"
+
+
+class QuestionReview(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    comment = RichTextUploadingField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    parent = models.ForeignKey('self', on_delete=models.CASCADE)
 
 
 class ImageQuestion(models.Model):
@@ -118,10 +142,3 @@ class Theme(MPTTModel):
 
     def __str__(self):
         return f"{self.id} | {self.name}"
-
-
-class Review(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    comment = RichTextUploadingField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    parent = models.ForeignKey('self', on_delete=models.CASCADE)

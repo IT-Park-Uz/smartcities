@@ -4,7 +4,7 @@
     <inspection_tool class="PyPackageRequirementsInspection" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="ignoredPackages">
         <value>
-          <list size="42">
+          <list size="44">
             <item index="0" class="java.lang.String" itemvalue="django-environ" />
             <item index="1" class="java.lang.String" itemvalue="sphinx-autobuild" />
             <item index="2" class="java.lang.String" itemvalue="factory-boy" />
@@ -47,6 +47,8 @@
             <item index="39" class="java.lang.String" itemvalue="pytz" />
             <item index="40" class="java.lang.String" itemvalue="pylint-celery" />
             <item index="41" class="java.lang.String" itemvalue="Pillow" />
+            <item index="42" class="java.lang.String" itemvalue="idegovuz-0.2" />
+            <item index="43" class="java.lang.String" itemvalue="djangorestframework-simplejwt-5.2.0" />
           </list>
         </value>
       </option>

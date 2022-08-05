@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from smart_city.posts.models import (News, Article, Question, ImageQuestion, Tags, Theme, Review)
+from smart_city.posts.models import (News, Article, Question, ImageQuestion, Tags, Theme)
 
 
 class NewsSerializer(serializers.ModelSerializer):
@@ -30,9 +30,4 @@ class TagsSerializer(serializers.ModelSerializer):
 class ThemeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Theme
-        fields = '__all__'
-
-class ReviewSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Review
         fields = '__all__'

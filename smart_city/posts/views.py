@@ -6,8 +6,10 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 
 from .serializer import (NewsSerializer, ArticleSerializer, QuestionSerializer, ImageQuestionSerializer,
-                         TagsSerializer, ThemeSerializer, ReviewSerializer)
-from smart_city.posts.models import (News, Article, Question, ImageQuestion, Tags, Theme, Review)
+                         TagsSerializer, ThemeSerializer)
+from smart_city.posts.models import (News, Article, Question, ImageQuestion, Tags, Theme)
+from django.core.serializers import json
+
 
 class CustomPagination(pagination.PageNumberPagination):
     page_size = 2
@@ -138,7 +140,6 @@ class QuestionApiView(viewsets.ModelViewSet):
     # permission_classes = [IsAuthenticatedOrReadOnly]
     pagination_class = CustomPagination
 
-
     def list(self, request, *args, **kwargs):
         questions = self.get_queryset()
         # questions = self.queryset.filter(is_active=True, is_delete=False)
@@ -230,10 +231,15 @@ class TagsApiView(viewsets.ModelViewSet):
 class ThemeApiView(viewsets.ModelViewSet):
     queryset = Theme.objects.all()
     serializer_class = ThemeSerializer
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def list(self, request, *args, **kwargs):
+        if not request.data:
+            themes = self.get_queryset().filter(parent=None)
+            serializer = ThemeSerializer(themes, many=True)
+            return Response(serializer.data)
+        themes = self.get_queryset().filter(parent=int(request.data['tree_id']))
+        serializer = ThemeSerializer(themes, many=True)
+        return Response(serializer.data)
 
 
-class ReviewApiView(viewsets.ModelViewSet):
-    queryset = Review.objects.all()
-    serializer_class = ReviewSerializer
-    # permission_classes = [IsAuthenticatedOrReadOnly]

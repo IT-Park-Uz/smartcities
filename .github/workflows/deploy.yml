@@ -1,4 +1,4 @@
-name: Deploy
+name: Django deploy smartcities
 
 on:
   push:
@@ -13,7 +13,7 @@ jobs:
     steps:
     - uses: actions/checkout@v1
 
-    - name: Copy repository contents via scp
+    - name: Repozitoriydan git pull qilinishi
       uses: appleboy/scp-action@master
       env:
         HOST: ${{ secrets.HOST }}
@@ -22,9 +22,9 @@ jobs:
         KEY: ${{ secrets.SSHKEY }}
       with:
         source: "."
-        target: "/root/tour_agency"
+        target: "/root/smartcities"
 
-    - name: Executing remote command
+    - name: Komandalar terilishi @@@@@@@@@@
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.HOST }}
@@ -35,5 +35,5 @@ jobs:
           /root/smartcities/venv/bin/pip install -r /root/smartcities/requirements/production.txt
           /root/smartcities/venv/bin/python /root/smartcities/manage.py migrate
           /root/smartcities/venv/bin/python /root/smartcities/manage.py compilemessages
-          /root/smartcities/venv/bin/python /root/smartcities/manage.py collectstatic
+          /root/smartcities/venv/bin/python /root/smartcities/manage.py collectstatic --noinput
           systemctl restart gunicorn.service

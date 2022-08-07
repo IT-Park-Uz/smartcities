@@ -87,7 +87,9 @@ DATABASES["default"]["CONN_MAX_AGE"] = env.int("CONN_MAX_AGE", default=60)  # no
 # aws_s3_domain = AWS_S3_CUSTOM_DOMAIN or f"{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com"
 # # STATIC
 # # ------------------------
-# STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+STATIC_ROOT = "/var/www/api.smartcities.uz/static"
+MEDIA_ROOT = "/var/www/api.smartcities.uz/media"
 # # MEDIA
 # # ------------------------------------------------------------------------------
 # DEFAULT_FILE_STORAGE = "smart_city.utils.storages.MediaRootS3Boto3Storage"

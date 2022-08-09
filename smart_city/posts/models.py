@@ -1,5 +1,7 @@
 from ckeditor_uploader.fields import RichTextUploadingField
 from django.db import models
+from django.db.models.fields import related
+
 from smart_city.users.models import User
 from mptt.models import MPTTModel, TreeForeignKey
 from django.utils.translation import gettext_lazy as _
@@ -142,3 +144,4 @@ class Theme(MPTTModel):
 
     def __str__(self):
         return f"{self.id} | {self.name}"
+

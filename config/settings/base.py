@@ -105,6 +105,7 @@ THIRD_PARTY_APPS = [
     'mptt',
     'ckeditor',
     'ckeditor_uploader',
+
 ]
 
 LOCAL_APPS = [
@@ -126,7 +127,7 @@ MIGRATION_MODULES = {"sites": "smart_city.contrib.sites.migrations"}
 # https://docs.djangoproject.com/en/dev/ref/settings/#authentication-backends
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
-    "allauth.account.auth_backends.AuthenticationBackend",
+    # "allauth.account.auth_backends.AuthenticationBackend",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#auth-user-model
 AUTH_USER_MODEL = "users.User"
@@ -343,6 +344,7 @@ ACCOUNT_ALLOW_REGISTRATION = env.bool("DJANGO_ACCOUNT_ALLOW_REGISTRATION", True)
 ACCOUNT_AUTHENTICATION_METHOD = "username"
 # https://django-allauth.readthedocs.io/en/latest/configuration.html
 ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_LOGOUT_ON_GET = True
 # https://django-allauth.readthedocs.io/en/latest/configuration.html
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 # https://django-allauth.readthedocs.io/en/latest/configuration.html
@@ -392,3 +394,28 @@ SPECTACULAR_SETTINGS = {
 }
 # Your stuff...
 # ------------------------------------------------------------------------------
+
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(days=1),
+    'REFRESH_TOKEN_LIFETIME': datetime.timedelta(minutes=1)
+}
+
+
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_PORT = 465
+# EMAIL_USE_TLS = False
+# EMAIL_USE_SSL = True
+# EMAIL_HOST_USER = 'smart_city@gmail.com'
+# EMAIL_HOST_PASSWORD = 'test'
+
+
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 465
+EMAIL_USE_TLS = False
+EMAIL_USE_SSL = True
+# EMAIL_HOST_USER = env.str('EMAIL_HOST_USER')
+EMAIL_HOST_USER = 'fayyozbekov20@gmail.com'
+# EMAIL_HOST_PASSWORD = env.str('EMAIL_HOST_PASSWORD')
+# EMAIL_HOST_PASSWORD = 'bspkmcwrebfgviof'
+EMAIL_HOST_PASSWORD = 'bhzsqdsqsbpnhrpg'

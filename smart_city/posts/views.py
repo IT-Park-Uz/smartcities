@@ -1,16 +1,16 @@
 from django.db.models import Q
-from rest_framework import viewsets, status, permissions, pagination
-from rest_framework.authentication import TokenAuthentication
-from rest_framework.generics import ListAPIView
+from rest_framework import viewsets, status,pagination
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 
 from .serializer import (NewsSerializer, ArticleSerializer, QuestionSerializer, ImageQuestionSerializer,
                          TagsSerializer, ThemeSerializer, SearchNewsSerializer, SearchArticlesSerializer,
                          SearchQuestionsSerializer, NewsHistorySerializer, QuestionHistorySerializer,
-                         ArticleHistorySerializer)
-from smart_city.posts.models import (News, Article, Question, ImageQuestion, Tags, Theme)
+                         ArticleHistorySerializer, NewsReviewSerializer, ArticleReviewSerializer,
+                         QuestionReviewSerializer)
+from smart_city.posts.models import (News, Article, Question, ImageQuestion, Tags, Theme, NewsReview, ArticleReview, QuestionReview)
 from django.contrib.auth import get_user_model
+
 User = get_user_model()
 
 
@@ -32,7 +32,6 @@ class NewsApiView(viewsets.ModelViewSet):
     queryset = News.objects.all()
     serializer_class = NewsSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
-
 
     def list(self, request, *args, **kwargs):
         news = self.queryset.filter(is_active=True, is_delete=False)
@@ -61,6 +60,20 @@ class NewsApiView(viewsets.ModelViewSet):
         new.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+    def create(self, request, *args, **kwargs):
+        try:
+            art = News.objects.create(user=request.user, title=request.data['title'], image=request.data['image'],
+                                      description=request.data['description'], theme_id=request.data['theme'])
+            try:
+                for i in request.data['tags']:
+                    tag = Tags.objects.get(id=int(i))
+                    art.tags.add(tag)
+            except:
+                pass
+            return Response(status=status.HTTP_201_CREATED)
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
 
 class SearchNewsView(viewsets.ModelViewSet):
     queryset = News.objects.all()
@@ -70,13 +83,51 @@ class SearchNewsView(viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         # TODO: search fields: title, theme, tags
-        news = News.objects.filter(Q(title__icontains=request.data['word']) | Q(theme__name__icontains=request.data['word']) | Q(tags__name=request.data['word']), is_active=True).order_by('view_count','created_at','like_count')
-        articles = Article.objects.filter(Q(title__icontains=request.data['word']) | Q(theme__name__icontains=request.data['word']) | Q(tags__name=request.data['word']), is_active=True).order_by('view_count','created_at','like_count')
-        questions = Question.objects.filter(Q(title__icontains=request.data['word']) | Q(theme__name__icontains=request.data['word']) | Q(tags__name=request.data['word']), is_active=True).order_by('view_count','created_at','like_count')
-        nserializer = SearchNewsSerializer(news, many=True)
-        aserializer = SearchArticlesSerializer(articles, many=True)
-        qserializer = SearchQuestionsSerializer(questions, many=True)
-        return Response({'news':nserializer.data,'articles':aserializer.data,'questions':qserializer.data}, status=status.HTTP_200_OK)
+        try:
+            news = News.objects.filter(
+                Q(title__icontains=request.data['word']) | Q(theme__name__icontains=request.data['word']) | Q(
+                    tags__name=request.data['word']), is_active=True).order_by('view_count', 'created_at', 'like_count')
+            serializer = SearchNewsSerializer(news, many=True)
+            return Response({'news': serializer.data}, status=status.HTTP_200_OK)
+        except:
+            return Response({'status': status.HTTP_204_NO_CONTENT})
+
+
+class SearchArticleView(viewsets.ModelViewSet):
+    queryset = Article.objects.all()
+    serializer_class = SearchArticlesSerializer
+    http_method_names = ['get']
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def list(self, request, *args, **kwargs):
+        # TODO: search fields: title, theme, tags
+        try:
+            articles = Article.objects.filter(
+                Q(title__icontains=request.data['word']) | Q(theme__name__icontains=request.data['word']) | Q(
+                    tags__name=request.data['word']), is_active=True).order_by('view_count', 'created_at', 'like_count')
+            serializer = SearchArticlesSerializer(articles, many=True)
+            return Response({'articles': serializer.data}, status=status.HTTP_200_OK)
+        except:
+            return Response({'status': status.HTTP_204_NO_CONTENT})
+
+
+class SearchQuestionView(viewsets.ModelViewSet):
+    queryset = Question.objects.all()
+    serializer_class = SearchQuestionsSerializer
+    http_method_names = ['get']
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def list(self, request, *args, **kwargs):
+        # TODO: search fields: title, theme, tags
+        try:
+            questions = Question.objects.filter(
+                Q(title__icontains=request.data['word']) | Q(theme__name__icontains=request.data['word']) | Q(
+                    tags__name=request.data['word']), is_active=True).order_by('view_count', 'created_at', 'like_count')
+            serializer = SearchQuestionsSerializer(questions, many=True)
+            return Response({'question': serializer.data}, status=status.HTTP_200_OK)
+        except:
+            return Response({'status': status.HTTP_204_NO_CONTENT})
+
 
 class UserNewsView(viewsets.ModelViewSet):
     queryset = News.objects.all()
@@ -84,7 +135,8 @@ class UserNewsView(viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         # TODO: History(active,passive) is_active = True, False beriladi
-        news = self.get_queryset().filter(user=request.user, is_active=request.data['is_active'], is_delete=False)
+        news = self.get_queryset().filter(user=request.user, is_active=request.data['is_active'],
+                                          is_delete=False).order_by('created_at')
         if news:
             serializer = NewsHistorySerializer(news, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -123,14 +175,29 @@ class ArticleApiView(viewsets.ModelViewSet):
         article.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+    def create(self, request, *args, **kwargs):
+        try:
+            art = Article.objects.create(user=request.user, title=request.data['title'], image=request.data['image'],
+                                         description=request.data['description'], theme_id=request.data['theme'])
+            try:
+                for i in request.data['tags']:
+                    tag = Tags.objects.get(id=int(i))
+                    art.tags.add(tag)
+            except:
+                pass
+            return Response(status=status.HTTP_201_CREATED)
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
 
 class UserArticleView(viewsets.ModelViewSet):
     queryset = Article.objects.all()
     permission_classes = [IsAuthenticated]
 
     def list(self, request, *args, **kwargs):
-        is_active = request.data  # TODO: History(active,passive) is_active True yoki False beriladi
-        articles = self.get_queryset().filter(user=request.user, is_active=is_active['is_active'], is_delete=False)
+        # TODO: History(active,passive) is_active True yoki False beriladi
+        articles = self.get_queryset().filter(user=request.user, is_active=request.data['is_active'],
+                                              is_delete=False).order_by('created_at')
         if articles:
             serializer = ArticleHistorySerializer(articles, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -177,8 +244,10 @@ class QuestionApiView(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         try:
             data = request.data
-            question = Question.objects.create(user_id=1, type=data['type'], title=data['title'],
+            question = Question.objects.create(user=request.user, type=data['type'],theme=data['theme'], title=data['title'],
                                                description=data['description'])
+            for i in data['images']:
+                ImageQuestion.objects.create(question=question.id, image=i)
             for i in data['tags']:
                 tag = Tags.objects.get(id=int(i))
                 question.tags.add(tag)
@@ -193,7 +262,8 @@ class UserQuestionView(viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         # TODO: History(active,passive) is_active True yoki False beriladi
-        questions = self.get_queryset().filter(user=request.user, is_active=request.data['is_active'], is_delete=False)
+        questions = self.get_queryset().filter(user=request.user, is_active=request.data['is_active'],
+                                               is_delete=False).order_by('created_at')
         if questions:
             serializer = QuestionHistorySerializer(questions, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -226,3 +296,18 @@ class ThemeApiView(viewsets.ModelViewSet):
         themes = self.get_queryset().filter(parent=int(request.data['tree_id']))
         serializer = ThemeSerializer(themes, many=True)
         return Response(serializer.data)
+
+class NewsReviewView(viewsets.ModelViewSet):
+    queryset = NewsReview.objects.all()
+    serializer_class = NewsReviewSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+class ArticleReviewView(viewsets.ModelViewSet):
+    queryset = ArticleReview.objects.all()
+    serializer_class = ArticleReviewSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+class QuestionReviewView(viewsets.ModelViewSet):
+    queryset = QuestionReview.objects.all()
+    serializer_class = QuestionReviewSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]

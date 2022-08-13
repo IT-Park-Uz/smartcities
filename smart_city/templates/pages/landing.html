@@ -1,12 +1,12 @@
+{% load i18n static%}
 <!DOCTYPE html>
-{% load static i18n %}
 <html lang="en">
 
 <head>
   <meta charset="UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Landing Page for Summit</title>
+  <title>{% trans "Smart Cities Landing Page" %}</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="{% static 'js/tailwind.config.js' %}"></script>
   <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
@@ -30,7 +30,7 @@
           <div class="links">
             <ul>
               <li><a href="#">Главный</a></li>
-              <li><a href="https://hub.smartcities.uz">Форум</a></li>
+              <li><a href="#">Форум</a></li>
               <li><a href="#" class="btn">Регистрация</a></li>
             </ul>
           </div>
@@ -75,21 +75,192 @@
         </div>
       </div>
 
-      <div class="bottom-area">
+      <!-- <div class="bottom-area">
         <div class="container">
           <button class="toggle-btn">
             <i class="far fa-moon"></i>
             <i class="far fa-sun"></i>
           </button>
         </div>
-      </div>
+      </div> -->
     </div>
-  </header>
+    </header>
+    <main class="main_">
+      <div class="container">
 
-  <!-- JavaScript Files -->
+        <section class="flex">
+          <div class="location">
+            <div class="loc">
+              <img class="img_loc" src="{% static 'img/icons8-location-30.png' %}" alt="">
+              <div class="loc_text">
+                <h4 class="joy">Manzil</h4>
+                <h3 class="sam">Toshlent</h3>
+              </div>
 
-  <script src="https://kit.fontawesome.com/a81368914c.js"></script>
-  <script src="{% static 'app.js' %}"></script>
+            </div>
+            <div class="data">
+              <div class="data_time">
+                <img src="{% static 'img/icons8-calendar-50.png' %}" alt="">
+                <div class="data_time_text">
+                  <h4 class="vaqt">Qachon</h4>
+                  <h3 class="sana">24-27 октябрь 2022 йил</h3>
+                </div>
+              </div>
+            </div>
+            <button class="button">Tadbirlar Dasturid</button>
+
+            <p class="info_text">Тадбир Ўзбекистон Республикаси Aхборот технологиялари ва коммуникацияларини ривожлантириш вазирлиги кўмагида ўтказилади. ICTWEEK Uzbekistan ташкилотчиси AVANTAGE EVENT AGENCY ҳисобланади.</p>
+
+          </div>
+          <div class="information">
+            <h1 class="information_title">ҲАФТАЛИК ТЎҒРИСИДА</h1>
+            <p class="information_title_text">
+              Ўзбекистон ахборот-коммуникация технологиялари ҳафталиги — ICTWEEK UZBEKISTAN — Ўзбекистон ахборот технологиялари соҳасида 2004 йилдан буён ўтадиган ҳар йилги энг йирк ва муҳим тадбирдир.
+              <br>
+              <br>
+              Анъанавий равишда, ушбу тадбир бир форматда қатор ихтисослашган тадбирларни жамлайди.
+              <br>
+              <br>
+              ICTWEEK нинг асосий вазифаси тажриба алмашиш ва замонавий технологиялар ҳамда инновациялар ютуқларини намойиш этиш саналади. Шунингдек, бу Ўзбекистон АТ-бозорининг жозибадорлигини хорижий инвесторларга намойиш этиш, давлат, компаниялар ва истеъмолчилар ўзаро ҳамкорлиги учун идеал майдончадир.
+            </p>
+          </div>
+
+        </section>
+        <section class="links1">
+              <div class="flight">
+                <img class="icon" src="{% static 'img/icons8-airplane-take-off-50.png' %}" alt="">
+                <a class="link2" href="#">{% blocktrans %}Авиабилетларни харид қилиш{% endblocktrans %} </a>
+              </div>
+              <div class="hotel">
+                <img class="icon" src="{% static 'img/icons8-hotel-star-50.png' %}" alt="">
+                <a class="link2" href="#">{% blocktrans %}Мехмонхонани бронь қилиш{% endblocktrans %} </a>
+              </div>
+        </section>
+
+      </div>
+      <section class="container">
+        <div class="card">
+          <h1 class="plan">
+            ДАСТУР
+          </h1>
+
+            <ul class="data_list">
+              <li class="data_list_item"><a class="data_link" href="#">25 октябрь</a></li>
+              <li class="data_list_item"><a class="data_link" href="#">26 октябрь</a></li>
+              <li class="data_list_item"><a class="data_link" href="#">27 октябрь</a></li>
+              <li class="data_list_item"><a class="data_link" href="#">28 октябрь</a></li>
+              <li class="data_list_item"><a class="data_link" href="#">29 октябрь</a></li>
+            </ul>
+            <br />
+            <div class="plan1">
+              <h4 class="time2">10:00 - 17:00</h4>
+              <p class="time2_text">ICTEXPO - ЎЗБЕКИСТОН АХБОРОТ ТЕХНОЛОГИЯЛАРИ КЎРГАЗМАСИ
+              </p>
+            </div>
+            <div class="plan1">
+              <h4 class="time2">9:00 - 18:00</h4>
+              <p class="time2_text">BPO SUMMIT</p>
+            </div>
+            <div class="plan1">
+              <h4 class="time2">10:00 - 13:00</h4>
+              <p class="time2_text">ДАВЛАТЛАРНИНГ - ТУРКИЙ ДАВЛАТЛАР ТАШКИЛОТИ АЪЗОЛАРИ, AКТ СОҲАСИ УЧУН МАСЪУЛ ВАЗИРЛИК ВА ИДОРАЛАР РАҲБАРЛАРИНИНГ НАВБАТДАГИ ЙИҒИЛИШИ
+
+              </p>
+            </div>
+            <div class="plan1">
+              <h4 class="time2">10:00 - 19:00</h4>
+              <p class="time2_text">ХАЛҚАРО ЭЛЕКТРАЛОҚА ИТТИФОҚИНИНГ “РАҚАМЛИ ТРАНСФОРМАЦИЯ ОРҚАЛИ РАҚАМЛИ ЭКОТИЗИМЛАРНИ РИВОЖЛАНТИРИШ” МАВЗУСИДАГИ МИНТАҚАВИЙ СЕМИНАРИ
+
+              </p>
+            </div>
+
+        </div>
+
+
+      </section>
+      <section class="container">
+        <div class="registration">
+          <h2 class="reg">{% trans "Регистрация" %}</h2>
+          <div class="flex2">
+            <div class="forma1">
+              <label for="">{% trans "Имя" %}</label>
+              <label>
+                <input type="text" placeholder="{% trans "Имя" %}">
+              </label>
+              <label for="">{% trans "Фамилия" %}</label>
+              <label>
+                <input type="text" placeholder="{% trans "Фамилия" %}">
+              </label>
+            </div>
+            <div class="forma2">
+              <label for="">{% blocktrans %}Место работы{% endblocktrans %}</label>
+              <label>
+                <input type="text" placeholder="{% trans "Место работы" %}">
+              </label>
+              <label for="">{% trans "Должность" %}</label>
+              <label>
+                <input type="text" placeholder="{% trans "Должность" %}">
+              </label>
+            </div>
+          </div>
+          <label for="">{% trans "Пол" %}</label>
+          <br>
+          <div class="flex3">
+            <div class="aaa">
+              <input type="radio" id="boy" name="ccc" value="{% trans "Мужчина" %}">
+              <label for="boy">{% trans "Мужчина" %}</label><br>
+
+            </div>
+            <div class="bbb">
+              <input type="radio" id="girl" name="ccc" value="{% trans "Женщина" %}">
+              <label for="girl">{% trans "Женщина" %}</label><br>
+
+            </div>
+          </div>
+          <div class="flex2">
+            <div class="forma1">
+              <label for="">{% trans "Страна" %}</label>
+              <label>
+                <input type="text" placeholder="{% trans "Страна" %}">
+              </label>
+              <label for="">{% blocktrans %}Электронная почта{% endblocktrans %}</label>
+              <label>
+                <input type="text" placeholder="{% trans "Электронная почта" %}">
+              </label>
+            </div>
+            <div class="forma2">
+              <label for="">{% trans "Пароль" %}</label>
+              <label>
+                <input type="password" placeholder="{% trans "Пароль" %}">
+              </label>
+              <label for="">{% blocktrans %}Повторите пароль{% endblocktrans %}</label>
+              <label>
+                <input type="password" placeholder="{% trans "Повторите пароль" %}">
+              </label>
+            </div>
+          </div>
+          <div class="forma2">
+            <label for="">{% blocktrans %}Номер телефона{% endblocktrans %}</label>
+            <label>
+              <input class="input" type="text" placeholder="{% trans "Номер телефона" %}">
+            </label>
+
+          </div>
+
+          <button class="btn2">{% trans "ОТПРАВИТЬ" %}</button>
+        </div>
+      </section>
+
+
+
+
+
+    </main>
+
+    <!-- JavaScript Files -->
+
+    <script src="https://kit.fontawesome.com/a81368914c.js"></script>
+    <script src="{% static 'js/app.js' %}"></script>
 </body>
 
 </html>

@@ -1,0 +1,39 @@
+name: Django deploy smartcities
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Repozitoriydan git pull qilinishi
+      uses: appleboy/scp-action@master
+      env:
+        HOST: ${{ secrets.HOST }}
+        USERNAME: ${{ secrets.USERNAME }}
+        PORT: ${{ secrets.PORT }}
+        KEY: ${{ secrets.SSHKEY }}
+      with:
+        source: "."
+        target: "/root/smartcities"
+
+    - name: Komandalar terilishi @@@@@@@@@@
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        USERNAME: ${{ secrets.USERNAME }}
+        PORT: ${{ secrets.PORT }}
+        KEY: ${{ secrets.SSHKEY }}
+        script: |
+          /root/smartcities/venv/bin/pip install -r /root/smartcities/requirements/production.txt
+          /root/smartcities/venv/bin/python /root/smartcities/manage.py migrate
+          /root/smartcities/venv/bin/python /root/smartcities/manage.py compilemessages
+          /root/smartcities/venv/bin/python /root/smartcities/manage.py collectstatic --noinput
+          systemctl restart gunicorn.service

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from smart_city.posts.models import (News, Article, Question, ImageQuestion, Tags, Theme)
+from smart_city.posts.models import (News, Article, Question, ImageQuestion, Tags, Theme, NewsReview, ArticleReview, QuestionReview)
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
@@ -85,3 +85,22 @@ class ThemeSerializer(serializers.ModelSerializer):
         model = Theme
         fields = '__all__'
         depth = 1
+
+class NewsReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = NewsReview
+        fields = '__all__'
+        # fields = ['id','news','user','comment','created_at']
+        # depth = 1
+
+class ArticleReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ArticleReview
+        fields = '__all__'
+        # depth = 1
+
+class QuestionReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = QuestionReview
+        fields = '__all__'
+        # depth = 1

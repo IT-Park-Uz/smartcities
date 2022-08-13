@@ -39,7 +39,10 @@ class NewsReview(models.Model):
     news = models.ForeignKey(News, on_delete=models.CASCADE)
     comment = RichTextUploadingField()
     created_at = models.DateTimeField(auto_now_add=True)
-    parent = models.ForeignKey('self', on_delete=models.CASCADE)
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.id} | {self.user.username}"
 
 
 class Article(models.Model):
@@ -74,7 +77,10 @@ class ArticleReview(models.Model):
     article = models.ForeignKey(Article, on_delete=models.CASCADE)
     comment = RichTextUploadingField()
     created_at = models.DateTimeField(auto_now_add=True)
-    parent = models.ForeignKey('self', on_delete=models.CASCADE)
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.id} | {self.user.username}"
 
 
 class Type_Question(models.IntegerChoices):
@@ -108,7 +114,10 @@ class QuestionReview(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     comment = RichTextUploadingField()
     created_at = models.DateTimeField(auto_now_add=True)
-    parent = models.ForeignKey('self', on_delete=models.CASCADE)
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.id} | {self.user.username}"
 
 
 class ImageQuestion(models.Model):

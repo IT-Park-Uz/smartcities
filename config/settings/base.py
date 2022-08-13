@@ -83,6 +83,7 @@ THIRD_PARTY_APPS = [
     "django_celery_beat",
 
     "rest_framework",
+    'rest_framework_simplejwt.token_blacklist',
     "rest_framework.authtoken",
     'dj_rest_auth',
 
@@ -97,7 +98,6 @@ THIRD_PARTY_APPS = [
     'allauth.socialaccount.providers.linkedin_oauth2',
     'idegovuz',
 
-    # 'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
     'rest_framework_simplejwt',
 
     "corsheaders",
@@ -112,6 +112,7 @@ LOCAL_APPS = [
     "smart_city.users",
     "smart_city.posts",
     "smart_city.chats",
+    "smart_city.summit",
     # Your stuff: custom apps go here
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
@@ -366,7 +367,7 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         "rest_framework.authentication.SessionAuthentication",
-        "rest_framework.authentication.TokenAuthentication",
+        # "rest_framework.authentication.TokenAuthentication",
     ),
 
     # "DEFAULT_PERMISSION_CLASSES": (
@@ -398,7 +399,7 @@ SPECTACULAR_SETTINGS = {
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': datetime.timedelta(days=1),
-    'REFRESH_TOKEN_LIFETIME': datetime.timedelta(minutes=1)
+    'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=1)
 }
 
 

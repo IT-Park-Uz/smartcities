@@ -1,3 +1,5 @@
+from dj_rest_auth.serializers import PasswordChangeSerializer
+from dj_rest_auth.views import sensitive_post_parameters_m
 from django.contrib.auth import get_user_model, login
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
@@ -20,7 +22,10 @@ from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 # Connect with SocialLogin
 from dj_rest_auth.registration.views import SocialConnectView
 from rest_framework import generics, status, viewsets
+from rest_framework.generics import GenericAPIView
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from smart_city.users.api.serializers import RegisterSerializer, CodeSerializer
@@ -141,3 +146,35 @@ class VerifyCodeView(generics.GenericAPIView):
         refresh = RefreshToken.for_user(user)
         return {'refresh': str(refresh),'access': str(refresh.access_token)}
 
+class LogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        try:
+            refresh_token = request.data["refresh_token"]
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+            return Response(status=status.HTTP_205_RESET_CONTENT)
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+class PasswordChangeView(GenericAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = PasswordChangeSerializer
+    throttle_scope = 'dj_rest_auth'
+
+    @sensitive_post_parameters_m
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        try:
+            old_password = request.POST['old_password']
+            if not request.user.check_password(old_password):
+                return Response({'status':"Old password is incorrect"},status=status.HTTP_400_BAD_REQUEST)
+        except:
+            return Response({'detail': _('Old password not found.')},status=status.HTTP_204_NO_CONTENT)
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({'detail': _('New password has been saved.')})

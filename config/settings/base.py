@@ -367,16 +367,17 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         "rest_framework.authentication.SessionAuthentication",
-        # "rest_framework.authentication.TokenAuthentication",
     ),
 
-    # "DEFAULT_PERMISSION_CLASSES": (
-    #     # "rest_framework.permissions.BasePermission",
-    #     # "rest_framework.permissions.IsAuthenticatedOrReadOnly",
-    #     "rest_framework.permissions.AllowAny",
-    # ),
+    "DEFAULT_PERMISSION_CLASSES": (
+        # "rest_framework.permissions.BasePermission",
+        "rest_framework.permissions.IsAuthenticatedOrReadOnly",
+        # "rest_framework.permissions.AllowAny",
+    ),
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
+
+OLD_PASSWORD_FIELD_ENABLED = True
 
 # django-cors-headers - https://github.com/adamchainz/django-cors-headers#setup
 # CORS_URLS_REGEX = r"^/v1/.*$"

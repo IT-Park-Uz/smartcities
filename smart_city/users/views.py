@@ -22,7 +22,7 @@ from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 # Connect with SocialLogin
 from dj_rest_auth.registration.views import SocialConnectView
 from rest_framework import generics, status, viewsets
-from rest_framework.generics import GenericAPIView
+from rest_framework.generics import GenericAPIView, UpdateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -123,7 +123,7 @@ class RegisterAPIView(generics.GenericAPIView):
             code.save()
             # send_email({'to_email': serializer.data['email']})
             print(code.number)
-            #Todo: send the code by email to user
+            # Todo: send the code by email to user
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -139,42 +139,52 @@ class VerifyCodeView(generics.GenericAPIView):
             user_email = EmailAddress.objects.create(user=user, email=user.email, verified=True)
             token = self.get_tokens_for_user(user)
             login(request, user)
-            return Response({'Message': 'Successfully activated','token': token}, status=status.HTTP_200_OK)
+            return Response({'Message': 'Successfully activated', 'token': token}, status=status.HTTP_200_OK)
         return Response({"Error": 'InvalidCode'}, status=status.HTTP_404_NOT_FOUND)
 
-    def get_tokens_for_user(self,user):
+    def get_tokens_for_user(self, user):
         refresh = RefreshToken.for_user(user)
-        return {'refresh': str(refresh),'access': str(refresh.access_token)}
+        return {'refresh': str(refresh), 'access': str(refresh.access_token)}
+
 
 class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
         try:
-            refresh_token = request.data["refresh_token"]
+            refresh_token = request.data["refresh"]
             token = RefreshToken(refresh_token)
             token.blacklist()
             return Response(status=status.HTTP_205_RESET_CONTENT)
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-class PasswordChangeView(GenericAPIView):
+
+class PasswordChangeView(UpdateAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = PasswordChangeSerializer
     throttle_scope = 'dj_rest_auth'
 
-    @sensitive_post_parameters_m
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
+    def get_object(self, queryset=None):
+        obj = self.request.user
+        return obj
 
-    def post(self, request, *args, **kwargs):
-        try:
-            old_password = request.data['old_password']
-            if not request.user.check_password(old_password):
-                return Response({'status':"Old password is incorrect"},status=status.HTTP_400_BAD_REQUEST)
-        except:
-            return Response({'detail': _('Old password not found.')},status=status.HTTP_204_NO_CONTENT)
+    def update(self, request, *args, **kwargs):
+        self.object = self.get_object()
         serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response({'detail': _('New password has been saved.')})
+
+        if serializer.is_valid():
+            if not self.object.check_password(serializer.data.get("old_password")):
+                return Response({"old_password": ["Wrong password."]}, status=status.HTTP_400_BAD_REQUEST)
+
+            if serializer.data.get("new_password1") == serializer.data.get("new_password2"):
+                self.object.set_password(serializer.data.get("new_password"))
+                self.object.save()
+                response = {
+                    'status': 'success',
+                    'code': status.HTTP_200_OK,
+                    'message': 'Password updated successfully',
+                    'data': []
+                }
+                return Response(response)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

@@ -40,6 +40,7 @@ class NewsApiView(viewsets.ModelViewSet):
             i['user'] = {'id': i['user']['id'], 'username': i['user']['username'],
                          'first_name': i['user']['first_name'], 'last_name': i['user']['last_name'],
                          'email': i['user']['email'], 'image': i['user']['image']}
+            i.update({'comments':NewsReview.objects.filter(news_id=i['id']).count()})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def retrieve(self, request, *args, **kwargs):
@@ -155,6 +156,7 @@ class ArticleApiView(viewsets.ModelViewSet):
             i['user'] = {'id': i['user']['id'], 'username': i['user']['username'],
                          'first_name': i['user']['first_name'], 'last_name': i['user']['last_name'],
                          'email': i['user']['email'], 'image': i['user']['image']}
+            i.update({'comments': ArticleReview.objects.filter(article_id=i['id']).count()})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def retrieve(self, request, *args, **kwargs):
@@ -211,13 +213,13 @@ class QuestionApiView(viewsets.ModelViewSet):
     pagination_class = CustomPagination
 
     def list(self, request, *args, **kwargs):
-        # questions = self.get_queryset()
         questions = self.queryset.filter(is_active=True, is_delete=False)
         serializer = QuestionSerializer(questions, many=True)
         for i in serializer.data:
             i['user'] = {'id': i['user']['id'], 'username': i['user']['username'],
                          'first_name': i['user']['first_name'], 'last_name': i['user']['last_name'],
                          'email': i['user']['email'], 'image': i['user']['image']}
+            i.update({'comments': QuestionReview.objects.filter(question_id=i['id']).count()})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def retrieve(self, request, *args, **kwargs):
@@ -286,14 +288,14 @@ class TagsApiView(viewsets.ModelViewSet):
 class ThemeApiView(viewsets.ModelViewSet):
     queryset = Theme.objects.all()
     serializer_class = ThemeSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticated]
 
     def list(self, request, *args, **kwargs):
-        if not request.data:
+        if not request.query_params:
             themes = self.get_queryset().filter(parent=None)
             serializer = ThemeSerializer(themes, many=True)
             return Response(serializer.data)
-        themes = self.get_queryset().filter(parent=int(request.data['tree_id']))
+        themes = self.get_queryset().filter(parent=int(request.query_params['tree_id']))
         serializer = ThemeSerializer(themes, many=True)
         return Response(serializer.data)
 
@@ -301,13 +303,27 @@ class NewsReviewView(viewsets.ModelViewSet):
     queryset = NewsReview.objects.all()
     serializer_class = NewsReviewSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
+    http_method_names = ['get', 'post']
+
+    def list(self,request, *args, **kwargs):
+        if not request.query_params:
+            return Response({'message':"You should give id in params"}, status=status.HTTP_204_NO_CONTENT)
+        new_id = request.query_params['id']
+        #TODO: ichki comment bilan ishlash
+        comments = self.get_queryset().filter(news_id=new_id, parent=None)
+        serializer = NewsReviewSerializer(comments, many=True)
+        return Response(serializer.data, status=status.HTTP_204_NO_CONTENT)
+
+
 
 class ArticleReviewView(viewsets.ModelViewSet):
     queryset = ArticleReview.objects.all()
     serializer_class = ArticleReviewSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
+    http_method_names = ['get', 'post']
 
 class QuestionReviewView(viewsets.ModelViewSet):
     queryset = QuestionReview.objects.all()
     serializer_class = QuestionReviewSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
+    http_method_names = ['get', 'post']

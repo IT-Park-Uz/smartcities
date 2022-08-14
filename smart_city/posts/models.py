@@ -35,7 +35,7 @@ class News(models.Model):
 
 
 class NewsReview(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     news = models.ForeignKey(News, on_delete=models.CASCADE)
     comment = RichTextUploadingField()
     created_at = models.DateTimeField(auto_now_add=True)
@@ -73,7 +73,7 @@ class Article(models.Model):
 
 
 class ArticleReview(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     article = models.ForeignKey(Article, on_delete=models.CASCADE)
     comment = RichTextUploadingField()
     created_at = models.DateTimeField(auto_now_add=True)
@@ -110,7 +110,7 @@ class Question(models.Model):
 
 
 class QuestionReview(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     comment = RichTextUploadingField()
     created_at = models.DateTimeField(auto_now_add=True)

@@ -169,7 +169,7 @@ class PasswordChangeView(GenericAPIView):
 
     def post(self, request, *args, **kwargs):
         try:
-            old_password = request.POST['old_password']
+            old_password = request.data['old_password']
             if not request.user.check_password(old_password):
                 return Response({'status':"Old password is incorrect"},status=status.HTTP_400_BAD_REQUEST)
         except:

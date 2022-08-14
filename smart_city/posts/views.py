@@ -51,7 +51,7 @@ class NewsApiView(viewsets.ModelViewSet):
                 i['user'] = {'id': i['user']['id'], 'username': i['user']['username'],
                              'first_name': i['user']['first_name'], 'last_name': i['user']['last_name'],
                              'email': i['user']['email'], 'image': i['user']['image']}
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.data[0], status=status.HTTP_200_OK)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     def destroy(self, request, *args, **kwargs):
@@ -167,7 +167,7 @@ class ArticleApiView(viewsets.ModelViewSet):
                 i['user'] = {'id': i['user']['id'], 'username': i['user']['username'],
                              'first_name': i['user']['first_name'], 'last_name': i['user']['last_name'],
                              'email': i['user']['email'], 'image': i['user']['image']}
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.data[0], status=status.HTTP_200_OK)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     def destroy(self, request, *args, **kwargs):
@@ -231,7 +231,7 @@ class QuestionApiView(viewsets.ModelViewSet):
                     i['user'] = {'id': i['user']['id'], 'username': i['user']['username'],
                                  'first_name': i['user']['first_name'], 'last_name': i['user']['last_name'],
                                  'email': i['user']['email'], 'image': i['user']['image']}
-                return Response(serializer.data, status=status.HTTP_200_OK)
+                return Response(serializer.data[0], status=status.HTTP_200_OK)
         except:
             pass
         return Response(status=status.HTTP_204_NO_CONTENT)

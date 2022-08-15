@@ -1,5 +1,5 @@
 from django.db.models import Q
-from rest_framework import viewsets, status,pagination
+from rest_framework import viewsets, status, pagination
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 
@@ -8,7 +8,8 @@ from .serializer import (NewsSerializer, ArticleSerializer, QuestionSerializer, 
                          SearchQuestionsSerializer, NewsHistorySerializer, QuestionHistorySerializer,
                          ArticleHistorySerializer, NewsReviewSerializer, ArticleReviewSerializer,
                          QuestionReviewSerializer)
-from smart_city.posts.models import (News, Article, Question, ImageQuestion, Tags, Theme, NewsReview, ArticleReview, QuestionReview)
+from smart_city.posts.models import (News, Article, Question, ImageQuestion, Tags, Theme, NewsReview, ArticleReview,
+                                     QuestionReview)
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -40,7 +41,7 @@ class NewsApiView(viewsets.ModelViewSet):
             i['user'] = {'id': i['user']['id'], 'username': i['user']['username'],
                          'first_name': i['user']['first_name'], 'last_name': i['user']['last_name'],
                          'email': i['user']['email'], 'image': i['user']['image']}
-            i.update({'comments':NewsReview.objects.filter(news_id=i['id']).count()})
+            i.update({'comments': NewsReview.objects.filter(news_id=i['id']).count()})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def retrieve(self, request, *args, **kwargs):
@@ -86,8 +87,8 @@ class SearchNewsView(viewsets.ModelViewSet):
         # TODO: search fields: title, theme, tags
         try:
             news = News.objects.filter(
-                Q(title__icontains=request.data['word']) | Q(theme__name__icontains=request.data['word']) | Q(
-                    tags__name=request.data['word']), is_active=True).order_by('view_count', 'created_at', 'like_count')
+                Q(title__icontains=request.query_params['word']) | Q(theme__name__icontains=request.query_params['word']) | Q(
+                    tags__name=request.query_params['word']), is_active=True).order_by('view_count', 'created_at', 'like_count')
             serializer = SearchNewsSerializer(news, many=True)
             return Response({'news': serializer.data}, status=status.HTTP_200_OK)
         except:
@@ -104,8 +105,8 @@ class SearchArticleView(viewsets.ModelViewSet):
         # TODO: search fields: title, theme, tags
         try:
             articles = Article.objects.filter(
-                Q(title__icontains=request.data['word']) | Q(theme__name__icontains=request.data['word']) | Q(
-                    tags__name=request.data['word']), is_active=True).order_by('view_count', 'created_at', 'like_count')
+                Q(title__icontains=request.query_params['word']) | Q(theme__name__icontains=request.query_params['word']) | Q(
+                    tags__name=request.query_params['word']), is_active=True).order_by('view_count', 'created_at', 'like_count')
             serializer = SearchArticlesSerializer(articles, many=True)
             return Response({'articles': serializer.data}, status=status.HTTP_200_OK)
         except:
@@ -122,8 +123,8 @@ class SearchQuestionView(viewsets.ModelViewSet):
         # TODO: search fields: title, theme, tags
         try:
             questions = Question.objects.filter(
-                Q(title__icontains=request.data['word']) | Q(theme__name__icontains=request.data['word']) | Q(
-                    tags__name=request.data['word']), is_active=True).order_by('view_count', 'created_at', 'like_count')
+                Q(title__icontains=request.query_params['word']) | Q(theme__name__icontains=request.query_params['word']) | Q(
+                    tags__name=request.query_params['word']), is_active=True).order_by('view_count', 'created_at', 'like_count')
             serializer = SearchQuestionsSerializer(questions, many=True)
             return Response({'question': serializer.data}, status=status.HTTP_200_OK)
         except:
@@ -136,8 +137,11 @@ class UserNewsView(viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         # TODO: History(active,passive) is_active = True, False beriladi
-        news = self.get_queryset().filter(user=request.user, is_active=request.data['is_active'],
-                                          is_delete=False).order_by('created_at')
+        try:
+            news = self.get_queryset().filter(user=request.user, is_active=request.query_params['active'],
+                                                   is_delete=False).order_by('created_at')
+        except:
+            return Response({"status": "Not fount active key"}, status=status.HTTP_400_BAD_REQUEST)
         if news:
             serializer = NewsHistorySerializer(news, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -198,8 +202,11 @@ class UserArticleView(viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         # TODO: History(active,passive) is_active True yoki False beriladi
-        articles = self.get_queryset().filter(user=request.user, is_active=request.data['is_active'],
-                                              is_delete=False).order_by('created_at')
+        try:
+            articles = self.get_queryset().filter(user=request.user, is_active=request.query_params['active'],
+                                                   is_delete=False).order_by('created_at')
+        except:
+            return Response({"status": "Not fount active key"}, status=status.HTTP_400_BAD_REQUEST)
         if articles:
             serializer = ArticleHistorySerializer(articles, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -223,17 +230,14 @@ class QuestionApiView(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def retrieve(self, request, *args, **kwargs):
-        try:
-            question = self.queryset.get(id=kwargs['pk'])
-            if question:
-                serializer = QuestionSerializer(question, many=True)
-                for i in serializer.data:
-                    i['user'] = {'id': i['user']['id'], 'username': i['user']['username'],
-                                 'first_name': i['user']['first_name'], 'last_name': i['user']['last_name'],
-                                 'email': i['user']['email'], 'image': i['user']['image']}
-                return Response(serializer.data[0], status=status.HTTP_200_OK)
-        except:
-            pass
+        question = self.queryset.filter(id=kwargs['pk'])
+        if question:
+            serializer = QuestionSerializer(question, many=True)
+            for i in serializer.data:
+                i['user'] = {'id': i['user']['id'], 'username': i['user']['username'],
+                             'first_name': i['user']['first_name'], 'last_name': i['user']['last_name'],
+                             'email': i['user']['email'], 'image': i['user']['image']}
+            return Response(serializer.data[0], status=status.HTTP_200_OK)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     def destroy(self, request, *args, **kwargs):
@@ -246,7 +250,8 @@ class QuestionApiView(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         try:
             data = request.data
-            question = Question.objects.create(user=request.user, type=data['type'],theme=data['theme'], title=data['title'],
+            question = Question.objects.create(user=request.user, type=data['type'], theme=data['theme'],
+                                               title=data['title'],
                                                description=data['description'])
             for i in data['images']:
                 ImageQuestion.objects.create(question=question.id, image=i)
@@ -264,8 +269,11 @@ class UserQuestionView(viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         # TODO: History(active,passive) is_active True yoki False beriladi
-        questions = self.get_queryset().filter(user=request.user, is_active=request.data['is_active'],
+        try:
+            questions = self.get_queryset().filter(user=request.user, is_active=request.query_params['active'],
                                                is_delete=False).order_by('created_at')
+        except:
+            return Response({"status":"Not fount active key"}, status=status.HTTP_400_BAD_REQUEST)
         if questions:
             serializer = QuestionHistorySerializer(questions, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -299,21 +307,21 @@ class ThemeApiView(viewsets.ModelViewSet):
         serializer = ThemeSerializer(themes, many=True)
         return Response(serializer.data)
 
+
 class NewsReviewView(viewsets.ModelViewSet):
     queryset = NewsReview.objects.all()
     serializer_class = NewsReviewSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
     http_method_names = ['get', 'post']
 
-    def list(self,request, *args, **kwargs):
+    def list(self, request, *args, **kwargs):
         if not request.query_params:
-            return Response({'message':"You should give id in params"}, status=status.HTTP_204_NO_CONTENT)
+            return Response({'message': "You should give id in params"}, status=status.HTTP_204_NO_CONTENT)
         new_id = request.query_params['id']
-        #TODO: ichki comment bilan ishlash
+        # TODO: ichki comment bilan ishlash
         comments = self.get_queryset().filter(news_id=new_id, parent=None)
         serializer = NewsReviewSerializer(comments, many=True)
         return Response(serializer.data, status=status.HTTP_204_NO_CONTENT)
-
 
 
 class ArticleReviewView(viewsets.ModelViewSet):
@@ -321,6 +329,7 @@ class ArticleReviewView(viewsets.ModelViewSet):
     serializer_class = ArticleReviewSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
     http_method_names = ['get', 'post']
+
 
 class QuestionReviewView(viewsets.ModelViewSet):
     queryset = QuestionReview.objects.all()

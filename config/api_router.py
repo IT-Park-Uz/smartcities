@@ -17,7 +17,8 @@ from smart_city.users.views import (
     user_redirect_view,
     user_update_view, RegisterAPIView, VerifyCodeView, LogoutView,
 )
-from smart_city.users.views import (FacebookLogin, GitHubLogin,GoogleLogin, FacebookConnect, GithubConnect, PasswordChangeView)
+from smart_city.users.views import (FacebookLogin, GitHubLogin, GoogleLogin, FacebookConnect, GithubConnect,
+                                    PasswordChangeView)
 
 if settings.DEBUG:
     router = DefaultRouter()
@@ -40,7 +41,6 @@ router.register('search-news', SearchNewsView, basename='search-news')
 router.register('search-articles', SearchArticleView, basename='search-articles')
 router.register('search-question', SearchQuestionView, basename='search-question')
 
-
 router.register('news-history', UserNewsView, basename='news-history')
 router.register('article-history', UserArticleView, basename='article-history')
 router.register('question-history', UserQuestionView, basename='question-history')
@@ -50,7 +50,6 @@ router.register('summit', SummitView, basename='summit')
 router.register('program', ProgramsView, basename='program')
 router.register('participant', ParticipantView, basename='participant')
 
-
 app_name = "api"
 urlpatterns = router.urls
 urlpatterns += [
@@ -59,11 +58,11 @@ urlpatterns += [
 
 # TODO: USERS urls
 urlpatterns += [
-    path('register/',RegisterAPIView.as_view(),name="register"),
-    path('verify/',VerifyCodeView.as_view(),name="verify"),
-    path('logout/',LogoutView.as_view(),name="logout"),
+    path('register/', RegisterAPIView.as_view(), name="register"),
+    path('verify/', VerifyCodeView.as_view(), name="verify"),
+    path('logout/', LogoutView.as_view(), name="logout"),
     path('login/', TokenObtainPairView.as_view(), name='login'),
-    path('password/change/',PasswordChangeView.as_view(), name='login'),
+    path('password/change/', PasswordChangeView.as_view(), name='password_change'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
     path("~redirect/", view=user_redirect_view, name="redirect"),

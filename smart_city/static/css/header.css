@@ -1,4 +1,4 @@
-@import url('http://fonts.cdnfonts.com/css/gilroy-bold');
+@import url('https://fonts.cdnfonts.com/css/gilroy-bold');
 
 * {
     padding: 0;
@@ -76,7 +76,7 @@ ul {
 
 /* MAIN SECTION */
 .my-hero {
-    /* background: url('../img/Photo.svg'); */
+    /* background: url('../img/Photo.png'); */
     width: 1440px;
     margin: auto;
     padding: 0 142px;
@@ -148,7 +148,7 @@ ul {
 }
 
 .showcontent-pic {
-    background: url('../img/Photo.svg');
+    background: url('../img/Photo.png');
     background-size: cover;
     width: 520px;
     height: 613px;

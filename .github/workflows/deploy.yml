@@ -36,4 +36,5 @@ jobs:
           /root/smartcities/venv/bin/python /root/smartcities/manage.py migrate
           /root/smartcities/venv/bin/python /root/smartcities/manage.py compilemessages
           /root/smartcities/venv/bin/python /root/smartcities/manage.py collectstatic --noinput
+          systemctl daemon-reload
           systemctl restart gunicorn.service

@@ -87,8 +87,10 @@ class SearchNewsView(viewsets.ModelViewSet):
         # TODO: search fields: title, theme, tags
         try:
             news = News.objects.filter(
-                Q(title__icontains=request.query_params['word']) | Q(theme__name__icontains=request.query_params['word']) | Q(
-                    tags__name=request.query_params['word']), is_active=True).order_by('view_count', 'created_at', 'like_count')
+                Q(title__icontains=request.query_params['word']) | Q(
+                    theme__name__icontains=request.query_params['word']) | Q(
+                    tags__name=request.query_params['word']), is_active=True).order_by('view_count', 'created_at',
+                                                                                       'like_count')
             serializer = SearchNewsSerializer(news, many=True)
             return Response({'news': serializer.data}, status=status.HTTP_200_OK)
         except:
@@ -105,8 +107,10 @@ class SearchArticleView(viewsets.ModelViewSet):
         # TODO: search fields: title, theme, tags
         try:
             articles = Article.objects.filter(
-                Q(title__icontains=request.query_params['word']) | Q(theme__name__icontains=request.query_params['word']) | Q(
-                    tags__name=request.query_params['word']), is_active=True).order_by('view_count', 'created_at', 'like_count')
+                Q(title__icontains=request.query_params['word']) | Q(
+                    theme__name__icontains=request.query_params['word']) | Q(
+                    tags__name=request.query_params['word']), is_active=True).order_by('view_count', 'created_at',
+                                                                                       'like_count')
             serializer = SearchArticlesSerializer(articles, many=True)
             return Response({'articles': serializer.data}, status=status.HTTP_200_OK)
         except:
@@ -123,8 +127,10 @@ class SearchQuestionView(viewsets.ModelViewSet):
         # TODO: search fields: title, theme, tags
         try:
             questions = Question.objects.filter(
-                Q(title__icontains=request.query_params['word']) | Q(theme__name__icontains=request.query_params['word']) | Q(
-                    tags__name=request.query_params['word']), is_active=True).order_by('view_count', 'created_at', 'like_count')
+                Q(title__icontains=request.query_params['word']) | Q(
+                    theme__name__icontains=request.query_params['word']) | Q(
+                    tags__name=request.query_params['word']), is_active=True).order_by('view_count', 'created_at',
+                                                                                       'like_count')
             serializer = SearchQuestionsSerializer(questions, many=True)
             return Response({'question': serializer.data}, status=status.HTTP_200_OK)
         except:
@@ -139,7 +145,7 @@ class UserNewsView(viewsets.ModelViewSet):
         # TODO: History(active,passive) is_active = True, False beriladi
         try:
             news = self.get_queryset().filter(user=request.user, is_active=request.query_params['active'],
-                                                   is_delete=False).order_by('created_at')
+                                              is_delete=False).order_by('created_at')
         except:
             return Response({"status": "Not fount active key"}, status=status.HTTP_400_BAD_REQUEST)
         if news:
@@ -204,7 +210,7 @@ class UserArticleView(viewsets.ModelViewSet):
         # TODO: History(active,passive) is_active True yoki False beriladi
         try:
             articles = self.get_queryset().filter(user=request.user, is_active=request.query_params['active'],
-                                                   is_delete=False).order_by('created_at')
+                                                  is_delete=False).order_by('created_at')
         except:
             return Response({"status": "Not fount active key"}, status=status.HTTP_400_BAD_REQUEST)
         if articles:
@@ -271,9 +277,9 @@ class UserQuestionView(viewsets.ModelViewSet):
         # TODO: History(active,passive) is_active True yoki False beriladi
         try:
             questions = self.get_queryset().filter(user=request.user, is_active=request.query_params['active'],
-                                               is_delete=False).order_by('created_at')
+                                                   is_delete=False).order_by('created_at')
         except:
-            return Response({"status":"Not fount active key"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"status": "Not fount active key"}, status=status.HTTP_400_BAD_REQUEST)
         if questions:
             serializer = QuestionHistorySerializer(questions, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -299,6 +305,16 @@ class ThemeApiView(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def list(self, request, *args, **kwargs):
+        """
+        This text is the description for this API.
+        ---
+        parameters:
+        - tree_id: get all themes by anyone ID
+          description: News ID for list view for News Comments
+          required: false
+          type: integer
+          paramType: form
+        """
         if not request.query_params:
             themes = self.get_queryset().filter(parent=None)
             serializer = ThemeSerializer(themes, many=True)
@@ -315,13 +331,24 @@ class NewsReviewView(viewsets.ModelViewSet):
     http_method_names = ['get', 'post']
 
     def list(self, request, *args, **kwargs):
+        """
+            This text is the description for this API.
+            ---
+            parameters:
+            - id: news ID
+              description: News ID for list view for News Comments
+              required: true
+              type: integer
+              paramType: parameters
+        """
         if not request.query_params:
             return Response({'message': "You should give id in params"}, status=status.HTTP_204_NO_CONTENT)
         new_id = request.query_params['id']
         # TODO: ichki comment bilan ishlash
         comments = self.get_queryset().filter(news__pk=new_id, parent=None)
         serializer = NewsReviewSerializer(comments, many=True)
-        return Response(serializer.data, status=status.HTTP_204_NO_CONTENT)
+        print("NOOOOOOO")
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class ArticleReviewView(viewsets.ModelViewSet):

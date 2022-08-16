@@ -1,0 +1,272 @@
+@import url('http://fonts.cdnfonts.com/css/gilroy-bold');
+
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: 'Gilroy-Bold', sans-serif;
+    font-family: 'Gilroy-Heavy', sans-serif;
+    font-family: 'Gilroy-Light', sans-serif;
+    font-family: 'Gilroy-Medium', sans-serif;
+    font-family: 'Gilroy-Regular', sans-serif;
+    font-style: none;
+}
+
+button {
+    cursor: pointer;
+}
+
+.page-container {
+    width: 1440px;
+    margin: 0 auto;
+}
+
+/* .container {
+    width: 1156px;
+    margin: 0 auto;
+} */
+
+/* NAVIGATION BAR */
+.nav-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1156px;
+    margin: 0 auto;
+    height: 98px;
+}
+
+.nav-links__container {
+    display: flex;
+    align-items: center;
+    list-style: none;
+}
+
+.nav-links__container li {
+    padding: 0 21px;
+}
+ul {
+    margin: 0;
+}
+.nav-links {
+    display: flex;
+    align-items: center;
+}
+
+.nav-links__item {
+    text-decoration: none;
+    color: rgba(17, 17, 17, 1);
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 19px;
+}
+
+.blue-btn {
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 21px;
+    color: #fff;
+    padding: 16px 24px;
+    background: #47b2e4;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    margin-left: 26px;
+}
+
+/* MAIN SECTION */
+.my-hero {
+    /* background: url('../img/Photo.svg'); */
+    width: 1440px;
+    margin: auto;
+    padding: 0 142px;
+    padding-bottom: 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.main-container {
+    width: 1156px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+}
+
+.blue-text {
+    font-weight: 700;
+    font-size: 64px;
+    line-height: 66px;
+    color: #47b2e4;
+}
+
+.text-content h1 {
+    font-weight: 800;
+    font-size: 64px;
+    line-height: 66px;
+    color: rgba(17, 17, 17, 1);
+    width: 498px;
+}
+
+.text-content h4 {
+    color: #111111;
+    opacity: 0.48;
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 24px;
+    width: 493px;
+    margin-top: 14px;
+}
+
+.main-buttons {
+    padding-top: 30px;
+}
+
+.main-regis-btn {
+    width: 148px;
+    height: 53px;
+    background: #47b2e4;
+    border-radius: 4px;
+    color: #fff;
+    border: none;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 21px;
+}
+
+.main-agenda-btn {
+    width: 148px;
+    height: 53px;
+    background: #efefef;
+    border-radius: 4px;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 21px;
+    color: #111111;
+    border: none;
+    margin-left: 18px;
+}
+
+.showcontent-pic {
+    background: url('../img/Photo.svg');
+    background-size: cover;
+    width: 520px;
+    height: 613px;
+    border-radius: 24px;
+}
+
+.noise {
+    width: 520px;
+    height: 713px;
+}
+
+.black {
+    width: 520px;
+    height: 613px;
+    background-color: rgba(0, 0, 0, 0.35);
+    /* mix-blend-mode: normal; */
+    /* opacity: 0.36; */
+    border-radius: 24px;
+}
+
+.date {
+    position: relative;
+    display: flex;
+    right: -107px;
+    top: 312px;
+}
+
+.date div {
+    text-align: center;
+    margin: 3px;
+    width: 72px;
+    height: 79px;
+    padding-top: 8px;
+    color: rgba(255, 255, 255, 1);
+    background: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(4px);
+    border-radius: 4px;
+}
+
+.date div h2 {
+    font-weight: 700;
+    font-size: 36px;
+    line-height: 44px;
+    text-align: center;
+}
+
+.date div h5 {
+    font-weight: 400;
+    font-size: 13px;
+    line-height: 15px;
+}
+
+.showcontent-buttons {
+    position: relative;
+    bottom: -485px;
+    right: -12px;
+}
+
+.live-btn {
+    background-color: rgba(232, 74, 74, 1);
+    width: 58px;
+    height: 30px;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 14px;
+    letter-spacing: 0.02em;
+    color: #ffffff;
+    border: none;
+}
+
+.webinar-btn {
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 14px;
+    letter-spacing: 0.02em;
+    color: #111111;
+    background-color: #fff;
+    width: 78px;
+    height: 30px;
+    border-radius: 4px;
+    border: none;
+}
+
+.mini-texts {
+    width: 453px;
+    height: 40px;
+    display: flex;
+    text-align: center;
+}
+
+.mini-texts h5 {
+    font-weight: 400;
+    font-size: 20px;
+    line-height: 36px;
+    color: rgba(17, 17, 17, 1);
+}
+
+.slash {
+    height: 36px;
+    margin: 6px 24px;
+    color: #111;
+    opacity: 0.3;
+}
+
+.wh-questions {
+    display: flex;
+}
+
+.wh-questions h5 {
+    padding-right: 130px;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 16px;
+    color: #111111;
+    opacity: 0.48;
+}
+
+.text-ques {
+    padding-top: 155px;
+}

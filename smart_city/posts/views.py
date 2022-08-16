@@ -319,7 +319,7 @@ class NewsReviewView(viewsets.ModelViewSet):
             return Response({'message': "You should give id in params"}, status=status.HTTP_204_NO_CONTENT)
         new_id = request.query_params['id']
         # TODO: ichki comment bilan ishlash
-        comments = self.get_queryset().filter(news_id=new_id, parent=None)
+        comments = self.get_queryset().filter(news__pk=new_id, parent=None)
         serializer = NewsReviewSerializer(comments, many=True)
         return Response(serializer.data, status=status.HTTP_204_NO_CONTENT)
 

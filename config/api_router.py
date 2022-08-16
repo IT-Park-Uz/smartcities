@@ -65,10 +65,6 @@ urlpatterns += [
     path('password/change/', PasswordChangeView.as_view(), name='password_change'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
-    path("~redirect/", view=user_redirect_view, name="redirect"),
-    path("~update/", view=user_update_view, name="update"),
-    path("<str:username>/", view=user_detail_view, name="detail"),
-
     # Social Login
     path('social/facebook/', FacebookLogin.as_view(), name='fb_login'),
     path('social/github/', GitHubLogin.as_view(), name='github_login'),

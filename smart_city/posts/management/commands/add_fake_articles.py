@@ -1,5 +1,5 @@
 from django_seed import Seed
-from smart_city.posts.models import News, Theme
+from smart_city.posts.models import Theme, Article
 from django.core.management.base import BaseCommand, CommandError
 
 from django.contrib.auth import get_user_model
@@ -23,12 +23,12 @@ class Command(BaseCommand):
     def create_object(self):
         theme = Theme.objects.all().first()
         user = User.objects.all().first()
-        obj = News.objects.create(title=seeder.faker.name(),
-                                  # image=seeder.faker.image_url(),
-                                  theme=theme,
-                                  user=user,
-                                  is_active=True
-                                  )
+        obj = Article.objects.create(title=seeder.faker.name(),
+                                     # image=seeder.faker.image_url(),
+                                     theme=theme,
+                                     user=user,
+                                     is_active=True
+                                     )
         return obj
 
     def handle(self, *args, **options):
@@ -36,4 +36,4 @@ class Command(BaseCommand):
         for i in range(workers_count):
             self.create_object()
 
-        self.stdout.write(self.style.SUCCESS(f'{workers_count} news created successfully'))
+        self.stdout.write(self.style.SUCCESS(f'{workers_count} articles created successfully'))

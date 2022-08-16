@@ -15,66 +15,26 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 
-class CustomPagination(pagination.PageNumberPagination):
-    page_size = 2
-    page_size_query_param = 'page_size'
-    max_page_size = 50
-    page_query_param = 'p'
-
-    def get_paginated_response(self, data):
-        response = Response(data)
-        response['count'] = self.page.paginator.count
-        response['next'] = self.get_next_link()
-        response['previous'] = self.get_previous_link()
-        return response
-
-
 class NewsApiView(viewsets.ModelViewSet):
-    queryset = News.objects.all()
+    queryset = News.objects.filter(is_active=True, is_delete=False)
     serializer_class = NewsSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
 
-    def list(self, request, *args, **kwargs):
-        news = self.queryset.filter(is_active=True, is_delete=False)
-        serializer = NewsSerializer(news, many=True)
-        for i in serializer.data:
-            i['user'] = {'id': i['user']['id'], 'username': i['user']['username'],
-                         'first_name': i['user']['first_name'], 'last_name': i['user']['last_name'],
-                         'email': i['user']['email'], 'image': i['user']['image']}
-            i.update({'comments': NewsReview.objects.filter(news_id=i['id']).count()})
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
     def retrieve(self, request, *args, **kwargs):
-        new = self.queryset.filter(id=kwargs['pk'])
-        if new:
-            serializer = NewsSerializer(new, many=True)
-            for i in serializer.data:
-                i['user'] = {'id': i['user']['id'], 'username': i['user']['username'],
-                             'first_name': i['user']['first_name'], 'last_name': i['user']['last_name'],
-                             'email': i['user']['email'], 'image': i['user']['image']}
-            return Response(serializer.data[0], status=status.HTTP_200_OK)
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        try:
+            new = self.queryset.get(id=int(kwargs['pk']))
+            if new:
+                serializer = NewsSerializer(new, many=False)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+        except:
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
     def destroy(self, request, *args, **kwargs):
         new = self.queryset.get(id=kwargs['pk'])
         new.is_active = False
         new.is_delete = True
         new.save()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-    def create(self, request, *args, **kwargs):
-        try:
-            art = News.objects.create(user=request.user, title=request.data['title'], image=request.data['image'],
-                                      description=request.data['description'], theme_id=request.data['theme'])
-            try:
-                for i in request.data['tags']:
-                    tag = Tags.objects.get(id=int(i))
-                    art.tags.add(tag)
-            except:
-                pass
-            return Response(status=status.HTTP_201_CREATED)
-        except:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_200_OK)
 
 
 class SearchNewsView(viewsets.ModelViewSet):
@@ -155,51 +115,25 @@ class UserNewsView(viewsets.ModelViewSet):
 
 
 class ArticleApiView(viewsets.ModelViewSet):
-    queryset = Article.objects.all()
+    queryset = Article.objects.filter(is_active=True, is_delete=False)
     serializer_class = ArticleSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
 
-    def list(self, request, *args, **kwargs):
-        articles = self.queryset.filter(is_active=True, is_delete=False)
-        serializer = ArticleSerializer(articles, many=True)
-        for i in serializer.data:
-            i['user'] = {'id': i['user']['id'], 'username': i['user']['username'],
-                         'first_name': i['user']['first_name'], 'last_name': i['user']['last_name'],
-                         'email': i['user']['email'], 'image': i['user']['image']}
-            i.update({'comments': ArticleReview.objects.filter(article_id=i['id']).count()})
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
     def retrieve(self, request, *args, **kwargs):
-        article = self.queryset.filter(id=kwargs['pk'])
-        if article:
-            serializer = ArticleSerializer(article, many=True)
-            for i in serializer.data:
-                i['user'] = {'id': i['user']['id'], 'username': i['user']['username'],
-                             'first_name': i['user']['first_name'], 'last_name': i['user']['last_name'],
-                             'email': i['user']['email'], 'image': i['user']['image']}
-            return Response(serializer.data[0], status=status.HTTP_200_OK)
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        try:
+            article = self.queryset.get(id=int(kwargs['pk']))
+            if article:
+                serializer = ArticleSerializer(article, many=False)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+        except:
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
     def destroy(self, request, *args, **kwargs):
         article = self.queryset.get(id=kwargs['pk'])
         article.is_active = False
         article.is_delete = True
         article.save()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-    def create(self, request, *args, **kwargs):
-        try:
-            art = Article.objects.create(user=request.user, title=request.data['title'], image=request.data['image'],
-                                         description=request.data['description'], theme_id=request.data['theme'])
-            try:
-                for i in request.data['tags']:
-                    tag = Tags.objects.get(id=int(i))
-                    art.tags.add(tag)
-            except:
-                pass
-            return Response(status=status.HTTP_201_CREATED)
-        except:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_200_OK)
 
 
 class UserArticleView(viewsets.ModelViewSet):
@@ -220,53 +154,25 @@ class UserArticleView(viewsets.ModelViewSet):
 
 
 class QuestionApiView(viewsets.ModelViewSet):
-    queryset = Question.objects.all()
+    queryset = Question.objects.filter(is_active=True, is_delete=False)
     serializer_class = QuestionSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
-    pagination_class = CustomPagination
-
-    def list(self, request, *args, **kwargs):
-        questions = self.queryset.filter(is_active=True, is_delete=False)
-        serializer = QuestionSerializer(questions, many=True)
-        for i in serializer.data:
-            i['user'] = {'id': i['user']['id'], 'username': i['user']['username'],
-                         'first_name': i['user']['first_name'], 'last_name': i['user']['last_name'],
-                         'email': i['user']['email'], 'image': i['user']['image']}
-            i.update({'comments': QuestionReview.objects.filter(question_id=i['id']).count()})
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def retrieve(self, request, *args, **kwargs):
-        question = self.queryset.filter(id=kwargs['pk'])
-        if question:
-            serializer = QuestionSerializer(question, many=True)
-            for i in serializer.data:
-                i['user'] = {'id': i['user']['id'], 'username': i['user']['username'],
-                             'first_name': i['user']['first_name'], 'last_name': i['user']['last_name'],
-                             'email': i['user']['email'], 'image': i['user']['image']}
-            return Response(serializer.data[0], status=status.HTTP_200_OK)
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        try:
+            question = self.queryset.get(id=int(kwargs['pk']))
+            if question:
+                serializer = QuestionSerializer(question, many=False)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+        except:
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
     def destroy(self, request, *args, **kwargs):
         question = self.queryset.get(id=kwargs['pk'])
         question.is_active = False
         question.is_delete = True
         question.save()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-    def create(self, request, *args, **kwargs):
-        try:
-            data = request.data
-            question = Question.objects.create(user=request.user, type=data['type'], theme=data['theme'],
-                                               title=data['title'],
-                                               description=data['description'])
-            for i in data['images']:
-                ImageQuestion.objects.create(question=question.id, image=i)
-            for i in data['tags']:
-                tag = Tags.objects.get(id=int(i))
-                question.tags.add(tag)
-            return Response(status=status.HTTP_201_CREATED)
-        except:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_200_OK)
 
 
 class UserQuestionView(viewsets.ModelViewSet):
@@ -289,7 +195,7 @@ class UserQuestionView(viewsets.ModelViewSet):
 class ImageQuestionApiView(viewsets.ModelViewSet):
     queryset = ImageQuestion.objects.all()
     serializer_class = ImageQuestionSerializer
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
 
 class TagsApiView(viewsets.ModelViewSet):
@@ -305,16 +211,6 @@ class ThemeApiView(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def list(self, request, *args, **kwargs):
-        """
-        This text is the description for this API.
-        ---
-        parameters:
-        - tree_id: get all themes by anyone ID
-          description: News ID for list view for News Comments
-          required: false
-          type: integer
-          paramType: form
-        """
         if not request.query_params:
             themes = self.get_queryset().filter(parent=None)
             serializer = ThemeSerializer(themes, many=True)
@@ -325,29 +221,18 @@ class ThemeApiView(viewsets.ModelViewSet):
 
 
 class NewsReviewView(viewsets.ModelViewSet):
-    queryset = NewsReview.objects.all()
+    queryset = NewsReview.objects.all().order_by('-created_at')
     serializer_class = NewsReviewSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
     http_method_names = ['get', 'post']
 
     def list(self, request, *args, **kwargs):
-        """
-            This text is the description for this API.
-            ---
-            parameters:
-            - id: news ID
-              description: News ID for list view for News Comments
-              required: true
-              type: integer
-              paramType: parameters
-        """
         if not request.query_params:
             return Response({'message': "You should give id in params"}, status=status.HTTP_204_NO_CONTENT)
         new_id = request.query_params['id']
         # TODO: ichki comment bilan ishlash
         comments = self.get_queryset().filter(news__pk=new_id, parent=None)
         serializer = NewsReviewSerializer(comments, many=True)
-        print("NOOOOOOO")
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 

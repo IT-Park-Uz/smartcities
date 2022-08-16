@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
-seeder = Seed.seeder()
+seeder = Seed.seeder(locale='ru_RU')
 
 
 class Command(BaseCommand):
@@ -27,7 +27,8 @@ class Command(BaseCommand):
                                       # image=seeder.faker.image_url(),
                                       theme=theme,
                                       user=user,
-                                      is_active=True
+                                      is_active=True,
+                                      description=seeder.faker.paragraph(),
                                       )
         return obj
 

@@ -31,7 +31,12 @@ class NewsSerializer(serializers.ModelSerializer):
         response = super().to_representation(instance)
         response['user'] = UserSerializer(instance.user).data
         response['theme'] = ThemeSerializer(instance.theme).data
+        response['comments_count'] = self.get_comments(instance)
         return response
+
+    def get_comments(self, obj):
+        posts = obj.newsreview_set.all().count()
+        return posts
 
 
 class NewsHistorySerializer(serializers.ModelSerializer):
@@ -79,7 +84,12 @@ class ArticleSerializer(serializers.ModelSerializer):
         response = super().to_representation(instance)
         response['user'] = UserSerializer(instance.user).data
         response['theme'] = ThemeSerializer(instance.theme).data
+        response['comments_count'] = self.get_comments(instance)
         return response
+
+    def get_comments(self, obj):
+        posts = obj.articlereview_set.all().count()
+        return posts
 
 
 class ArticleHistorySerializer(serializers.ModelSerializer):
@@ -106,8 +116,12 @@ class QuestionSerializer(serializers.ModelSerializer):
         response = super().to_representation(instance)
         response['user'] = UserSerializer(instance.user).data
         response['theme'] = ThemeSerializer(instance.theme).data
+        response['comments_count'] = self.get_comments(instance)
         return response
 
+    def get_comments(self, obj):
+        posts = obj.questionreview_set.all().count()
+        return posts
 
 class QuestionHistorySerializer(serializers.ModelSerializer):
     tags = TagsSerializer(read_only=True, many=True)

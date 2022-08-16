@@ -3,6 +3,7 @@ from smart_city.posts.models import Theme, Article
 from django.core.management.base import BaseCommand, CommandError
 
 from django.contrib.auth import get_user_model
+
 User = get_user_model()
 
 seeder = Seed.seeder()
@@ -23,11 +24,11 @@ class Command(BaseCommand):
         theme = Theme.objects.all().first()
         user = User.objects.all().first()
         obj = Article.objects.create(title=seeder.faker.name(),
-                                  # image=seeder.faker.image_url(),
-                                  theme=theme,
-                                  user=user,
-                                  is_active=True
-                                  )
+                                     # image=seeder.faker.image_url(),
+                                     theme=theme,
+                                     user=user,
+                                     is_active=True
+                                     )
         return obj
 
     def handle(self, *args, **options):

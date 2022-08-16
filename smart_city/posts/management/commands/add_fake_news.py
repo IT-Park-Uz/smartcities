@@ -3,6 +3,7 @@ from smart_city.posts.models import News, Theme
 from django.core.management.base import BaseCommand, CommandError
 
 from django.contrib.auth import get_user_model
+
 User = get_user_model()
 
 seeder = Seed.seeder()

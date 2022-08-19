@@ -23,6 +23,7 @@ urlpatterns = [
     path("ckeditor/", include('ckeditor_uploader.urls')),
     path('api-auth/', include('rest_framework.urls')),
     path("users/", include("smart_city.users.urls", namespace="users")),
+    path("itpark/", include("smart_city.itpark.urls", namespace="itpark")),
     # Your stuff: custom urls includes go here
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 if settings.DEBUG:

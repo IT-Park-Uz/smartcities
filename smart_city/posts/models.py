@@ -22,6 +22,8 @@ class News(models.Model):
 
     class Meta:
         ordering = ['-id']
+        verbose_name = _("Новость")
+        verbose_name_plural = _("Новости")
 
     @property
     def imageURL(self):
@@ -44,6 +46,10 @@ class NewsReview(models.Model):
     def __str__(self):
         return f"{self.id} | {self.user.username}"
 
+    class Meta:
+        verbose_name = _("Комментарии к новостью")
+        verbose_name_plural = _("Комментарии к новостям")
+
 
 class Article(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
@@ -60,6 +66,8 @@ class Article(models.Model):
 
     class Meta:
         ordering = ['-id']
+        verbose_name = _("Статья")
+        verbose_name_plural = _("Статьи")
 
     @property
     def imageURL(self):
@@ -81,6 +89,10 @@ class ArticleReview(models.Model):
 
     def __str__(self):
         return f"{self.id} | {self.user.username}"
+
+    class Meta:
+        verbose_name = _("Комментарии к статье")
+        verbose_name_plural = _("Комментарии к статьям")
 
 
 class Type_Question(models.IntegerChoices):
@@ -104,6 +116,8 @@ class Question(models.Model):
 
     class Meta:
         ordering = ['-id']
+        verbose_name = _("Вопрос")
+        verbose_name_plural = _("Вопросы")
 
     def __str__(self):
         return f"{self.id} | {self.title[:20]}"
@@ -125,6 +139,10 @@ class ImageQuestion(models.Model):
     image = models.ImageField(upload_to='QuestionImages')
     default = models.BooleanField(default=True)
 
+    class Meta:
+        verbose_name = _("Изображения вопроса")
+        verbose_name_plural = _("Изображении вопросов")
+
     @property
     def imageURL(self):
         try:
@@ -142,6 +160,10 @@ class Tags(models.Model):
     def __str__(self):
         return f"{self.id} | {self.name}"
 
+    class Meta:
+        verbose_name = _("Тег")
+        verbose_name_plural = _("Теги")
+
 
 class Theme(MPTTModel):
     parent = TreeForeignKey('self', on_delete=models.CASCADE, related_name='children', null=True, blank=True)
@@ -153,3 +175,7 @@ class Theme(MPTTModel):
 
     def __str__(self):
         return f"{self.id} | {self.name}"
+
+    class Meta:
+        verbose_name = _("Категория")
+        verbose_name_plural = _("Категории")

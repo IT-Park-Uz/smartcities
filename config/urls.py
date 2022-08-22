@@ -68,3 +68,9 @@ if settings.DEBUG:
         import debug_toolbar
 
         urlpatterns = [path("__debug__/", include(debug_toolbar.urls))] + urlpatterns
+
+admin.site.site_header = "Модерация - Smart City"
+admin.site.index_title = "Добро пожаловать в модерацию"
+admin.site.site_title = "Туториал модерации"
+admin.site.index_template = 'admin/index.html'
+admin.autodiscover()

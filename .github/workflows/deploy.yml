@@ -31,10 +31,11 @@ jobs:
         USERNAME: ${{ secrets.USERNAME }}
         PORT: ${{ secrets.PORT }}
         KEY: ${{ secrets.SSHKEY }}
+        script_stop: true
         script: |
           /root/smartcities/venv/bin/pip install -r /root/smartcities/requirements/production.txt
-          /root/smartcities/venv/bin/python /root/smartcities/manage.py migrate
-          /root/smartcities/venv/bin/python /root/smartcities/manage.py compilemessages
-          /root/smartcities/venv/bin/python /root/smartcities/manage.py collectstatic --noinput
+          /root/smartcities/venv/bin/python /root/smartcities/manage_prod.py migrate
+          /root/smartcities/venv/bin/python /root/smartcities/manage_prod.py compilemessages
+          /root/smartcities/venv/bin/python /root/smartcities/manage_prod.py collectstatic --noinput
           systemctl daemon-reload
           systemctl restart gunicorn.service

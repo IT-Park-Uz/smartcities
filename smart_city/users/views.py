@@ -116,13 +116,9 @@ class RegisterAPIView(generics.GenericAPIView):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
-            try:
-                code = Code.objects.get(user_id=serializer.data['id'])
-            except:
-                code = Code.objects.create(user_id=serializer.data['id'])
+            code = Code.objects.get_or_create(user_id=serializer.data['id'])
             code.save()
-            # send_email({'to_email': serializer.data['email']})
-            print(code.number)
+            send_email({'to_email': serializer.data['email']})
             # Todo: send the code by email to user
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -133,10 +129,12 @@ class VerifyCodeView(generics.GenericAPIView):
 
     def post(self, request, *args, **kwargs):
         code = request.data
-        num = Code.objects.get(user_id=int(code['id']))
+        num = Code.objects.filter(user_id=int(code['id'])).first()
+        if not num:
+            return Response({'error':'code not found'},status=status.HTTP_400_BAD_REQUEST)
         if str(num.number) == str(code['number']):
-            user = User.objects.get(id=code['id'])
-            user_email = EmailAddress.objects.create(user=user, email=user.email, verified=True)
+            user = User.objects.filter(id=code['id']).first()
+            EmailAddress.objects.create(user=user, email=user.email, verified=True)
             token = self.get_tokens_for_user(user)
             login(request, user)
             return Response({'Message': 'Successfully activated', 'token': token}, status=status.HTTP_200_OK)

@@ -16,25 +16,28 @@ User = get_user_model()
 
 
 class NewsApiView(viewsets.ModelViewSet):
-    queryset = News.objects.filter(is_active=True, is_delete=False)
+    queryset = News.objects.filter(is_active=True, is_delete=False, is_draft=False)
     serializer_class = NewsSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
 
     def retrieve(self, request, *args, **kwargs):
         try:
-            new = self.queryset.get(id=int(kwargs['pk']))
+            new = self.queryset.filter(id=int(kwargs['pk'])).first()
             if new:
                 serializer = NewsSerializer(new, many=False)
                 return Response(serializer.data, status=status.HTTP_200_OK)
-        except:
             return Response(status=status.HTTP_204_NO_CONTENT)
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, *args, **kwargs):
-        new = self.queryset.get(id=kwargs['pk'])
-        new.is_active = False
-        new.is_delete = True
-        new.save()
-        return Response(status=status.HTTP_200_OK)
+        new = self.queryset.filter(id=kwargs['pk']).first()
+        if new:
+            new.is_active = False
+            new.is_delete = True
+            new.save()
+            return Response(status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class SearchNewsView(viewsets.ModelViewSet):
@@ -115,25 +118,28 @@ class UserNewsView(viewsets.ModelViewSet):
 
 
 class ArticleApiView(viewsets.ModelViewSet):
-    queryset = Article.objects.filter(is_active=True, is_delete=False)
+    queryset = Article.objects.filter(is_active=True, is_delete=False, is_draft=False)
     serializer_class = ArticleSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
 
     def retrieve(self, request, *args, **kwargs):
         try:
-            article = self.queryset.get(id=int(kwargs['pk']))
+            article = self.queryset.filter(id=int(kwargs['pk'])).first()
             if article:
                 serializer = ArticleSerializer(article, many=False)
                 return Response(serializer.data, status=status.HTTP_200_OK)
-        except:
             return Response(status=status.HTTP_204_NO_CONTENT)
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, *args, **kwargs):
-        article = self.queryset.get(id=kwargs['pk'])
-        article.is_active = False
-        article.is_delete = True
-        article.save()
-        return Response(status=status.HTTP_200_OK)
+        article = self.queryset.filter(id=kwargs['pk']).first()
+        if article:
+            article.is_active = False
+            article.is_delete = True
+            article.save()
+            return Response(status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class UserArticleView(viewsets.ModelViewSet):
@@ -154,25 +160,28 @@ class UserArticleView(viewsets.ModelViewSet):
 
 
 class QuestionApiView(viewsets.ModelViewSet):
-    queryset = Question.objects.filter(is_active=True, is_delete=False)
+    queryset = Question.objects.filter(is_active=True, is_delete=False, is_draft=False)
     serializer_class = QuestionSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
 
     def retrieve(self, request, *args, **kwargs):
         try:
-            question = self.queryset.get(id=int(kwargs['pk']))
+            question = self.queryset.filter(id=int(kwargs['pk'])).first()
             if question:
                 serializer = QuestionSerializer(question, many=False)
                 return Response(serializer.data, status=status.HTTP_200_OK)
-        except:
             return Response(status=status.HTTP_204_NO_CONTENT)
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, *args, **kwargs):
-        question = self.queryset.get(id=kwargs['pk'])
-        question.is_active = False
-        question.is_delete = True
-        question.save()
-        return Response(status=status.HTTP_200_OK)
+        question = self.queryset.filter(id=kwargs['pk']).first()
+        if question:
+            question.is_active = False
+            question.is_delete = True
+            question.save()
+            return Response(status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class UserQuestionView(viewsets.ModelViewSet):
@@ -215,7 +224,10 @@ class ThemeApiView(viewsets.ModelViewSet):
             themes = self.get_queryset().filter(parent=None)
             serializer = ThemeSerializer(themes, many=True)
             return Response(serializer.data)
-        themes = self.get_queryset().filter(parent=int(request.query_params['tree_id']))
+        try:
+            themes = self.get_queryset().filter(parent=int(request.query_params['tree_id']))
+        except:
+            return Response({'error':'tree_id didn\'t match in params'}, status=status.HTTP_406_NOT_ACCEPTABLE)
         serializer = ThemeSerializer(themes, many=True)
         return Response(serializer.data)
 

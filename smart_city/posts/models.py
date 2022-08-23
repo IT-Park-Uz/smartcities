@@ -19,7 +19,7 @@ class News(models.Model):
     tags = models.ManyToManyField('Tags', blank=True)
     is_delete = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
-
+    is_draft = models.BooleanField(default=False)
     class Meta:
         ordering = ['-id']
         verbose_name = _("Новость")
@@ -63,6 +63,7 @@ class Article(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     is_delete = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
+    is_draft = models.BooleanField(default=False)
 
     class Meta:
         ordering = ['-id']
@@ -113,6 +114,7 @@ class Question(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     is_delete = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
+    is_draft = models.BooleanField(default=False)
 
     class Meta:
         ordering = ['-id']

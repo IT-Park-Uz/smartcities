@@ -27,6 +27,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.permissions import AllowAny
 
 from smart_city.users.api.serializers import RegisterSerializer, CodeSerializer
 from smart_city.users.models import Code
@@ -111,12 +112,13 @@ class GoogleConnect(SocialConnectView):
 
 class RegisterAPIView(generics.GenericAPIView):
     serializer_class = RegisterSerializer
+    permission_classes = (AllowAny,)
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
-            code = Code.objects.get_or_create(user_id=serializer.data['id'])
+            code, created = Code.objects.get_or_create(user_id=serializer.data['id'])
             code.save()
             send_email({'to_email': serializer.data['email']})
             # Todo: send the code by email to user

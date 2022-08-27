@@ -33,7 +33,7 @@ router.register('question-image', ImageQuestionApiView, basename='question-image
 router.register('tags', TagsApiView, basename='tags')
 router.register('theme', ThemeApiView, basename='theme')
 
-router.register('new-comment', NewsReviewView, basename='new-comment')
+router.register('news-comment', NewsReviewView, basename='new-comment')
 router.register('article-comment', ArticleReviewView, basename='article-comment')
 router.register('question-comment', QuestionReviewView, basename='question-comment')
 

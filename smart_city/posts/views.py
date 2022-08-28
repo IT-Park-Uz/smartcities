@@ -238,14 +238,14 @@ class NewsReviewView(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly]
     http_method_names = ['get', 'post']
 
-    def list(self, request, *args, **kwargs):
-        if not request.query_params:
-            return Response({'message': "You should give id in params"}, status=status.HTTP_204_NO_CONTENT)
-        new_id = request.query_params['id']
-        # TODO: ichki comment bilan ishlash
-        comments = self.get_queryset().filter(news__pk=new_id, parent=None)
-        serializer = NewsReviewSerializer(comments, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+    # def list(self, request, *args, **kwargs):
+    #     if not request.query_params:
+    #         return Response({'message': "You should give id in params"}, status=status.HTTP_204_NO_CONTENT)
+    #     new_id = request.query_params['id']
+    #     # TODO: ichki comment bilan ishlash
+    #     comments = self.get_queryset().filter(news__pk=new_id, parent=None)
+    #     serializer = NewsReviewSerializer(comments, many=True)
+    #     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class ArticleReviewView(viewsets.ModelViewSet):

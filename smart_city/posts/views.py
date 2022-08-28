@@ -234,12 +234,16 @@ class ThemeApiView(viewsets.ModelViewSet):
 
 
 class NewsReviewView(viewsets.ModelViewSet):
-    queryset = NewsReview.objects.all()
-    serializer_class = NewsReviewSerializer
+    serializer_class = NewsReviewSerializer  # noqa F405
     permission_classes = [IsAuthenticatedOrReadOnly]
     http_method_names = ['get', 'post']
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['news__id']
+
+    def get_queryset(self):
+        queryset = NewsReview.objects.all().order_by('-created_at')
+        news_id = self.request.query_params.get('id')
+        if news_id is not None:
+            queryset = queryset.filter(news__pk=news_id)
+        return queryset
 
     # def list(self, request, *args, **kwargs):
     #     if not request.query_params:
@@ -252,18 +256,26 @@ class NewsReviewView(viewsets.ModelViewSet):
 
 
 class ArticleReviewView(viewsets.ModelViewSet):
-    queryset = ArticleReview.objects.all()
-    serializer_class = ArticleReviewSerializer
+    serializer_class = ArticleReviewSerializer  # noqa F405
     permission_classes = [IsAuthenticatedOrReadOnly]
     http_method_names = ['get', 'post']
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['article__id']
+
+    def get_queryset(self):
+        queryset = ArticleReview.objects.all().order_by('-created_at')
+        article_id = self.request.query_params.get('id')
+        if article_id is not None:
+            queryset = queryset.filter(article__pk=article_id)
+        return queryset
 
 
 class QuestionReviewView(viewsets.ModelViewSet):
-    queryset = QuestionReview.objects.all()
-    serializer_class = QuestionReviewSerializer
+    serializer_class = QuestionReviewSerializer  # noqa F405
     permission_classes = [IsAuthenticatedOrReadOnly]
     http_method_names = ['get', 'post']
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['question__id']
+
+    def get_queryset(self):
+        queryset = QuestionReview.objects.all().order_by('-created_at')
+        question_id = self.request.query_params.get('id')
+        if question_id is not None:
+            queryset = queryset.filter(question__pk=question_id)
+        return queryset

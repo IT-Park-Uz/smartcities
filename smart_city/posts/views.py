@@ -1,7 +1,8 @@
 from django.db.models import Q
-from rest_framework import viewsets, status, pagination
+from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
+from django_filters.rest_framework import DjangoFilterBackend
 
 from .serializer import (NewsSerializer, ArticleSerializer, QuestionSerializer, ImageQuestionSerializer,
                          TagsSerializer, ThemeSerializer, SearchNewsSerializer, SearchArticlesSerializer,
@@ -233,10 +234,12 @@ class ThemeApiView(viewsets.ModelViewSet):
 
 
 class NewsReviewView(viewsets.ModelViewSet):
-    queryset = NewsReview.objects.all().order_by('-created_at')
+    queryset = NewsReview.objects.all()
     serializer_class = NewsReviewSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
     http_method_names = ['get', 'post']
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['news__id']
 
     # def list(self, request, *args, **kwargs):
     #     if not request.query_params:
@@ -253,6 +256,8 @@ class ArticleReviewView(viewsets.ModelViewSet):
     serializer_class = ArticleReviewSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
     http_method_names = ['get', 'post']
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['article__id']
 
 
 class QuestionReviewView(viewsets.ModelViewSet):
@@ -260,3 +265,5 @@ class QuestionReviewView(viewsets.ModelViewSet):
     serializer_class = QuestionReviewSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
     http_method_names = ['get', 'post']
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['question__id']

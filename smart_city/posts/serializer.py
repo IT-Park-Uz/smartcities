@@ -159,12 +159,7 @@ class NewsReviewSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         response = super().to_representation(instance)
         response['user'] = UserSerializer(instance.user).data
-        response['comments_count'] = self.get_comments(instance)
         return response
-
-    def get_comments(self, obj):
-        posts = obj.newsreview_set.all().count()
-        return posts
 
 
 class ArticleReviewSerializer(serializers.ModelSerializer):
@@ -175,12 +170,8 @@ class ArticleReviewSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         response = super().to_representation(instance)
         response['user'] = UserSerializer(instance.user).data
-        response['comments_count'] = self.get_comments(instance)
         return response
 
-    def get_comments(self, obj):
-        posts = obj.articlereview_set.all().count()
-        return posts
 
 class QuestionReviewSerializer(serializers.ModelSerializer):
     class Meta:
@@ -190,10 +181,4 @@ class QuestionReviewSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         response = super().to_representation(instance)
         response['user'] = UserSerializer(instance.user).data
-        response['comments_count'] = self.get_comments(instance)
         return response
-
-    def get_comments(self, obj):
-        posts = obj.questionreview_set.all().count()
-        return posts
-

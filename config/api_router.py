@@ -6,7 +6,9 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from smart_city.posts.views import (NewsApiView, ArticleApiView, QuestionApiView, UserNewsView,
                                     UserArticleView, UserQuestionView,
                                     ImageQuestionApiView, TagsApiView, ThemeApiView, SearchNewsView, SearchArticleView,
-                                    SearchQuestionView, NewsReviewView, ArticleReviewView, QuestionReviewView)
+                                    SearchQuestionView, NewsReviewView, ArticleReviewView, QuestionReviewView,
+                                    LikeNewsView, ReadNewsView, LikeArticlesView, ReadArticlesView, LikeQuestionsView,
+                                    ReadQuestionsView)
 from smart_city.summit.views import (SummitView, ProgramsView, ParticipantView)
 from smart_city.users.api.views import UserViewSet
 
@@ -33,7 +35,15 @@ router.register('question-image', ImageQuestionApiView, basename='question-image
 router.register('tags', TagsApiView, basename='tags')
 router.register('theme', ThemeApiView, basename='theme')
 
-router.register('news-comment', NewsReviewView, basename='new-comment')
+# sidebar routes
+router.register('n-like', LikeNewsView, basename='n-like')
+router.register('n-read', ReadNewsView, basename='n-read')
+router.register('a-like', LikeArticlesView, basename='a-like')
+router.register('a-read', ReadArticlesView, basename='a-read')
+router.register('q-like', LikeQuestionsView, basename='q-like')
+router.register('q-read', ReadQuestionsView, basename='q-read')
+
+router.register('new-comment', NewsReviewView, basename='new-comment')
 router.register('article-comment', ArticleReviewView, basename='article-comment')
 router.register('question-comment', QuestionReviewView, basename='question-comment')
 

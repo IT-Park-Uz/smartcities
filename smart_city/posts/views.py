@@ -17,13 +17,15 @@ User = get_user_model()
 
 
 class NewsApiView(viewsets.ModelViewSet):
-    queryset = News.objects.filter(is_active=True, is_delete=False, is_draft=False)
+    queryset = News.objects.filter(is_active=True).order_by('-created_at')
     serializer_class = NewsSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
 
     def retrieve(self, request, *args, **kwargs):
         try:
             new = self.queryset.filter(id=int(kwargs['pk'])).first()
+            new.view_count += 1
+            new.save()
             if new:
                 serializer = NewsSerializer(new, many=False)
                 return Response(serializer.data, status=status.HTTP_200_OK)
@@ -42,7 +44,7 @@ class NewsApiView(viewsets.ModelViewSet):
 
 
 class SearchNewsView(viewsets.ModelViewSet):
-    queryset = News.objects.all()
+    queryset = News.objects.filter(is_active=True)
     serializer_class = SearchNewsSerializer
     http_method_names = ['get']
     permission_classes = [IsAuthenticatedOrReadOnly]
@@ -50,7 +52,7 @@ class SearchNewsView(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         # TODO: search fields: title, theme, tags
         try:
-            news = News.objects.filter(
+            news = self.get_queryset().filter(
                 Q(title__icontains=request.query_params['word']) | Q(
                     theme__name__icontains=request.query_params['word']) | Q(
                     tags__name=request.query_params['word']), is_active=True).order_by('view_count', 'created_at',
@@ -62,7 +64,7 @@ class SearchNewsView(viewsets.ModelViewSet):
 
 
 class SearchArticleView(viewsets.ModelViewSet):
-    queryset = Article.objects.all()
+    queryset = Article.objects.filter(is_active=True)
     serializer_class = SearchArticlesSerializer
     http_method_names = ['get']
     permission_classes = [IsAuthenticatedOrReadOnly]
@@ -70,7 +72,7 @@ class SearchArticleView(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         # TODO: search fields: title, theme, tags
         try:
-            articles = Article.objects.filter(
+            articles = self.get_queryset().filter(
                 Q(title__icontains=request.query_params['word']) | Q(
                     theme__name__icontains=request.query_params['word']) | Q(
                     tags__name=request.query_params['word']), is_active=True).order_by('view_count', 'created_at',
@@ -82,7 +84,7 @@ class SearchArticleView(viewsets.ModelViewSet):
 
 
 class SearchQuestionView(viewsets.ModelViewSet):
-    queryset = Question.objects.all()
+    queryset = Question.objects.filter(is_active=True)
     serializer_class = SearchQuestionsSerializer
     http_method_names = ['get']
     permission_classes = [IsAuthenticatedOrReadOnly]
@@ -90,7 +92,7 @@ class SearchQuestionView(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         # TODO: search fields: title, theme, tags
         try:
-            questions = Question.objects.filter(
+            questions = self.get_queryset().filter(
                 Q(title__icontains=request.query_params['word']) | Q(
                     theme__name__icontains=request.query_params['word']) | Q(
                     tags__name=request.query_params['word']), is_active=True).order_by('view_count', 'created_at',
@@ -119,13 +121,15 @@ class UserNewsView(viewsets.ModelViewSet):
 
 
 class ArticleApiView(viewsets.ModelViewSet):
-    queryset = Article.objects.filter(is_active=True, is_delete=False, is_draft=False)
+    queryset = Article.objects.filter(is_active=True).order_by('-created_at')
     serializer_class = ArticleSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
 
     def retrieve(self, request, *args, **kwargs):
         try:
-            article = self.queryset.filter(id=int(kwargs['pk'])).first()
+            article = self.get_queryset().filter(id=int(kwargs['pk'])).first()
+            article.view_count += 1
+            article.save()
             if article:
                 serializer = ArticleSerializer(article, many=False)
                 return Response(serializer.data, status=status.HTTP_200_OK)
@@ -134,7 +138,7 @@ class ArticleApiView(viewsets.ModelViewSet):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, *args, **kwargs):
-        article = self.queryset.filter(id=kwargs['pk']).first()
+        article = self.get_queryset().filter(id=kwargs['pk']).first()
         if article:
             article.is_active = False
             article.is_delete = True
@@ -161,13 +165,15 @@ class UserArticleView(viewsets.ModelViewSet):
 
 
 class QuestionApiView(viewsets.ModelViewSet):
-    queryset = Question.objects.filter(is_active=True, is_delete=False, is_draft=False)
+    queryset = Question.objects.filter(is_active=True).order_by('-created_at')
     serializer_class = QuestionSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
 
     def retrieve(self, request, *args, **kwargs):
         try:
-            question = self.queryset.filter(id=int(kwargs['pk'])).first()
+            question = self.get_queryset().filter(id=int(kwargs['pk'])).first()
+            question.view_count += 1
+            question.save()
             if question:
                 serializer = QuestionSerializer(question, many=False)
                 return Response(serializer.data, status=status.HTTP_200_OK)
@@ -176,7 +182,7 @@ class QuestionApiView(viewsets.ModelViewSet):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, *args, **kwargs):
-        question = self.queryset.filter(id=kwargs['pk']).first()
+        question = self.get_queryset().filter(id=kwargs['pk']).first()
         if question:
             question.is_active = False
             question.is_delete = True
@@ -228,7 +234,7 @@ class ThemeApiView(viewsets.ModelViewSet):
         try:
             themes = self.get_queryset().filter(parent=int(request.query_params['tree_id']))
         except:
-            return Response({'error':'tree_id didn\'t match in params'}, status=status.HTTP_406_NOT_ACCEPTABLE)
+            return Response({'error': 'tree_id didn\'t match in params'}, status=status.HTTP_406_NOT_ACCEPTABLE)
         serializer = ThemeSerializer(themes, many=True)
         return Response(serializer.data)
 
@@ -279,3 +285,45 @@ class QuestionReviewView(viewsets.ModelViewSet):
         if question_id is not None:
             queryset = queryset.filter(question__pk=question_id)
         return queryset
+
+
+class LikeNewsView(viewsets.ModelViewSet):
+    queryset = News.objects.filter(is_active=True).order_by('-like_count')[:10]
+    serializer_class = NewsSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    http_method_names = ['get']
+
+
+class ReadNewsView(viewsets.ModelViewSet):
+    queryset = News.objects.filter(is_active=True).order_by('-view_count')[:10]
+    serializer_class = NewsSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    http_method_names = ['get']
+
+
+class LikeArticlesView(viewsets.ModelViewSet):
+    queryset = Article.objects.filter(is_active=True).order_by('-like_count')[:10]
+    serializer_class = ArticleSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    http_method_names = ['get']
+
+
+class ReadArticlesView(viewsets.ModelViewSet):
+    queryset = Article.objects.filter(is_active=True).order_by('-view_count')[:10]
+    serializer_class = ArticleSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    http_method_names = ['get']
+
+
+class LikeQuestionsView(viewsets.ModelViewSet):
+    queryset = Question.objects.filter(is_active=True).order_by('-like_count')[:10]
+    serializer_class = QuestionSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    http_method_names = ['get']
+
+
+class ReadQuestionsView(viewsets.ModelViewSet):
+    queryset = Question.objects.filter(is_active=True).order_by('-view_count')[:10]
+    serializer_class = QuestionSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    http_method_names = ['get']

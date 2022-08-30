@@ -1,6 +1,7 @@
 from ckeditor_uploader.fields import RichTextUploadingField
 from django.db import models
 from django.db.models.fields import related
+import os
 
 from smart_city.users.models import User
 from mptt.models import MPTTModel, TreeForeignKey
@@ -11,7 +12,7 @@ class News(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     theme = models.ForeignKey('Theme', on_delete=models.SET_NULL, null=True)
     title = models.CharField(max_length=200)
-    image = models.ImageField(upload_to='News', null=True, blank=True)
+    image = models.ImageField(upload_to='News/%y/%m/%d', null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     view_count = models.IntegerField(default=0)
     like_count = models.IntegerField(default=0)
@@ -20,6 +21,7 @@ class News(models.Model):
     is_delete = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
     is_draft = models.BooleanField(default=False)
+
     class Meta:
         ordering = ['-id']
         verbose_name = _("Новость")
@@ -55,7 +57,7 @@ class Article(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     theme = models.ForeignKey('Theme', on_delete=models.SET_NULL, null=True)
     title = models.CharField(max_length=200)
-    image = models.ImageField(upload_to='Article', null=True, blank=True)
+    image = models.ImageField(upload_to='Article/%y/%m/%d', null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     view_count = models.IntegerField(default=0)
     like_count = models.IntegerField(default=0)
@@ -137,8 +139,9 @@ class QuestionReview(models.Model):
 
 
 class ImageQuestion(models.Model):
-    question = models.ForeignKey(Question, on_delete=models.CASCADE, null=True, blank=True)
-    image = models.ImageField(upload_to='QuestionImages')
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='question_images', null=True,
+                                 blank=True)
+    image = models.ImageField(upload_to='QuestionImages/%y/%m/%d', null=True, blank=True)
     default = models.BooleanField(default=True)
 
     class Meta:

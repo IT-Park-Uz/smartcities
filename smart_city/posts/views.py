@@ -3,6 +3,7 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.parsers import MultiPartParser, FormParser
 
 from .serializer import (NewsSerializer, ArticleSerializer, QuestionSerializer, ImageQuestionSerializer,
                          TagsSerializer, ThemeSerializer, SearchNewsSerializer, SearchArticlesSerializer,
@@ -20,6 +21,7 @@ class NewsApiView(viewsets.ModelViewSet):
     queryset = News.objects.filter(is_active=True).order_by('-created_at')
     serializer_class = NewsSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
+    # parser_classes = [MultiPartParser, FormParser]
 
     def retrieve(self, request, *args, **kwargs):
         try:
@@ -32,6 +34,15 @@ class NewsApiView(viewsets.ModelViewSet):
             return Response(status=status.HTTP_204_NO_CONTENT)
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    # def create(self, request, *args, **kwargs):
+    #     print(request.data)
+    #     serializer = self.get_serializer(data=request.data)
+    #     serializer.is_valid(raise_exception=True)
+    #     print(serializer.data)
+    #     self.perform_create(serializer)
+    #     headers = self.get_success_headers(serializer.data)
+    #     return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     def destroy(self, request, *args, **kwargs):
         new = self.queryset.filter(id=kwargs['pk']).first()
@@ -124,6 +135,7 @@ class ArticleApiView(viewsets.ModelViewSet):
     queryset = Article.objects.filter(is_active=True).order_by('-created_at')
     serializer_class = ArticleSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
+    parser_classes = [MultiPartParser, FormParser]
 
     def retrieve(self, request, *args, **kwargs):
         try:
@@ -212,6 +224,7 @@ class ImageQuestionApiView(viewsets.ModelViewSet):
     queryset = ImageQuestion.objects.all()
     serializer_class = ImageQuestionSerializer
     permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
 
 
 class TagsApiView(viewsets.ModelViewSet):

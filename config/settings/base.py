@@ -113,7 +113,6 @@ LOCAL_APPS = [
     "smart_city.users",
     "smart_city.posts",
     "smart_city.chats",
-    "smart_city.summit",
     "smart_city.itpark",
     # Your stuff: custom apps go here
 ]

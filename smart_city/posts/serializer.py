@@ -22,6 +22,9 @@ class TagsSerializer(serializers.ModelSerializer):
 class NewsSerializer(serializers.ModelSerializer):
     # username = serializers.CharField(source='user.first_name')
     tags = TagsSerializer(read_only=True, many=True)
+    tags_ids = serializers.PrimaryKeyRelatedField(
+        many=True, write_only=True, queryset=Tags.objects.all()
+    )
 
     class Meta:
         model = News
@@ -37,6 +40,15 @@ class NewsSerializer(serializers.ModelSerializer):
     def get_comments(self, obj):
         posts = obj.newsreview_set.all().count()
         return posts
+
+    def create(self, validated_data):
+        tag = validated_data.pop("tags_ids", None)
+        validated_data["user"] = self.context["request"].user
+        new = News.objects.create(**validated_data)
+        if tag:
+            for i in tag:
+                new.tags.add(i)
+        return new
 
 
 class NewsHistorySerializer(serializers.ModelSerializer):
@@ -75,6 +87,9 @@ class SearchQuestionsSerializer(serializers.ModelSerializer):
 
 class ArticleSerializer(serializers.ModelSerializer):
     tags = TagsSerializer(read_only=True, many=True)
+    tags_ids = serializers.PrimaryKeyRelatedField(
+        many=True, write_only=True, queryset=Tags.objects.all()
+    )
 
     class Meta:
         model = Article
@@ -90,6 +105,15 @@ class ArticleSerializer(serializers.ModelSerializer):
     def get_comments(self, obj):
         posts = obj.articlereview_set.all().count()
         return posts
+
+    def create(self, validated_data):
+        tag = validated_data.pop("tags_ids", None)
+        validated_data["user"] = self.context["request"].user
+        article = Article.objects.create(**validated_data)
+        if tag:
+            for i in tag:
+                article.tags.add(i)
+        return article
 
 
 class ArticleHistorySerializer(serializers.ModelSerializer):
@@ -107,6 +131,9 @@ class ArticleHistorySerializer(serializers.ModelSerializer):
 
 class QuestionSerializer(serializers.ModelSerializer):
     tags = TagsSerializer(read_only=True, many=True)
+    tags_ids = serializers.PrimaryKeyRelatedField(
+        many=True, write_only=True, queryset=Tags.objects.all()
+    )
 
     class Meta:
         model = Question
@@ -122,6 +149,16 @@ class QuestionSerializer(serializers.ModelSerializer):
     def get_comments(self, obj):
         posts = obj.questionreview_set.all().count()
         return posts
+
+    def create(self, validated_data):
+        tag = validated_data.pop("tags_ids", None)
+        validated_data["user"] = self.context["request"].user
+        question = Question.objects.create(**validated_data)
+        if tag:
+            for i in tag:
+                question.tags.add(i)
+        return question
+
 
 class QuestionHistorySerializer(serializers.ModelSerializer):
     tags = TagsSerializer(read_only=True, many=True)

@@ -11,8 +11,8 @@ from rest_framework_simplejwt.views import (TokenObtainPairView, TokenRefreshVie
 )
 
 urlpatterns = [
-    path("", TemplateView.as_view(template_name="pages/landing.html"), name="home"),
-    path("dev/", TemplateView.as_view(template_name="pages/home.html"), name="home"),
+    path("", TemplateView.as_view(template_name="pages/main_menu.html"), name="home"),
+    path("dev/", TemplateView.as_view(template_name="pages/home.html"), name="dev"),
     path(
         "about/", TemplateView.as_view(template_name="pages/about.html"), name="about"
     ),

@@ -42,7 +42,7 @@ router.register('a-read', ReadArticlesView, basename='a-read')
 router.register('q-like', LikeQuestionsView, basename='q-like')
 router.register('q-read', ReadQuestionsView, basename='q-read')
 
-router.register('new-comment', NewsReviewView, basename='new-comment')
+router.register('news-comment', NewsReviewView, basename='news-comment')
 router.register('article-comment', ArticleReviewView, basename='article-comment')
 router.register('question-comment', QuestionReviewView, basename='question-comment')
 

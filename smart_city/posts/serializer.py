@@ -44,10 +44,10 @@ class NewsSerializer(serializers.ModelSerializer):
         return posts
 
     def is_liked(self, obj):
-        # try:
-        liked = obj.user_liked_news.filter(user=self.context['request'].user).first()
-        # except:
-        #     liked = False
+        try:
+            liked = obj.user_liked_news.filter(user=self.context['request'].user).first()
+        except:
+            liked = False
         return True if liked else False
 
     def create(self, validated_data):

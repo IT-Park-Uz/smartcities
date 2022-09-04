@@ -248,7 +248,6 @@ class QuestionReviewSerializer(serializers.ModelSerializer):
         return response
 
 
-
 class UserLikedNewsSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserLikedNews

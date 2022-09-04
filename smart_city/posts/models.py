@@ -1,7 +1,6 @@
 from ckeditor_uploader.fields import RichTextUploadingField
 from django.db import models
 from django.db.models.fields import related
-import os
 
 from smart_city.users.models import User
 from mptt.models import MPTTModel, TreeForeignKey
@@ -15,7 +14,6 @@ class News(models.Model):
     image = models.ImageField(upload_to='News/%y/%m/%d', null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     view_count = models.IntegerField(default=0)
-    like_count = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     tags = models.ManyToManyField('Tags', blank=True)
     is_delete = models.BooleanField(default=False)
@@ -60,7 +58,6 @@ class Article(models.Model):
     image = models.ImageField(upload_to='Article/%y/%m/%d', null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     view_count = models.IntegerField(default=0)
-    like_count = models.IntegerField(default=0)
     tags = models.ManyToManyField('Tags', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     is_delete = models.BooleanField(default=False)
@@ -111,7 +108,6 @@ class Question(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField(null=True, blank=True)
     view_count = models.IntegerField(default=0)
-    like_count = models.IntegerField(default=0)
     tags = models.ManyToManyField('Tags', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     is_delete = models.BooleanField(default=False)
@@ -158,6 +154,10 @@ class ImageQuestion(models.Model):
     def __str__(self):
         return f"{self.id}"
 
+    def delete(self, *args, **kwargs):
+        self.image.delete(save=False)
+        super(ImageQuestion, self).delete(*args, **kwargs)
+
 
 class Tags(models.Model):
     name = models.CharField(max_length=50, unique=True)
@@ -184,3 +184,30 @@ class Theme(MPTTModel):
     class Meta:
         verbose_name = _("Категория")
         verbose_name_plural = _("Категории")
+
+
+class UserLikedNews(models.Model):
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    new = models.ForeignKey(News, on_delete=models.SET_NULL, related_query_name="user_liked_news",
+                            related_name="user_liked_news", null=True)
+
+    def __str__(self):
+        return f"{self.id}"
+
+
+class UserLikedArticles(models.Model):
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    article = models.ForeignKey(Article, on_delete=models.SET_NULL, related_name="user_liked_articles",
+                                related_query_name="user_liked_articles", null=True)
+
+    def __str__(self):
+        return f"{self.id}"
+
+
+class UserLikedQuestions(models.Model):
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    question = models.ForeignKey(Question, on_delete=models.SET_NULL, related_name="user_liked_questions",
+                                 related_query_name="user_liked_questions", null=True)
+
+    def __str__(self):
+        return f"{self.id}"

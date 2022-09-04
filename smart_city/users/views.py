@@ -1,6 +1,6 @@
 from dj_rest_auth.serializers import PasswordChangeSerializer
 from dj_rest_auth.views import sensitive_post_parameters_m
-from django.contrib.auth import get_user_model, login
+from django.contrib.auth import get_user_model, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse
@@ -120,7 +120,8 @@ class RegisterAPIView(generics.GenericAPIView):
             serializer.save()
             code, created = Code.objects.get_or_create(user_id=serializer.data['id'])
             code.save()
-            send_email({'to_email': serializer.data['email']})
+            print(serializer.data['email'], code.number)
+            send_email({'to_email': serializer.data['email'], 'code': code.number})
             # Todo: send the code by email to user
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -154,6 +155,7 @@ class LogoutView(APIView):
         try:
             refresh_token = request.data["refresh"]
             token = RefreshToken(refresh_token)
+            logout(request)
             token.blacklist()
             return Response(status=status.HTTP_205_RESET_CONTENT)
         except:

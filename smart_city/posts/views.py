@@ -1,30 +1,31 @@
-from django.db.models import Q
+from django.db.models import Q, Count
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
-from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.parsers import MultiPartParser, FormParser
 
 from .serializer import (NewsSerializer, ArticleSerializer, QuestionSerializer, ImageQuestionSerializer,
                          TagsSerializer, ThemeSerializer, SearchNewsSerializer, SearchArticlesSerializer,
                          SearchQuestionsSerializer, NewsHistorySerializer, QuestionHistorySerializer,
                          ArticleHistorySerializer, NewsReviewSerializer, ArticleReviewSerializer,
-                         QuestionReviewSerializer)
+                         QuestionReviewSerializer, UserLikedNewsSerializer, UserLikedArticlesSerializer,
+                         UserLikedQuestionsSerializer)
 from smart_city.posts.models import (News, Article, Question, ImageQuestion, Tags, Theme, NewsReview, ArticleReview,
-                                     QuestionReview)
+                                     QuestionReview, UserLikedNews, UserLikedArticles, UserLikedQuestions)
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
 
 class NewsApiView(viewsets.ModelViewSet):
-    queryset = News.objects.filter(is_active=True).order_by('-created_at')
+    queryset = News.objects.filter(is_active=True).annotate(like_count=Count('user_liked_news')).order_by('-created_at')
     serializer_class = NewsSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
-    # parser_classes = [MultiPartParser, FormParser]
+    parser_classes = [MultiPartParser, FormParser]
 
     def retrieve(self, request, *args, **kwargs):
         try:
+            print(request.user)
             new = self.queryset.filter(id=int(kwargs['pk'])).first()
             new.view_count += 1
             new.save()
@@ -34,15 +35,6 @@ class NewsApiView(viewsets.ModelViewSet):
             return Response(status=status.HTTP_204_NO_CONTENT)
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-
-    # def create(self, request, *args, **kwargs):
-    #     print(request.data)
-    #     serializer = self.get_serializer(data=request.data)
-    #     serializer.is_valid(raise_exception=True)
-    #     print(serializer.data)
-    #     self.perform_create(serializer)
-    #     headers = self.get_success_headers(serializer.data)
-    #     return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     def destroy(self, request, *args, **kwargs):
         new = self.queryset.filter(id=kwargs['pk']).first()
@@ -132,7 +124,8 @@ class UserNewsView(viewsets.ModelViewSet):
 
 
 class ArticleApiView(viewsets.ModelViewSet):
-    queryset = Article.objects.filter(is_active=True).order_by('-created_at')
+    queryset = Article.objects.filter(is_active=True).annotate(like_count=Count('user_liked_articles')).order_by(
+        '-created_at')
     serializer_class = ArticleSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
     parser_classes = [MultiPartParser, FormParser]
@@ -177,7 +170,8 @@ class UserArticleView(viewsets.ModelViewSet):
 
 
 class QuestionApiView(viewsets.ModelViewSet):
-    queryset = Question.objects.filter(is_active=True).order_by('-created_at')
+    queryset = Question.objects.filter(is_active=True).annotate(like_count=Count('user_liked_questions')).order_by(
+        '-created_at')
     serializer_class = QuestionSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
 
@@ -301,7 +295,8 @@ class QuestionReviewView(viewsets.ModelViewSet):
 
 
 class LikeNewsView(viewsets.ModelViewSet):
-    queryset = News.objects.filter(is_active=True).order_by('-like_count')[:10]
+    queryset = News.objects.filter(is_active=True).annotate(like_count=Count('user_liked_news')).order_by(
+        '-like_count')[:10]
     serializer_class = NewsSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
     http_method_names = ['get']
@@ -315,7 +310,8 @@ class ReadNewsView(viewsets.ModelViewSet):
 
 
 class LikeArticlesView(viewsets.ModelViewSet):
-    queryset = Article.objects.filter(is_active=True).order_by('-like_count')[:10]
+    queryset = Article.objects.filter(is_active=True).annotate(like_count=Count('user_liked_articles')).order_by(
+        '-like_count')[:10]
     serializer_class = ArticleSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
     http_method_names = ['get']
@@ -329,7 +325,8 @@ class ReadArticlesView(viewsets.ModelViewSet):
 
 
 class LikeQuestionsView(viewsets.ModelViewSet):
-    queryset = Question.objects.filter(is_active=True).order_by('-like_count')[:10]
+    queryset = Question.objects.filter(is_active=True).annotate(like_count=Count('user_liked_questions')).order_by(
+        '-like_count')[:10]
     serializer_class = QuestionSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
     http_method_names = ['get']
@@ -340,3 +337,24 @@ class ReadQuestionsView(viewsets.ModelViewSet):
     serializer_class = QuestionSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
     http_method_names = ['get']
+
+
+class UserLikesNewsView(viewsets.ModelViewSet):
+    queryset = UserLikedNews.objects.all()
+    serializer_class = UserLikedNewsSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    http_method_names = ['get', 'post', 'delete']
+
+
+class UserLikesArticlesView(viewsets.ModelViewSet):
+    queryset = UserLikedArticles.objects.all()
+    serializer_class = UserLikedArticlesSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    http_method_names = ['get', 'post', 'delete']
+
+
+class UserLikesQuestionsView(viewsets.ModelViewSet):
+    queryset = UserLikedQuestions.objects.all()
+    serializer_class = UserLikedQuestionsSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    http_method_names = ['get', 'post', 'delete']

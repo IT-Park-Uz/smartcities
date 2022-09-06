@@ -8,7 +8,7 @@ from smart_city.posts.views import (NewsApiView, ArticleApiView, QuestionApiView
                                     ImageQuestionApiView, TagsApiView, ThemeApiView, SearchNewsView, SearchArticleView,
                                     SearchQuestionView, NewsReviewView, ArticleReviewView, QuestionReviewView,
                                     LikeNewsView, ReadNewsView, LikeArticlesView, ReadArticlesView, LikeQuestionsView,
-                                    ReadQuestionsView)
+                                    ReadQuestionsView, UserLikesQuestionsView, UserLikesArticlesView, UserLikesNewsView)
 from smart_city.users.api.views import UserViewSet
 
 from idegovuz.views import IdEgovUzAdapter, oauth2_login
@@ -54,6 +54,9 @@ router.register('news-history', UserNewsView, basename='news-history')
 router.register('article-history', UserArticleView, basename='article-history')
 router.register('question-history', UserQuestionView, basename='question-history')
 
+router.register('like-question', UserLikesQuestionsView, basename='like-question')
+router.register('like-article', UserLikesArticlesView, basename='like-article')
+router.register('like-new', UserLikesNewsView, basename='like-new')
 
 app_name = "api"
 urlpatterns = router.urls

@@ -6,6 +6,8 @@ from pathlib import Path
 
 import environ
 
+# from config.settings.production import SECRET_KEY
+
 ROOT_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
 # smart_city/
 APPS_DIR = ROOT_DIR / "smart_city"
@@ -282,7 +284,6 @@ EMAIL_BACKEND = env(
 )
 # https://docs.djangoproject.com/en/dev/ref/settings/#email-timeout
 EMAIL_TIMEOUT = 5
-
 # ADMIN
 # ------------------------------------------------------------------------------
 # Django Admin URL.
@@ -375,6 +376,11 @@ REST_FRAMEWORK = {
         "rest_framework.permissions.IsAuthenticatedOrReadOnly",
         # "rest_framework.permissions.AllowAny",
     ),
+    "DEFAULT_PARSER_CLASSES": [
+            "rest_framework.parsers.JSONParser",
+            "rest_framework.parsers.FormParser",
+            "rest_framework.parsers.MultiPartParser",
+        ],
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
 }
@@ -401,8 +407,10 @@ SPECTACULAR_SETTINGS = {
 
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(days=15),
-    'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=15)
+    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(minutes=5),
+    'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True
 }
 
 # EMAIL_HOST = 'smtp.gmail.com'

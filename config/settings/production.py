@@ -16,7 +16,13 @@ SECRET_KEY = env("DJANGO_SECRET_KEY")
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=["smartcities.uz"])
 
-# DATABASES
+# DATABASES# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_PORT = 465
+# EMAIL_USE_TLS = False
+# EMAIL_USE_SSL = True
+# EMAIL_HOST_USER = 'smart_city@gmail.com'
+# EMAIL_HOST_PASSWORD = 'test'
+
 # ------------------------------------------------------------------------------
 DATABASES["default"] = env.db("DATABASE_URL")  # noqa F405
 DATABASES["default"]["ATOMIC_REQUESTS"] = True  # noqa F405
@@ -98,19 +104,25 @@ MEDIA_ROOT = "/var/www/api.smartcities.uz/media"
 #
 # # EMAIL
 # # ------------------------------------------------------------------------------
-# # https://docs.djangoproject.com/en/dev/ref/settings/#default-from-email
-# DEFAULT_FROM_EMAIL = env(
-#     "DJANGO_DEFAULT_FROM_EMAIL",
-#     default="Smart City <noreply@smartcities.uz>",
-# )
+# https://docs.djangoproject.com/en/dev/ref/settings/#default-from-email
+DEFAULT_FROM_EMAIL = env(
+    "DJANGO_DEFAULT_FROM_EMAIL",
+    default="Smart City <noreply@smartcities.uz>",
+)
 # # https://docs.djangoproject.com/en/dev/ref/settings/#server-email
-# SERVER_EMAIL = env("DJANGO_SERVER_EMAIL", default=DEFAULT_FROM_EMAIL)
-# # https://docs.djangoproject.com/en/dev/ref/settings/#email-subject-prefix
-# EMAIL_SUBJECT_PREFIX = env(
-#     "DJANGO_EMAIL_SUBJECT_PREFIX",
-#     default="[Smart City]",
-# )
-#
+SERVER_EMAIL = env("DJANGO_SERVER_EMAIL", default=DEFAULT_FROM_EMAIL)
+# https://docs.djangoproject.com/en/dev/ref/settings/#email-subject-prefix
+EMAIL_SUBJECT_PREFIX = env(
+    "DJANGO_EMAIL_SUBJECT_PREFIX",
+    default="[Smart City]",
+)
+EMAIL_HOST = env("DJANGO_EMAIL_HOST")
+EMAIL_PORT = 465
+EMAIL_USE_TLS = False
+EMAIL_USE_SSL = True
+EMAIL_HOST_USER = env("DJANGO_EMAIL_USER")
+EMAIL_HOST_PASSWORD = env("DJANGO_EMAIL_PASSWORD")
+
 # ADMIN
 # ------------------------------------------------------------------------------
 # Django Admin URL regex.

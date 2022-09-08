@@ -412,21 +412,3 @@ SIMPLE_JWT = {
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True
 }
-
-# EMAIL_HOST = 'smtp.gmail.com'
-# EMAIL_PORT = 465
-# EMAIL_USE_TLS = False
-# EMAIL_USE_SSL = True
-# EMAIL_HOST_USER = 'smart_city@gmail.com'
-# EMAIL_HOST_PASSWORD = 'test'
-
-
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 465
-EMAIL_USE_TLS = False
-EMAIL_USE_SSL = True
-# EMAIL_HOST_USER = env.str('EMAIL_HOST_USER')
-EMAIL_HOST_USER = 'fayyozbekov20@gmail.com'
-# EMAIL_HOST_PASSWORD = env.str('EMAIL_HOST_PASSWORD')
-# EMAIL_HOST_PASSWORD = 'bspkmcwrebfgviof'
-EMAIL_HOST_PASSWORD = 'bhzsqdsqsbpnhrpg'

@@ -1,5 +1,5 @@
 from django.core.mail import send_mail
-from config.settings.base import EMAIL_HOST_USER
+from django.conf import settings
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 
@@ -10,7 +10,7 @@ def send_email(data):
     #     'auth/activate.html', {'url': data['url'], 'firstname': data['firstname'], 'lastname': data['lastname'], 'text': data['text']})
     message = (f'Your code: {data["code"]}')
     # plain_message = strip_tags(message1)
-    from_email = EMAIL_HOST_USER
+    from_email = settings.EMAIL_HOST_USER
     to = data['to_email']
     print(to, message,'-----------')
 

@@ -227,6 +227,16 @@ class TagsApiView(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     http_method_names = ['get', 'post']
 
+    def list(self, request, *args, **kwargs):
+        # TODO: search fields: tag
+        try:
+            tag = self.get_queryset().filter(name__icontains=request.query_params['tag'])
+            serializer = TagsSerializer(tag, many=True)
+            return Response({'tag': serializer.data}, status=status.HTTP_200_OK)
+        except:
+            return Response({'status': status.HTTP_204_NO_CONTENT})
+
+
 
 class ThemeApiView(viewsets.ModelViewSet):
     queryset = Theme.objects.all()

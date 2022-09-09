@@ -43,20 +43,20 @@ router.register('q-like', LikeQuestionsView, basename='q-like')
 router.register('q-read', ReadQuestionsView, basename='q-read')
 
 router.register('news-comment', NewsReviewView, basename='news-comment')
-router.register('article-comment', ArticleReviewView, basename='article-comment')
-router.register('question-comment', QuestionReviewView, basename='question-comment')
+router.register('articles-comment', ArticleReviewView, basename='articles-comment')
+router.register('questions-comment', QuestionReviewView, basename='questions-comment')
 
 router.register('search-news', SearchNewsView, basename='search-news')
 router.register('search-articles', SearchArticleView, basename='search-articles')
-router.register('search-question', SearchQuestionView, basename='search-question')
+router.register('search-questions', SearchQuestionView, basename='search-questions')
 
 router.register('news-history', UserNewsView, basename='news-history')
-router.register('article-history', UserArticleView, basename='article-history')
-router.register('question-history', UserQuestionView, basename='question-history')
+router.register('articles-history', UserArticleView, basename='articles-history')
+router.register('questions-history', UserQuestionView, basename='questions-history')
 
-router.register('like-question', UserLikesQuestionsView, basename='like-question')
-router.register('like-article', UserLikesArticlesView, basename='like-article')
-router.register('like-new', UserLikesNewsView, basename='like-new')
+router.register('like-questions', UserLikesQuestionsView, basename='like-questions')
+router.register('like-articles', UserLikesArticlesView, basename='like-articles')
+router.register('like-news', UserLikesNewsView, basename='like-news')
 
 app_name = "api"
 urlpatterns = router.urls

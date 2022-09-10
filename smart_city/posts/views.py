@@ -25,7 +25,6 @@ class NewsApiView(viewsets.ModelViewSet):
 
     def retrieve(self, request, *args, **kwargs):
         try:
-            print(request.user)
             new = self.queryset.filter(id=int(kwargs['pk'])).first()
             new.view_count += 1
             new.save()

@@ -373,7 +373,7 @@ REST_FRAMEWORK = {
 
     "DEFAULT_PERMISSION_CLASSES": (
         # "rest_framework.permissions.BasePermission",
-        "rest_framework.permissions.IsAuthenticatedOrReadOnly",
+        "rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly",
         # "rest_framework.permissions.AllowAny",
     ),
     "DEFAULT_PARSER_CLASSES": [

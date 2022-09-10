@@ -31,6 +31,7 @@ from rest_framework.permissions import AllowAny
 
 from smart_city.users.api.serializers import RegisterSerializer, CodeSerializer
 from smart_city.users.models import Code
+from smart_city.users.serializer import LogOutSerializer
 from smart_city.users.utils import send_email
 
 User = get_user_model()
@@ -150,16 +151,18 @@ class VerifyCodeView(generics.GenericAPIView):
 
 class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
+    serializer_class = LogOutSerializer
 
     def post(self, request, *args, **kwargs):
+        serializer = LogOutSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
         try:
-            refresh_token = request.data["refresh"]
-            token = RefreshToken(refresh_token)
-            logout(request)
-            token.blacklist()
-            return Response(status=status.HTTP_205_RESET_CONTENT)
+            token = RefreshToken(serializer.data['refresh'])
         except:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': "Token is blacklisted"},status=status.HTTP_400_BAD_REQUEST)
+        logout(request)
+        token.blacklist()
+        return Response(status=status.HTTP_205_RESET_CONTENT)
 
 
 class PasswordChangeView(UpdateAPIView):

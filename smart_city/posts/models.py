@@ -188,8 +188,8 @@ class Theme(MPTTModel):
 
 class UserLikedNews(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-    new = models.ForeignKey(News, on_delete=models.SET_NULL, related_query_name="user_liked_news",
-                            related_name="user_liked_news", null=True)
+    news = models.ForeignKey(News, on_delete=models.SET_NULL, related_query_name="user_liked_news",
+                             related_name="user_liked_news", null=True)
 
     def __str__(self):
         return f"{self.id}"

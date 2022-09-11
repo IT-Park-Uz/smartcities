@@ -106,7 +106,7 @@ class SearchQuestionView(viewsets.ModelViewSet):
 
 
 class UserNewsView(viewsets.ModelViewSet):
-    queryset = News.objects.all()
+    queryset = News.objects.filter(is_delete=False).order_by("-created_at")
     permission_classes = [IsAuthenticated]
 
     def list(self, request, *args, **kwargs):
@@ -152,7 +152,7 @@ class ArticleApiView(viewsets.ModelViewSet):
 
 
 class UserArticleView(viewsets.ModelViewSet):
-    queryset = Article.objects.all()
+    queryset = Article.objects.filter(is_delete=False).order_by("-created_at")
     permission_classes = [IsAuthenticated]
 
     def list(self, request, *args, **kwargs):
@@ -197,7 +197,7 @@ class QuestionApiView(viewsets.ModelViewSet):
 
 
 class UserQuestionView(viewsets.ModelViewSet):
-    queryset = Question.objects.all()
+    queryset = Question.objects.filter(is_delete=False).order_by("-created_at")
     permission_classes = [IsAuthenticated]
 
     def list(self, request, *args, **kwargs):

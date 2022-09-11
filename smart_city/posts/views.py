@@ -236,7 +236,6 @@ class TagsApiView(viewsets.ModelViewSet):
             return Response({'status': status.HTTP_204_NO_CONTENT})
 
 
-
 class ThemeApiView(viewsets.ModelViewSet):
     queryset = Theme.objects.all()
     serializer_class = ThemeSerializer
@@ -266,15 +265,6 @@ class NewsReviewView(viewsets.ModelViewSet):
         if news_id is not None:
             queryset = queryset.filter(news__pk=news_id)
         return queryset
-
-    # def list(self, request, *args, **kwargs):
-    #     if not request.query_params:
-    #         return Response({'message': "You should give id in params"}, status=status.HTTP_204_NO_CONTENT)
-    #     new_id = request.query_params['id']
-    #     # TODO: ichki comment bilan ishlash
-    #     comments = self.get_queryset().filter(news__pk=new_id, parent=None)
-    #     serializer = NewsReviewSerializer(comments, many=True)
-    #     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class ArticleReviewView(viewsets.ModelViewSet):

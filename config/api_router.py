@@ -58,7 +58,6 @@ router.register('like-questions', UserLikesQuestionsView, basename='like-questio
 router.register('like-articles', UserLikesArticlesView, basename='like-articles')
 router.register('like-news', UserLikesNewsView, basename='like-news')
 
-
 app_name = "api"
 urlpatterns = router.urls
 urlpatterns += [

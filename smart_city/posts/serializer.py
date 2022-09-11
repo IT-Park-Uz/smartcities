@@ -54,7 +54,6 @@ class NewsSerializer(serializers.ModelSerializer):
         likes = obj.user_liked_news.filter(new=obj).count()
         return likes
 
-
     def create(self, validated_data):
         tag = validated_data.pop("tags_ids", None)
         validated_data["user"] = self.context["request"].user

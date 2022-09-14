@@ -15,6 +15,7 @@ from smart_city.posts.models import (News, Article, Question, ImageQuestion, Tag
 from django.contrib.auth import get_user_model
 
 from django.db.models import Exists, OuterRef
+from drf_spectacular.utils import extend_schema_view, extend_schema, OpenApiParameter
 
 User = get_user_model()
 
@@ -129,6 +130,8 @@ class SearchQuestionView(viewsets.ModelViewSet):
 
 class UserNewsView(viewsets.ModelViewSet):
     queryset = News.objects.filter(is_delete=False).order_by("-created_at")
+    serializer_class = NewsSerializer
+
     permission_classes = [IsAuthenticated]
 
     def list(self, request, *args, **kwargs):
@@ -175,6 +178,7 @@ class ArticleApiView(viewsets.ModelViewSet):
 
 class UserArticleView(viewsets.ModelViewSet):
     queryset = Article.objects.filter(is_delete=False).order_by("-created_at")
+    serializer_class = ArticleSerializer
     permission_classes = [IsAuthenticated]
 
     def list(self, request, *args, **kwargs):
@@ -220,6 +224,7 @@ class QuestionApiView(viewsets.ModelViewSet):
 
 class UserQuestionView(viewsets.ModelViewSet):
     queryset = Question.objects.filter(is_delete=False).order_by("-created_at")
+    serializer_class = QuestionSerializer
     permission_classes = [IsAuthenticated]
 
     def list(self, request, *args, **kwargs):
@@ -275,9 +280,23 @@ class ThemeApiView(viewsets.ModelViewSet):
         serializer = ThemeSerializer(themes, many=True)
         return Response(serializer.data)
 
+
+
+
+
+@extend_schema_view(
+    list=extend_schema(parameters=[
+        OpenApiParameter(name='theme_id',
+                         description="This parameter reequired")
+    ],
+    description="AUFFF")
+)
 class ThemeGroupNewsView(viewsets.ModelViewSet):
     queryset = News.objects.filter(is_active=True).order_by('-created_at')
+    serializer_class = NewsSerializer
     http_method_names = ['get']
+    def get_serializer_class(self):
+        return self.serializer_class
 
     def get_queryset(self):
         queryset = self.queryset.prefetch_related("user",'theme','tags',"user_liked_news")
@@ -298,7 +317,10 @@ class ThemeGroupNewsView(viewsets.ModelViewSet):
 
 class ThemeGroupQuestionsView(viewsets.ModelViewSet):
     queryset = Question.objects.filter(is_active=True).order_by('-created_at')
+    serializer_class = QuestionSerializer
     http_method_names = ['get']
+    def get_serializer_class(self):
+        return self.serializer_class
 
     def list(self, request, *args, **kwargs):
         try:
@@ -315,7 +337,11 @@ class ThemeGroupQuestionsView(viewsets.ModelViewSet):
 
 class ThemeGroupArticlesView(viewsets.ModelViewSet):
     queryset = Article.objects.filter(is_active=True).order_by('-created_at')
+    serializer_class = ArticleSerializer
     http_method_names = ['get']
+
+    def get_serializer_class(self):
+        return self.serializer_class
 
     def list(self, request, *args, **kwargs):
         try:

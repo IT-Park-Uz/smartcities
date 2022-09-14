@@ -14,14 +14,36 @@ from smart_city.posts.models import (News, Article, Question, ImageQuestion, Tag
                                      QuestionReview, UserLikedNews, UserLikedArticles, UserLikedQuestions)
 from django.contrib.auth import get_user_model
 
+from django.db.models import Exists, OuterRef
+
 User = get_user_model()
 
 
 class NewsApiView(viewsets.ModelViewSet):
-    queryset = News.objects.filter(is_active=True).annotate(like_count=Count('user_liked_news')).order_by('-created_at')
+    queryset = News.objects.filter(is_active=True).annotate(like_count=Count('user_liked_news'),
+                                                            comment_count=Count("newsreview")).order_by('-created_at')
     serializer_class = NewsSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
     parser_classes = [MultiPartParser, FormParser]
+
+    def get_queryset(self):
+        queryset = self.queryset.prefetch_related("user",'theme','tags',"user_liked_news")
+        return queryset
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(UserLikedNews.objects.filter(
+                user_id=request.user.id,
+                new_id=OuterRef('pk')
+            )
+        )))
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
     def retrieve(self, request, *args, **kwargs):
         try:
@@ -239,7 +261,7 @@ class TagsApiView(viewsets.ModelViewSet):
 class ThemeApiView(viewsets.ModelViewSet):
     queryset = Theme.objects.all()
     serializer_class = ThemeSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     def list(self, request, *args, **kwargs):
         if not request.query_params:
@@ -252,6 +274,61 @@ class ThemeApiView(viewsets.ModelViewSet):
             return Response({'error': 'tree_id didn\'t match in params'}, status=status.HTTP_406_NOT_ACCEPTABLE)
         serializer = ThemeSerializer(themes, many=True)
         return Response(serializer.data)
+
+class ThemeGroupNewsView(viewsets.ModelViewSet):
+    queryset = News.objects.filter(is_active=True).order_by('-created_at')
+    http_method_names = ['get']
+
+    def get_queryset(self):
+        queryset = self.queryset.prefetch_related("user",'theme','tags',"user_liked_news")
+        return queryset
+
+    def list(self, request, *args, **kwargs):
+        try:
+            id = int(request.query_params.get('theme_id'))
+        except:
+            return Response({'message':'theme_id not fount in params'},status=status.HTTP_406_NOT_ACCEPTABLE)
+        news = self.get_queryset().filter(theme_id=id)
+        page = self.paginate_queryset(news)
+        if page is not None:
+            serializer = NewsSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = NewsSerializer(news, many=True)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+
+class ThemeGroupQuestionsView(viewsets.ModelViewSet):
+    queryset = Question.objects.filter(is_active=True).order_by('-created_at')
+    http_method_names = ['get']
+
+    def list(self, request, *args, **kwargs):
+        try:
+            id = int(request.query_params.get('theme_id'))
+        except:
+            return Response({'message':'theme_id not fount in params'},status=status.HTTP_406_NOT_ACCEPTABLE)
+        questions = self.get_queryset().filter(theme_id=id)
+        page = self.paginate_queryset(questions)
+        if page is not None:
+            serializer = QuestionSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = QuestionSerializer(questions, many=True)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+
+class ThemeGroupArticlesView(viewsets.ModelViewSet):
+    queryset = Article.objects.filter(is_active=True).order_by('-created_at')
+    http_method_names = ['get']
+
+    def list(self, request, *args, **kwargs):
+        try:
+            id = int(request.query_params.get('theme_id'))
+        except:
+            return Response({'message':'theme_id not fount in params'},status=status.HTTP_406_NOT_ACCEPTABLE)
+        articles = self.get_queryset().filter(theme_id=id)
+        page = self.paginate_queryset(articles)
+        if page is not None:
+            serializer = ArticleSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = ArticleSerializer(articles, many=True)
+        return Response(serializer.data,status=status.HTTP_200_OK)
 
 
 class NewsReviewView(viewsets.ModelViewSet):

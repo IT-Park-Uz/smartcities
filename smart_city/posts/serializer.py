@@ -19,12 +19,16 @@ class TagsSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+
 class NewsSerializer(serializers.ModelSerializer):
     # username = serializers.CharField(source='user.first_name')
     tags = TagsSerializer(read_only=True, many=True)
     tags_ids = serializers.PrimaryKeyRelatedField(
         many=True, write_only=True, queryset=Tags.objects.all()
     )
+    like_count = serializers.IntegerField(read_only=True)
+    comments_count = serializers.IntegerField(read_only=True)
+    is_liked = serializers.BooleanField(read_only=True)
 
     class Meta:
         model = News
@@ -34,21 +38,11 @@ class NewsSerializer(serializers.ModelSerializer):
         response = super().to_representation(instance)
         response['user'] = UserSerializer(instance.user).data
         response['theme'] = ThemeSerializer(instance.theme).data
-        response['is_liked'] = self.is_liked(instance)
-        response['comments_count'] = self.get_comments(instance)
+        response['is_liked'] = instance.is_liked
+        response['comments_count'] = instance.comment_count
         response['like_count'] = instance.like_count
         return response
 
-    def get_comments(self, obj):
-        posts = obj.newsreview_set.all().count()
-        return posts
-
-    def is_liked(self, obj):
-        try:
-            liked = obj.user_liked_news.filter(user=self.context['request'].user).first()
-        except:
-            liked = False
-        return True if liked else False
 
     def create(self, validated_data):
         tag = validated_data.pop("tags_ids", None)
@@ -110,7 +104,7 @@ class ArticleSerializer(serializers.ModelSerializer):
         response['theme'] = ThemeSerializer(instance.theme).data
         response['is_liked'] = self.is_liked(instance)
         response['comments_count'] = self.get_comments(instance)
-        response['like_count'] = instance.like_count
+        response['like_count'] = self.like_count(instance)
         return response
 
     def get_comments(self, obj):
@@ -123,6 +117,10 @@ class ArticleSerializer(serializers.ModelSerializer):
         except:
             liked = False
         return True if liked else False
+
+    def like_count(self, obj):
+        likes = obj.user_liked_articles.filter(article=obj).count()
+        return likes
 
     def create(self, validated_data):
         tag = validated_data.pop("tags_ids", None)
@@ -163,7 +161,7 @@ class QuestionSerializer(serializers.ModelSerializer):
         response['theme'] = ThemeSerializer(instance.theme).data
         response['is_liked'] = self.is_liked(instance)
         response['comments_count'] = self.get_comments(instance)
-        response['like_count'] = instance.like_count
+        response['like_count'] = self.like_count(instance)
         return response
 
     def get_comments(self, obj):
@@ -176,6 +174,10 @@ class QuestionSerializer(serializers.ModelSerializer):
         except:
             liked = False
         return True if liked else False
+
+    def like_count(self, obj):
+        likes = obj.user_liked_questions.filter(question=obj).count()
+        return likes
 
     def create(self, validated_data):
         tag = validated_data.pop("tags_ids", None)

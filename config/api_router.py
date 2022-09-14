@@ -8,7 +8,8 @@ from smart_city.posts.views import (NewsApiView, ArticleApiView, QuestionApiView
                                     ImageQuestionApiView, TagsApiView, ThemeApiView, SearchNewsView, SearchArticleView,
                                     SearchQuestionView, NewsReviewView, ArticleReviewView, QuestionReviewView,
                                     LikeNewsView, ReadNewsView, LikeArticlesView, ReadArticlesView, LikeQuestionsView,
-                                    ReadQuestionsView, UserLikesQuestionsView, UserLikesArticlesView, UserLikesNewsView)
+                                    ReadQuestionsView, UserLikesQuestionsView, UserLikesArticlesView, UserLikesNewsView,
+                                    ThemeGroupNewsView, ThemeGroupArticlesView, ThemeGroupQuestionsView)
 from smart_city.users.api.views import UserViewSet
 
 from idegovuz.views import IdEgovUzAdapter, oauth2_login
@@ -34,6 +35,10 @@ router.register('question-image', ImageQuestionApiView, basename='question-image
 router.register('tags', TagsApiView, basename='tags')
 router.register('theme', ThemeApiView, basename='theme')
 
+router.register('theme-gr-news', ThemeGroupNewsView, basename='theme-gr-news')
+router.register('theme-gr-qs', ThemeGroupArticlesView, basename='theme-gr-qs')
+router.register('theme-gr-ar', ThemeGroupQuestionsView, basename='theme-gr-ar')
+
 # sidebar routes
 router.register('n-like', LikeNewsView, basename='n-like')
 router.register('n-read', ReadNewsView, basename='n-read')
@@ -57,7 +62,6 @@ router.register('questions-history', UserQuestionView, basename='questions-histo
 router.register('like-questions', UserLikesQuestionsView, basename='like-questions')
 router.register('like-articles', UserLikesArticlesView, basename='like-articles')
 router.register('like-news', UserLikesNewsView, basename='like-news')
-
 
 app_name = "api"
 urlpatterns = router.urls

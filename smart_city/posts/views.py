@@ -2,7 +2,7 @@ from django.db.models import Q, Count
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
-from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 
 from .serializer import (NewsSerializer, ArticleSerializer, QuestionSerializer, ImageQuestionSerializer,
                          TagsSerializer, ThemeSerializer, SearchNewsSerializer, SearchArticlesSerializer,
@@ -24,7 +24,7 @@ class NewsApiView(viewsets.ModelViewSet):
                                                             comment_count=Count("newsreview")).order_by('-created_at')
     serializer_class = NewsSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
-    parser_classes = [MultiPartParser, FormParser]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
 
     def get_queryset(self):
         queryset = self.queryset.prefetch_related("user",'theme','tags',"user_liked_news")

@@ -401,6 +401,7 @@ SPECTACULAR_SETTINGS = {
         {"url": "http://127.0.0.1:8000", "description": "Local Development server"},
         {"url": "https://api.smartcities.uz", "description": "Production server"},
     ],
+    'SCHEMA_PATH_PREFIX': '/v1/',
 }
 # Your stuff...
 # ------------------------------------------------------------------------------

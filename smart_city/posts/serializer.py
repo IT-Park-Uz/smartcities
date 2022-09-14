@@ -31,6 +31,7 @@ class NewsSerializer(serializers.ModelSerializer):
     class Meta:
         model = News
         fields = '__all__'
+
     def to_representation(self, instance):
         response = super().to_representation(instance)
         iterable = True if isinstance(instance, models.Manager) else False
@@ -72,21 +73,18 @@ class SearchNewsSerializer(serializers.ModelSerializer):
     class Meta:
         model = News
         fields = ['id', 'title', 'theme', 'tags', 'description']
-        depth = 1
 
 
 class SearchArticlesSerializer(serializers.ModelSerializer):
     class Meta:
         model = News
         fields = ['id', 'title', 'theme', 'tags', 'description']
-        depth = 1
 
 
 class SearchQuestionsSerializer(serializers.ModelSerializer):
     class Meta:
         model = News
         fields = ['id', 'title', 'theme', 'tags', 'description']
-        depth = 1
 
 
 class ArticleSerializer(serializers.ModelSerializer):
@@ -213,7 +211,6 @@ class ThemeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Theme
         fields = ['id', 'name', 'tree_id', 'parent', ]
-        depth = 1
 
 
 class NewsReviewSerializer(serializers.ModelSerializer):

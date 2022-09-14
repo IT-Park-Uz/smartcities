@@ -3,6 +3,8 @@ from smart_city.posts.models import (News, Article, Question, ImageQuestion, Tag
                                      QuestionReview, UserLikedNews, UserLikedArticles, UserLikedQuestions)
 from django.contrib.auth import get_user_model
 
+from django.db import models
+
 User = get_user_model()
 
 
@@ -19,28 +21,25 @@ class TagsSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-
 class NewsSerializer(serializers.ModelSerializer):
     # username = serializers.CharField(source='user.first_name')
     tags = TagsSerializer(read_only=True, many=True)
     tags_ids = serializers.PrimaryKeyRelatedField(
         many=True, write_only=True, queryset=Tags.objects.all()
     )
-    like_count = serializers.IntegerField(read_only=True)
-    comments_count = serializers.IntegerField(read_only=True)
-    is_liked = serializers.BooleanField(read_only=True)
 
     class Meta:
         model = News
         fields = '__all__'
-
     def to_representation(self, instance):
         response = super().to_representation(instance)
-        response['user'] = UserSerializer(instance.user).data
-        response['theme'] = ThemeSerializer(instance.theme).data
-        response['is_liked'] = instance.is_liked
-        response['comments_count'] = instance.comment_count
-        response['like_count'] = instance.like_count
+        iterable = True if isinstance(instance, models.Manager) else False
+        if iterable:
+            response['user'] = UserSerializer(instance.user).data
+            response['theme'] = ThemeSerializer(instance.theme).data
+            response['is_liked'] = instance.is_liked
+            response['comments_count'] = instance.comment_count
+            response['like_count'] = instance.like_count
         return response
 
 
@@ -52,6 +51,8 @@ class NewsSerializer(serializers.ModelSerializer):
             for i in tag:
                 new.tags.add(i)
         return new
+
+
 
 
 class NewsHistorySerializer(serializers.ModelSerializer):

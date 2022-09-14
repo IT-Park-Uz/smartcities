@@ -43,20 +43,6 @@ class NewsSerializer(serializers.ModelSerializer):
         response['like_count'] = instance.like_count
         return response
 
-    def get_comments(self, obj):
-        posts = obj.newsreview_set.all().count()
-        return posts
-
-    def is_liked(self, obj):
-        try:
-            liked = obj.user_liked_news.filter(user=self.context['request'].user).first()
-        except:
-            liked = False
-        return True if liked else False
-    #
-    # def like_count(self, obj):
-    #     likes = obj.user_liked_news.filter(new=obj).count()
-    #     return likes
 
     def create(self, validated_data):
         tag = validated_data.pop("tags_ids", None)

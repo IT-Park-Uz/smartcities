@@ -33,7 +33,7 @@ class NewsApiView(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(UserLikedNews.objects.filter(
                 user_id=request.user.id,
-                new_id=OuterRef('pk')
+                news_id=OuterRef('pk')
             )
         )))
 

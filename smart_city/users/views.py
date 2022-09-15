@@ -126,7 +126,7 @@ class RegisterAPIView(generics.GenericAPIView):
             code, created = Code.objects.get_or_create(user_id=serializer.data['id'])
             code.save()
             request.session['pk'] = serializer.data['id']
-            send_email({'to_email': serializer.data['email'], 'code': ber})
+            send_email({'to_email': serializer.data['email'], 'code': code.number})
             # Todo: send the code by email to user
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

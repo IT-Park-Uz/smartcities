@@ -117,34 +117,53 @@ class RegisterAPIView(generics.GenericAPIView):
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
+        check = self.check_user_verify(request)
         if serializer.is_valid(raise_exception=True):
-            serializer.save()
+            if check:
+                serializer.save()
+            else:
+                return Response({'message':'User already exists'}, status=status.HTTP_400_BAD_REQUEST)
             code, created = Code.objects.get_or_create(user_id=serializer.data['id'])
             code.save()
-            print(serializer.data['email'], code.number)
-            send_email({'to_email': serializer.data['email'], 'code': code.number})
+            request.session['pk'] = serializer.data['id']
+            send_email({'to_email': serializer.data['email'], 'code': ber})
             # Todo: send the code by email to user
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def check_user_verify(self, request):
+        try:
+            email = request.data.get('email')
+        except:
+            return True
+        if not EmailAddress.objects.filter(email=email).first():
+            user = User.objects.filter(email=email)
+            user.delete()
+            return True
+        else:
+            return False
+
 
 class VerifyCodeView(generics.GenericAPIView):
     serializer_class = CodeSerializer
+    permission_classes = (AllowAny,)
+    queryset = Code.objects.all()
 
     def post(self, request, *args, **kwargs):
-        serializer = CodeSerializer(request.data)
-        serializer.is_valid(raise_exception=True)
-        data = serializer.data
-        num = Code.objects.filter(user_id=int(data['user'])).first()
-        if not num:
-            return Response({'error':'code not found'},status=status.HTTP_400_BAD_REQUEST)
-        if str(num.number) == str(data['number']):
-            user = User.objects.filter(id=data['id']).first()
-            EmailAddress.objects.create(user=user, email=user.email, verified=True)
-            token = self.get_tokens_for_user(user)
-            login(request, user)
-            return Response({'Message': 'Successfully activated', 'token': token}, status=status.HTTP_200_OK)
-        return Response({"Error": 'InvalidCode'}, status=status.HTTP_404_NOT_FOUND)
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            pk = request.session.get('pk')
+            num = Code.objects.filter(user_id=int(pk)).first()
+            if not num:
+                return Response({'error': 'code not found'}, status=status.HTTP_400_BAD_REQUEST)
+            if str(num.number) == str(serializer.data['number']):
+                user = User.objects.filter(id=int(pk)).first()
+                EmailAddress.objects.create(user=user, email=user.email, primary=True, verified=True)
+                token = self.get_tokens_for_user(user)
+                login(request, user)
+                return Response({'Message': 'Successfully activated', 'token': token}, status=status.HTTP_200_OK)
+            return Response({'Message': 'Code is not match'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
 
     def get_tokens_for_user(self, user):
         refresh = RefreshToken.for_user(user)
@@ -161,7 +180,7 @@ class LogoutView(APIView):
         try:
             token = RefreshToken(serializer.data['refresh'])
         except:
-            return Response({'message': "Token is blacklisted"},status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': "Token is blacklisted"}, status=status.HTTP_400_BAD_REQUEST)
         logout(request)
         token.blacklist()
         return Response(status=status.HTTP_205_RESET_CONTENT)

@@ -28,6 +28,8 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 
 class CodeSerializer(serializers.ModelSerializer):
+    # user_id = serializers.IntegerField()
+
     class Meta:
         model = Code
-        fields = ['number']
+        fields = ['user','number']

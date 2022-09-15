@@ -132,12 +132,14 @@ class VerifyCodeView(generics.GenericAPIView):
     serializer_class = CodeSerializer
 
     def post(self, request, *args, **kwargs):
-        code = request.data
-        num = Code.objects.filter(user_id=int(code['id'])).first()
+        serializer = CodeSerializer(request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.data
+        num = Code.objects.filter(user_id=int(data['user'])).first()
         if not num:
             return Response({'error':'code not found'},status=status.HTTP_400_BAD_REQUEST)
-        if str(num.number) == str(code['number']):
-            user = User.objects.filter(id=code['id']).first()
+        if str(num.number) == str(data['number']):
+            user = User.objects.filter(id=data['id']).first()
             EmailAddress.objects.create(user=user, email=user.email, verified=True)
             token = self.get_tokens_for_user(user)
             login(request, user)

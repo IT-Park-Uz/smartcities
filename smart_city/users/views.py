@@ -125,7 +125,6 @@ class RegisterAPIView(generics.GenericAPIView):
                 return Response({'message':'User already exists'}, status=status.HTTP_400_BAD_REQUEST)
             code, created = Code.objects.get_or_create(user_id=serializer.data['id'])
             code.save()
-            request.session['pk'] = serializer.data['id']
             send_email({'to_email': serializer.data['email'], 'code': code.number})
             # Todo: send the code by email to user
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -152,12 +151,11 @@ class VerifyCodeView(generics.GenericAPIView):
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
-            pk = request.session.get('pk')
-            num = Code.objects.filter(user_id=int(pk)).first()
+            num = Code.objects.filter(user_id=int(serializer.data['user'])).first()
             if not num:
                 return Response({'error': 'code not found'}, status=status.HTTP_400_BAD_REQUEST)
             if str(num.number) == str(serializer.data['number']):
-                user = User.objects.filter(id=int(pk)).first()
+                user = User.objects.filter(id=int(serializer.data['user'])).first()
                 EmailAddress.objects.create(user=user, email=user.email, primary=True, verified=True)
                 token = self.get_tokens_for_user(user)
                 login(request, user)

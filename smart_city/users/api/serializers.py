@@ -27,5 +27,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         return User.objects.create_user(**validated_data)
 
 
-class CodeSerializer(serializers.Serializer):
-    number = serializers.CharField(max_length=6)
+class CodeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Code
+        fields = ['user','number']

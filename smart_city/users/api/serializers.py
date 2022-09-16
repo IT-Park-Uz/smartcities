@@ -31,3 +31,6 @@ class CodeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Code
         fields = ['user','number']
+
+class GetEmailSerializer(serializers.Serializer):
+    email = serializers.EmailField()

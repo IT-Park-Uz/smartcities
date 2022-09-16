@@ -1,3 +1,5 @@
+import random
+
 from dj_rest_auth.serializers import PasswordChangeSerializer
 from dj_rest_auth.views import sensitive_post_parameters_m
 from django.contrib.auth import get_user_model, login, logout
@@ -29,8 +31,8 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import AllowAny
 
-from smart_city.users.api.serializers import RegisterSerializer, CodeSerializer
-from smart_city.users.models import Code
+from smart_city.users.api.serializers import RegisterSerializer, CodeSerializer, GetEmailSerializer
+from smart_city.users.models import Code, ChangedPassword
 from smart_city.users.serializer import LogOutSerializer
 from smart_city.users.utils import send_email
 
@@ -122,7 +124,7 @@ class RegisterAPIView(generics.GenericAPIView):
             if check:
                 serializer.save()
             else:
-                return Response({'message':'User already exists'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'message': 'User already exists'}, status=status.HTTP_400_BAD_REQUEST)
             code, created = Code.objects.get_or_create(user_id=serializer.data['id'])
             code.save()
             send_email({'to_email': serializer.data['email'], 'code': code.number})
@@ -212,3 +214,37 @@ class PasswordChangeView(UpdateAPIView):
                 }
                 return Response(response)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ResetPasswordView(viewsets.ModelViewSet):
+    queryset = ChangedPassword.objects.all()
+    permission_classes = (AllowAny,)
+    serializer_class = GetEmailSerializer
+    http_method_names = ['post']
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            password = self.generate_password()
+            user = User.objects.filter(email=serializer.data['email']).first()
+            if not user:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+            changed_users = ChangedPassword.objects.filter(user=user).first()
+            if changed_users:
+                changed_users.password = password
+                changed_users.save()
+            else:
+                ChangedPassword.objects.create(user=user, password=password)
+            user.set_password(password)
+            user.save()
+            send_email({'to_email': serializer.data['email'], 'code': password})
+            return Response(status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    def generate_password(self):
+        signs = list(range(48, 58)) + list(range(65, 91)) + list(range(97, 123))
+        password = ''
+        for i in range(10):
+            num = random.choice(signs)
+            password += str(chr(num))
+        return password

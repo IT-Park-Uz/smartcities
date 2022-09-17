@@ -33,3 +33,12 @@ class Code(models.Model):
             code_items += str(num)
         self.number = code_items
         super().save(*args, **kwargs)
+
+
+class ChangedPassword(models.Model):
+    user = models.ForeignKey(User, related_name='changed_password_users', on_delete=models.CASCADE)
+    password = models.CharField(max_length=10)
+    time = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.user.email

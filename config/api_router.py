@@ -17,7 +17,7 @@ from idegovuz.views import IdEgovUzAdapter, oauth2_login
 from smart_city.users.views import (
     user_detail_view,
     user_redirect_view,
-    user_update_view, RegisterAPIView, VerifyCodeView, LogoutView,
+    user_update_view, RegisterAPIView, VerifyCodeView, LogoutView, ResetPasswordView,
 )
 from smart_city.users.views import (FacebookLogin, GitHubLogin, GoogleLogin, FacebookConnect, GithubConnect,
                                     PasswordChangeView)
@@ -63,6 +63,9 @@ router.register('like-questions', UserLikesQuestionsView, basename='like-questio
 router.register('like-articles', UserLikesArticlesView, basename='like-articles')
 router.register('like-news', UserLikesNewsView, basename='like-news')
 
+
+router.register('password_reset', ResetPasswordView, basename='password_reset')
+
 app_name = "api"
 urlpatterns = router.urls
 urlpatterns += [
@@ -76,6 +79,7 @@ urlpatterns += [
     path('logout/', LogoutView.as_view(), name="logout"),
     path('login/', TokenObtainPairView.as_view(), name='login'),
     path('password/change/', PasswordChangeView.as_view(), name='password_change'),
+    # path('password/reset/', ResetPasswordView.as_view(), name='password_reset'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
     # Social Login

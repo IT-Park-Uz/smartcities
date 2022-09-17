@@ -2,8 +2,9 @@ from django.contrib import admin
 from django.contrib.auth import admin as auth_admin
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
-from .models import Code
+from .models import Code, ChangedPassword
 from smart_city.users.forms import UserAdminChangeForm, UserAdminCreationForm
+from .views import ResetPasswordView
 
 User = get_user_model()
 
@@ -33,3 +34,4 @@ class UserAdmin(auth_admin.UserAdmin):
     list_display = ["username", "is_superuser"]
     search_fields = ["email"]
 admin.site.register(Code)
+admin.site.register(ChangedPassword)

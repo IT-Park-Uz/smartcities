@@ -6,8 +6,7 @@ from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 
 from .serializer import (NewsSerializer, ArticleSerializer, QuestionSerializer, ImageQuestionSerializer,
                          TagsSerializer, ThemeSerializer, SearchNewsSerializer, SearchArticlesSerializer,
-                         SearchQuestionsSerializer, NewsHistorySerializer, QuestionHistorySerializer,
-                         ArticleHistorySerializer, NewsReviewSerializer, ArticleReviewSerializer,
+                         SearchQuestionsSerializer,NewsReviewSerializer, ArticleReviewSerializer,
                          QuestionReviewSerializer, UserLikedNewsSerializer, UserLikedArticlesSerializer,
                          UserLikedQuestionsSerializer, NewsWriteSerializer, ArticleWriteSerializer,
                          QuestionWriteSerializer)

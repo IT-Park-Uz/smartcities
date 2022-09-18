@@ -36,8 +36,8 @@ router.register('tags', TagsApiView, basename='tags')
 router.register('theme', ThemeApiView, basename='theme')
 
 router.register('theme-gr-news', ThemeGroupNewsView, basename='theme-gr-news')
-router.register('theme-gr-qs', ThemeGroupArticlesView, basename='theme-gr-qs')
-router.register('theme-gr-ar', ThemeGroupQuestionsView, basename='theme-gr-ar')
+router.register('theme-gr-qs', ThemeGroupQuestionsView, basename='theme-gr-qs')
+router.register('theme-gr-ar', ThemeGroupArticlesView, basename='theme-gr-ar')
 
 # sidebar routes
 router.register('n-like', LikeNewsView, basename='n-like')

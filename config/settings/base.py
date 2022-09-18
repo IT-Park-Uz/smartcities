@@ -390,6 +390,19 @@ OLD_PASSWORD_FIELD_ENABLED = True
 # django-cors-headers - https://github.com/adamchainz/django-cors-headers#setup
 # CORS_URLS_REGEX = r"^/v1/.*$"
 
+CORS_ALLOWED_ORIGINS = [
+    "https://api.smartcities.uz",
+    "https://hub.smartcities.uz",
+    "http://localhost:8080",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://hub.smartcities.uz",
+    "https://api.smartcities.uz",
+]
+
+CORS_ALLOW_CREDENTIALS= True
+
 # By Default swagger ui is available only to admin user(s). You can change permission classes to change that
 # See more configuration options at https://drf-spectacular.readthedocs.io/en/latest/settings.html#settings
 SPECTACULAR_SETTINGS = {

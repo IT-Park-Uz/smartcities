@@ -1,4 +1,5 @@
 from django.db.models import Q, Count
+from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
@@ -6,7 +7,7 @@ from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 
 from .serializer import (NewsSerializer, ArticleSerializer, QuestionSerializer, ImageQuestionSerializer,
                          TagsSerializer, ThemeSerializer, SearchNewsSerializer, SearchArticlesSerializer,
-                         SearchQuestionsSerializer,NewsReviewSerializer, ArticleReviewSerializer,
+                         SearchQuestionsSerializer, NewsReviewSerializer, ArticleReviewSerializer,
                          QuestionReviewSerializer, UserLikedNewsSerializer, UserLikedArticlesSerializer,
                          UserLikedQuestionsSerializer, NewsWriteSerializer, ArticleWriteSerializer,
                          QuestionWriteSerializer)
@@ -785,8 +786,19 @@ class ReadQuestionsView(viewsets.ModelViewSet):
 class UserLikesNewsView(viewsets.ModelViewSet):
     queryset = UserLikedNews.objects.all()
     serializer_class = UserLikedNewsSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
     http_method_names = ['get', 'post', 'delete']
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            news = self.queryset.filter(news_id=serializer.data['news'], user_id=serializer.data['user']).first()
+            if not news and get_object_or_404(News, id=serializer.data['news']):
+                UserLikedNews.objects.create(news_id=serializer.data['news'], user_id=serializer.data['user'])
+                return Response(status=status.HTTP_201_CREATED)
+            self.perform_destroy(news)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserLikesArticlesView(viewsets.ModelViewSet):
@@ -795,9 +807,31 @@ class UserLikesArticlesView(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly]
     http_method_names = ['get', 'post', 'delete']
 
+    def create(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            article = self.queryset.filter(article_id=serializer.data['article'], user_id=serializer.data['user']).first()
+            if not article and get_object_or_404(Article, id=serializer.data['article']):
+                UserLikedArticles.objects.create(article_id=serializer.data['article'], user_id=serializer.data['user'])
+                return Response(status=status.HTTP_201_CREATED)
+            self.perform_destroy(article)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
 
 class UserLikesQuestionsView(viewsets.ModelViewSet):
     queryset = UserLikedQuestions.objects.all()
     serializer_class = UserLikedQuestionsSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
     http_method_names = ['get', 'post', 'delete']
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            question = self.queryset.filter(question_id=serializer.data['question'], user_id=serializer.data['user']).first()
+            if not question and get_object_or_404(Question, id=serializer.data['question']):
+                UserLikedQuestions.objects.create(question_id=serializer.data['question'], user_id=serializer.data['user'])
+                return Response(status=status.HTTP_201_CREATED)
+            self.perform_destroy(question)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_400_BAD_REQUEST)

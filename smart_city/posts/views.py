@@ -658,7 +658,7 @@ class LikeNewsView(viewsets.ModelViewSet):
             id=OuterRef('pk')
         ))))
 
-        page = self.paginate_queryset(queryset.order_by('user_liked')[:10])
+        page = self.paginate_queryset(queryset.order_by('user_liked'))
         if page is not None:
             serializer = self.get_serializer(page, many=True)
             return self.get_paginated_response(serializer.data)
@@ -668,8 +668,7 @@ class LikeNewsView(viewsets.ModelViewSet):
 
 
 class ReadNewsView(viewsets.ModelViewSet):
-    queryset = News.objects.filter(is_active=True).order_by("-view_count")[:10].annotate(
-        comment_count=Count("newsreview"))
+    queryset = News.objects.filter(is_active=True).order_by("-view_count").annotate(comment_count=Count("newsreview"))
     serializer_class = NewsSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
     http_method_names = ['get']
@@ -709,7 +708,7 @@ class LikeArticlesView(viewsets.ModelViewSet):
             id=OuterRef('pk')
         ))))
 
-        page = self.paginate_queryset(queryset.order_by('user_liked')[:10])
+        page = self.paginate_queryset(queryset.order_by('user_liked'))
         if page is not None:
             serializer = self.get_serializer(page, many=True)
             return self.get_paginated_response(serializer.data)
@@ -719,7 +718,7 @@ class LikeArticlesView(viewsets.ModelViewSet):
 
 
 class ReadArticlesView(viewsets.ModelViewSet):
-    queryset = Article.objects.filter(is_active=True).order_by("-view_count")[:10].annotate(
+    queryset = Article.objects.filter(is_active=True).order_by("-view_count").annotate(
         comment_count=Count("articlereview"))
     serializer_class = ArticleSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
@@ -760,7 +759,7 @@ class LikeQuestionsView(viewsets.ModelViewSet):
             id=OuterRef('pk')
         ))))
 
-        page = self.paginate_queryset(queryset.order_by('user_liked')[:10])
+        page = self.paginate_queryset(queryset.order_by('user_liked'))
         if page is not None:
             serializer = self.get_serializer(page, many=True)
             return self.get_paginated_response(serializer.data)
@@ -770,7 +769,7 @@ class LikeQuestionsView(viewsets.ModelViewSet):
 
 
 class ReadQuestionsView(viewsets.ModelViewSet):
-    queryset = Question.objects.filter(is_active=True).order_by('-view_count')[:10].annotate(
+    queryset = Question.objects.filter(is_active=True).order_by('-view_count').annotate(
         comment_count=Count("questionreview"))
     serializer_class = QuestionSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]

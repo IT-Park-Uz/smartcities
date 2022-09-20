@@ -7,8 +7,7 @@ from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnl
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 
 from .serializer import (NewsSerializer, ArticleSerializer, QuestionSerializer, ImageQuestionSerializer,
-                         TagsSerializer, ThemeSerializer, SearchNewsSerializer, SearchArticlesSerializer,
-                         SearchQuestionsSerializer, NewsReviewSerializer, ArticleReviewSerializer,
+                         TagsSerializer, ThemeSerializer, NewsReviewSerializer, ArticleReviewSerializer,
                          QuestionReviewSerializer, NewsWriteSerializer, ArticleWriteSerializer,
                          QuestionWriteSerializer)
 from .mixin import ReadWriteSerializerMixin
@@ -35,8 +34,7 @@ class NewsApiView(ReadWriteSerializerMixin, viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
-            user_liked__id=request.user.id,
-            id=OuterRef('pk')
+            Q(user_liked__id=request.user.id) & Q(id=OuterRef('pk'))
         ))))
         page = self.paginate_queryset(queryset)
         if page is not None:
@@ -46,9 +44,8 @@ class NewsApiView(ReadWriteSerializerMixin, viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def retrieve(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
-            user_liked__id=request.user.id,
-            id=OuterRef('pk')
+        queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.queryset.filter(
+            Q(user_liked__id=request.user.id) & Q(id=OuterRef('pk'))
         ))))
         try:
             new = queryset.filter(id=int(kwargs['pk'])).first()
@@ -96,18 +93,23 @@ class NewsApiView(ReadWriteSerializerMixin, viewsets.ModelViewSet):
         description="THE URL USES FOR SEARCHING NEWS ")
 )
 class SearchNewsView(viewsets.ModelViewSet):
-    queryset = News.objects.filter(is_active=True)
-    serializer_class = SearchNewsSerializer
+    queryset = News.objects.filter(is_active=True).annotate(comment_count=Count("newsreview")).order_by('-view_count')
+    serializer_class = NewsSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
     http_method_names = ['get']
 
+    def get_queryset(self):
+        queryset = self.queryset.prefetch_related("user", 'theme', 'tags')
+        return queryset
+
     def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
+            Q(user_liked__id=request.user.id) & Q(id=OuterRef('pk'))
+        ))))
         try:
             key = request.query_params['key']
-            news = self.get_queryset().filter(
-                Q(title__icontains=key) | Q(
-                    theme__name__icontains=key) | Q(
-                    tags__name=key)).order_by('view_count')
+            news = queryset.filter(
+                Q(title__icontains=key) | Q(theme__name__icontains=key) | Q(tags__name=key)).order_by('-view_count')
             if news:
                 page = self.paginate_queryset(news)
                 if page is not None:
@@ -128,7 +130,7 @@ class SearchNewsView(viewsets.ModelViewSet):
 )
 class SearchArticleView(viewsets.ModelViewSet):
     queryset = Article.objects.filter(is_active=True)
-    serializer_class = SearchArticlesSerializer
+    serializer_class = ArticleSerializer
     http_method_names = ['get']
     permission_classes = [IsAuthenticatedOrReadOnly]
 
@@ -157,7 +159,7 @@ class SearchArticleView(viewsets.ModelViewSet):
 )
 class SearchQuestionView(viewsets.ModelViewSet):
     queryset = Question.objects.filter(is_active=True)
-    serializer_class = SearchQuestionsSerializer
+    serializer_class = QuestionSerializer
     http_method_names = ['get']
     permission_classes = [IsAuthenticatedOrReadOnly]
 
@@ -200,7 +202,7 @@ class UserNewsView(viewsets.ModelViewSet):
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         queryset = self.filter_queryset(self.get_queryset().filter(user=request.user, is_active=stat).annotate(
-            is_liked=Exists(self.get_queryset().filter(user_liked__id=request.user.id, id=OuterRef('pk')))))
+            is_liked=Exists(self.get_queryset().filter(Q(user_liked__id=request.user.id) & Q(id=OuterRef('pk'))))))
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
@@ -224,8 +226,7 @@ class ArticleApiView(ReadWriteSerializerMixin, viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
-            user_liked__id=request.user.id,
-            id=OuterRef('pk')
+            Q(user_liked__id=request.user.id) & Q(id=OuterRef('pk'))
         ))))
 
         page = self.paginate_queryset(queryset)
@@ -238,8 +239,7 @@ class ArticleApiView(ReadWriteSerializerMixin, viewsets.ModelViewSet):
 
     def retrieve(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
-            user_liked__id=request.user.id,
-            id=OuterRef('pk')
+            Q(user_liked__id=request.user.id) & Q(id=OuterRef('pk'))
         ))))
         try:
             article = queryset.filter(id=int(kwargs['pk'])).first()
@@ -297,8 +297,7 @@ class UserArticleView(viewsets.ModelViewSet):
         queryset = self.filter_queryset(
             self.get_queryset().filter(user=request.user, is_active=stat).annotate(
                 is_liked=Exists(self.get_queryset().filter(
-                    user_liked__id=request.user.id,
-                    id=OuterRef('pk')
+                    Q(user_liked__id=request.user.id) & Q(id=OuterRef('pk'))
                 ))))
 
         page = self.paginate_queryset(queryset)
@@ -324,8 +323,7 @@ class QuestionApiView(ReadWriteSerializerMixin, viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
-            user_liked__id=request.user.id,
-            id=OuterRef('pk')
+            Q(user_liked__id=request.user.id) & Q(id=OuterRef('pk'))
         ))))
         page = self.paginate_queryset(queryset)
         if page is not None:
@@ -337,8 +335,7 @@ class QuestionApiView(ReadWriteSerializerMixin, viewsets.ModelViewSet):
 
     def retrieve(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
-            user_liked__id=request.user.id,
-            id=OuterRef('pk')
+            Q(user_liked__id=request.user.id) & Q(id=OuterRef('pk'))
         ))))
         try:
             question = queryset.filter(id=int(kwargs['pk'])).first()
@@ -396,8 +393,7 @@ class UserQuestionView(viewsets.ModelViewSet):
         queryset = self.filter_queryset(
             self.get_queryset().filter(user=request.user, is_active=stat).annotate(
                 is_liked=Exists(self.get_queryset().filter(
-                    user_liked__id=request.user.id,
-                    id=OuterRef('pk')
+                    Q(user_liked__id=request.user.id) & Q(id=OuterRef('pk'))
                 ))))
 
         page = self.paginate_queryset(queryset)
@@ -491,8 +487,7 @@ class ThemeGroupNewsView(viewsets.ModelViewSet):
         except:
             return Response({'message': 'theme_id not fount in params'}, status=status.HTTP_406_NOT_ACCEPTABLE)
         news = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
-            user_liked__id=request.user.id,
-            id=OuterRef('pk'))))).filter(theme_id=id)
+            Q(user_liked__id=request.user.id) & Q(id=OuterRef('pk')))))).filter(theme_id=id)
         page = self.paginate_queryset(news)
         if page is not None:
             serializer = NewsSerializer(page, many=True)
@@ -527,8 +522,7 @@ class ThemeGroupQuestionsView(viewsets.ModelViewSet):
         except:
             return Response({'message': 'theme_id not fount in params'}, status=status.HTTP_406_NOT_ACCEPTABLE)
         questions = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
-            user_liked__id=request.user.id,
-            id=OuterRef('pk'))))).filter(theme_id=id)
+            Q(user_liked__id=request.user.id) & Q(id=OuterRef('pk')))))).filter(theme_id=id)
         page = self.paginate_queryset(questions)
         if page is not None:
             serializer = QuestionSerializer(page, many=True)
@@ -563,8 +557,7 @@ class ThemeGroupArticlesView(viewsets.ModelViewSet):
         except:
             return Response({'message': 'theme_id not fount in params'}, status=status.HTTP_406_NOT_ACCEPTABLE)
         articles = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
-            user_liked__id=request.user.id,
-            id=OuterRef('pk'))))).filter(theme_id=id)
+            Q(user_liked__id=request.user.id) & Q(id=OuterRef('pk')))))).filter(theme_id=id)
         page = self.paginate_queryset(articles)
         if page is not None:
             serializer = ArticleSerializer(page, many=True)
@@ -654,8 +647,7 @@ class LikeNewsView(viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
-            user_liked__id=request.user.id,
-            id=OuterRef('pk')
+            Q(user_liked__id=request.user.id) & Q(id=OuterRef('pk'))
         ))))
 
         page = self.paginate_queryset(queryset.order_by('user_liked'))
@@ -679,8 +671,7 @@ class ReadNewsView(viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
-            user_liked__id=request.user.id,
-            id=OuterRef('pk')
+            Q(user_liked__id=request.user.id) & Q(id=OuterRef('pk'))
         ))))
 
         page = self.paginate_queryset(queryset)
@@ -704,8 +695,7 @@ class LikeArticlesView(viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
-            user_liked__id=request.user.id,
-            id=OuterRef('pk')
+            Q(user_liked__id=request.user.id) & Q(id=OuterRef('pk'))
         ))))
 
         page = self.paginate_queryset(queryset.order_by('user_liked'))
@@ -730,8 +720,7 @@ class ReadArticlesView(viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
-            user_liked__id=request.user.id,
-            id=OuterRef('pk')
+            Q(user_liked__id=request.user.id) & Q(id=OuterRef('pk'))
         ))))
 
         page = self.paginate_queryset(queryset)
@@ -755,8 +744,7 @@ class LikeQuestionsView(viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
-            user_liked__id=request.user.id,
-            id=OuterRef('pk')
+            Q(user_liked__id=request.user.id) & Q(id=OuterRef('pk'))
         ))))
 
         page = self.paginate_queryset(queryset.order_by('user_liked'))
@@ -781,8 +769,7 @@ class ReadQuestionsView(viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
-            user_liked__id=request.user.id,
-            id=OuterRef('pk')
+            Q(user_liked__id=request.user.id) & Q(id=OuterRef('pk'))
         ))))
 
         page = self.paginate_queryset(queryset)

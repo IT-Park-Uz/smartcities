@@ -56,45 +56,6 @@ class NewsWriteSerializer(serializers.ModelSerializer):
         return news
 
 
-class SearchNewsSerializer(serializers.ModelSerializer):
-    tags = TagsSerializer(read_only=True, many=True)
-
-    class Meta:
-        model = News
-        fields = ['id', 'title', 'theme', 'tags', 'description']
-
-    def to_representation(self, instance):
-        response = super().to_representation(instance)
-        response['theme'] = ThemeSerializer(instance.theme).data
-        return response
-
-
-class SearchArticlesSerializer(serializers.ModelSerializer):
-    tags = TagsSerializer(read_only=True, many=True)
-
-    class Meta:
-        model = News
-        fields = ['id', 'title', 'theme', 'tags', 'description']
-
-    def to_representation(self, instance):
-        response = super().to_representation(instance)
-        response['theme'] = ThemeSerializer(instance.theme).data
-        return response
-
-
-class SearchQuestionsSerializer(serializers.ModelSerializer):
-    tags = TagsSerializer(read_only=True, many=True)
-
-    class Meta:
-        model = News
-        fields = ['id', 'title', 'theme', 'tags', 'description']
-
-    def to_representation(self, instance):
-        response = super().to_representation(instance)
-        response['theme'] = ThemeSerializer(instance.theme).data
-        return response
-
-
 class ArticleSerializer(serializers.ModelSerializer):
     tags = TagsSerializer(read_only=True, many=True)
     like_count = serializers.ReadOnlyField()

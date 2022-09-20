@@ -29,6 +29,8 @@ class NewsApiView(ReadWriteSerializerMixin, viewsets.ModelViewSet):
     write_serializer_class = NewsWriteSerializer
 
     def get_queryset(self):
+        for i in News.objects.all():
+            i.delete()
         queryset = self.queryset.prefetch_related("user", 'theme', 'tags')
         return queryset
 
@@ -129,17 +131,24 @@ class SearchNewsView(viewsets.ModelViewSet):
         description="THE URL USES FOR SEARCHING ARTICLES ")
 )
 class SearchArticleView(viewsets.ModelViewSet):
-    queryset = Article.objects.filter(is_active=True)
+    queryset = Article.objects.filter(is_active=True).annotate(comment_count=Count("articlereview")).order_by('-view_count')
     serializer_class = ArticleSerializer
     http_method_names = ['get']
     permission_classes = [IsAuthenticatedOrReadOnly]
 
+    def get_queryset(self):
+        queryset = self.queryset.prefetch_related("user", 'theme', 'tags')
+        return queryset
+
     def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
+            Q(user_liked__id=request.user.id) & Q(id=OuterRef('pk'))
+        ))))
         try:
-            articles = self.queryset.filter(
+            articles = queryset.filter(
                 Q(title__icontains=request.query_params['key']) | Q(
                     theme__name__icontains=request.query_params['key']) | Q(
-                    tags__name=request.query_params['key'])).order_by('view_count', 'created_at')
+                    tags__name=request.query_params['key']))
             page = self.paginate_queryset(articles)
             if page is not None:
                 serializer = self.get_serializer(page, many=True)
@@ -158,17 +167,24 @@ class SearchArticleView(viewsets.ModelViewSet):
         description="THE URL USES FOR SEARCHING QUESTIONS ")
 )
 class SearchQuestionView(viewsets.ModelViewSet):
-    queryset = Question.objects.filter(is_active=True)
+    queryset = Question.objects.filter(is_active=True).annotate(comment_count=Count("questionreview")).order_by('-view_count')
     serializer_class = QuestionSerializer
     http_method_names = ['get']
     permission_classes = [IsAuthenticatedOrReadOnly]
 
+    def get_queryset(self):
+        queryset = self.queryset.prefetch_related("user", 'theme', 'tags')
+        return queryset
+
     def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
+            Q(user_liked__id=request.user.id) & Q(id=OuterRef('pk'))
+        ))))
         try:
-            questions = self.get_queryset().filter(
+            questions = queryset().filter(
                 Q(title__icontains=request.query_params['key']) | Q(
                     theme__name__icontains=request.query_params['key']) | Q(
-                    tags__name=request.query_params['key'])).order_by('view_count', 'created_at')
+                    tags__name=request.query_params['key']))
             page = self.paginate_queryset(questions)
             if page is not None:
                 serializer = self.get_serializer(page, many=True)

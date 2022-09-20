@@ -1,6 +1,5 @@
 from ckeditor_uploader.fields import RichTextUploadingField
 from django.db import models
-from django.db.models.fields import related
 
 from smart_city.users.models import User
 from mptt.models import MPTTModel, TreeForeignKey
@@ -14,6 +13,7 @@ class News(models.Model):
     image = models.ImageField(upload_to='News/%y/%m/%d', null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     view_count = models.IntegerField(default=0)
+    user_liked = models.ManyToManyField(User, related_name="user_liked_n", null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     tags = models.ManyToManyField('Tags', blank=True)
     is_delete = models.BooleanField(default=False)
@@ -24,6 +24,10 @@ class News(models.Model):
         ordering = ['-id']
         verbose_name = _("Новость")
         verbose_name_plural = _("Новости")
+
+    @property
+    def like_count(self):
+        return self.user_liked.count()
 
     @property
     def imageURL(self):
@@ -58,6 +62,7 @@ class Article(models.Model):
     image = models.ImageField(upload_to='Article/%y/%m/%d', null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     view_count = models.IntegerField(default=0)
+    user_liked = models.ManyToManyField(User, related_name="user_liked_a", null=True)
     tags = models.ManyToManyField('Tags', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     is_delete = models.BooleanField(default=False)
@@ -68,6 +73,10 @@ class Article(models.Model):
         ordering = ['-id']
         verbose_name = _("Статья")
         verbose_name_plural = _("Статьи")
+
+    @property
+    def like_count(self):
+        return self.user_liked.count()
 
     @property
     def imageURL(self):
@@ -108,6 +117,7 @@ class Question(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField(null=True, blank=True)
     view_count = models.IntegerField(default=0)
+    user_liked = models.ManyToManyField(User, related_name="user_liked_q", null=True)
     tags = models.ManyToManyField('Tags', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     is_delete = models.BooleanField(default=False)
@@ -118,6 +128,10 @@ class Question(models.Model):
         ordering = ['-id']
         verbose_name = _("Вопрос")
         verbose_name_plural = _("Вопросы")
+
+    @property
+    def like_count(self):
+        return self.user_liked.count()
 
     def __str__(self):
         return f"{self.id} | {self.title[:20]}"
@@ -186,49 +200,10 @@ class Theme(MPTTModel):
         verbose_name_plural = _("Категории")
 
 
-class UserLikedNews(models.Model):
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-    news = models.ForeignKey(News, on_delete=models.SET_NULL, related_query_name="user_liked_news",
-                             related_name="user_liked_news", null=True)
-
-    def __str__(self):
-        return f"{self.id}"
-
-
-class UserLikedArticles(models.Model):
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-    article = models.ForeignKey(Article, on_delete=models.SET_NULL, related_name="user_liked_articles",
-                                related_query_name="user_liked_articles", null=True)
-
-    def __str__(self):
-        return f"{self.id}"
-
-
-class UserLikedQuestions(models.Model):
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-    question = models.ForeignKey(Question, on_delete=models.SET_NULL, related_name="user_liked_questions",
-                                 related_query_name="user_liked_questions", null=True)
-
-    def __str__(self):
-        return f"{self.id}"
-
-# class UserReadNews(models.Model):
-#     user = models.ForeignKey(User, on_delete=models.CASCADE)
-#     question = models.ForeignKey(Question, on_delete=models.CASCADE)
+# class Notification(models.Model):
+#     title = models.CharField(max_length=255)
+#     description = models.TextField(null=True, blank=True)
+#     is_active = models.BooleanField(default=False)
 #
 #     def __str__(self):
-#         return f"{self.id}"
-#
-# class UserReadArticle(models.Model):
-#     user = models.ForeignKey(User, on_delete=models.CASCADE)
-#     question = models.ForeignKey(Question, on_delete=models.CASCADE)
-#
-#     def __str__(self):
-#         return f"{self.id}"
-#
-# class UserReadQuestions(models.Model):
-#     user = models.ForeignKey(User, on_delete=models.CASCADE)
-#     question = models.ForeignKey(Question, on_delete=models.CASCADE)
-#
-#     def __str__(self):
-#         return f"{self.id}"
+#         return f"{self.id} | {self.title[:20]}"

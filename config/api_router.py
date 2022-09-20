@@ -8,16 +8,13 @@ from smart_city.posts.views import (NewsApiView, ArticleApiView, QuestionApiView
                                     ImageQuestionApiView, TagsApiView, ThemeApiView, SearchNewsView, SearchArticleView,
                                     SearchQuestionView, NewsReviewView, ArticleReviewView, QuestionReviewView,
                                     LikeNewsView, ReadNewsView, LikeArticlesView, ReadArticlesView, LikeQuestionsView,
-                                    ReadQuestionsView, UserLikesQuestionsView, UserLikesArticlesView, UserLikesNewsView,
-                                    ThemeGroupNewsView, ThemeGroupArticlesView, ThemeGroupQuestionsView)
+                                    ReadQuestionsView,ThemeGroupNewsView, ThemeGroupArticlesView, ThemeGroupQuestionsView)
 from smart_city.users.api.views import UserViewSet
 
 from idegovuz.views import IdEgovUzAdapter, oauth2_login
 
 from smart_city.users.views import (
-    user_detail_view,
-    user_redirect_view,
-    user_update_view, RegisterAPIView, VerifyCodeView, LogoutView, ResetPasswordView,
+    RegisterAPIView, VerifyCodeView, LogoutView, ResetPasswordView,
 )
 from smart_city.users.views import (FacebookLogin, GitHubLogin, GoogleLogin, FacebookConnect, GithubConnect,
                                     PasswordChangeView)
@@ -58,10 +55,6 @@ router.register('search-questions', SearchQuestionView, basename='search-questio
 router.register('news-history', UserNewsView, basename='news-history')
 router.register('articles-history', UserArticleView, basename='articles-history')
 router.register('questions-history', UserQuestionView, basename='questions-history')
-
-router.register('like-questions', UserLikesQuestionsView, basename='like-questions')
-router.register('like-articles', UserLikesArticlesView, basename='like-articles')
-router.register('like-news', UserLikesNewsView, basename='like-news')
 
 
 router.register('password_reset', ResetPasswordView, basename='password_reset')

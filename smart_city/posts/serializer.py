@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from smart_city.posts.models import (News, Article, Question, ImageQuestion, Tags, Theme, NewsReview, ArticleReview,
-                                     QuestionReview, UserLikedNews, UserLikedArticles, UserLikedQuestions)
+                                     QuestionReview)
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -10,7 +10,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'first_name', 'last_name', 'image', 'username', 'email', 'organization_name', 'work_name',
-                  'bio', ]
+                  'bio']
 
 
 class TagsSerializer(serializers.ModelSerializer):
@@ -21,10 +21,11 @@ class TagsSerializer(serializers.ModelSerializer):
 
 class NewsSerializer(serializers.ModelSerializer):
     tags = TagsSerializer(read_only=True, many=True)
+    like_count = serializers.ReadOnlyField()
 
     class Meta:
         model = News
-        fields = '__all__'
+        exclude = ['user_liked', 'is_delete', 'is_active', 'is_draft']
 
     def to_representation(self, instance):
         response = super().to_representation(instance)
@@ -32,7 +33,6 @@ class NewsSerializer(serializers.ModelSerializer):
         response['theme'] = ThemeSerializer(instance.theme).data
         response['is_liked'] = instance.is_liked
         response['comments_count'] = instance.comment_count
-        response['like_count'] = instance.like_count
         return response
 
 
@@ -83,7 +83,6 @@ class SearchNewsSerializer(serializers.ModelSerializer):
         return response
 
 
-
 class SearchArticlesSerializer(serializers.ModelSerializer):
     tags = TagsSerializer(read_only=True, many=True)
 
@@ -112,10 +111,11 @@ class SearchQuestionsSerializer(serializers.ModelSerializer):
 
 class ArticleSerializer(serializers.ModelSerializer):
     tags = TagsSerializer(read_only=True, many=True)
+    like_count = serializers.ReadOnlyField()
 
     class Meta:
         model = Article
-        fields = '__all__'
+        exclude = ['user_liked', 'is_delete', 'is_active', 'is_draft']
 
     def to_representation(self, instance):
         response = super().to_representation(instance)
@@ -123,7 +123,6 @@ class ArticleSerializer(serializers.ModelSerializer):
         response['theme'] = ThemeSerializer(instance.theme).data
         response['is_liked'] = instance.is_liked
         response['comments_count'] = instance.comment_count
-        response['like_count'] = instance.like_count
         return response
 
 
@@ -163,10 +162,11 @@ class ArticleHistorySerializer(serializers.ModelSerializer):
 
 class QuestionSerializer(serializers.ModelSerializer):
     tags = TagsSerializer(read_only=True, many=True)
+    like_count = serializers.ReadOnlyField()
 
     class Meta:
         model = Question
-        fields = '__all__'
+        exclude = ['user_liked', 'is_delete', 'is_active', 'is_draft']
 
     def to_representation(self, instance):
         response = super().to_representation(instance)
@@ -174,7 +174,6 @@ class QuestionSerializer(serializers.ModelSerializer):
         response['theme'] = ThemeSerializer(instance.theme).data
         response['is_liked'] = instance.is_liked
         response['comments_count'] = instance.comment_count
-        response['like_count'] = instance.like_count
         return response
 
 
@@ -257,21 +256,3 @@ class QuestionReviewSerializer(serializers.ModelSerializer):
         response = super().to_representation(instance)
         response['user'] = UserSerializer(instance.user).data
         return response
-
-
-class UserLikedNewsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = UserLikedNews
-        fields = '__all__'
-
-
-class UserLikedArticlesSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = UserLikedArticles
-        fields = '__all__'
-
-
-class UserLikedQuestionsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = UserLikedQuestions
-        fields = '__all__'

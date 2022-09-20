@@ -33,6 +33,7 @@ class NewsSerializer(serializers.ModelSerializer):
         response['theme'] = ThemeSerializer(instance.theme).data
         response['is_liked'] = instance.is_liked
         response['comments_count'] = instance.comment_count
+        response['type'] = "NEWS"
         return response
 
 
@@ -53,21 +54,6 @@ class NewsWriteSerializer(serializers.ModelSerializer):
             for i in tag:
                 news.tags.add(i)
         return news
-
-
-class NewsHistorySerializer(serializers.ModelSerializer):
-    tags = TagsSerializer(read_only=True, many=True)
-
-    class Meta:
-        model = News
-        fields = ['id', 'title', 'image', 'created_at', 'theme', 'description', 'tags', 'view_count']
-
-    def to_representation(self, instance):
-        response = super().to_representation(instance)
-        response['theme'] = ThemeSerializer(instance.theme).data
-        response['comments_count'] = instance.comment_count
-        response['like_count'] = instance.like_count
-        return response
 
 
 class SearchNewsSerializer(serializers.ModelSerializer):
@@ -123,6 +109,7 @@ class ArticleSerializer(serializers.ModelSerializer):
         response['theme'] = ThemeSerializer(instance.theme).data
         response['is_liked'] = instance.is_liked
         response['comments_count'] = instance.comment_count
+        response['type'] = "ARTICLE"
         return response
 
 
@@ -145,21 +132,6 @@ class ArticleWriteSerializer(serializers.ModelSerializer):
         return article
 
 
-class ArticleHistorySerializer(serializers.ModelSerializer):
-    tags = TagsSerializer(read_only=True, many=True)
-
-    class Meta:
-        model = Article
-        fields = ['id', 'title', 'image', 'created_at', 'theme', 'description', 'tags', 'view_count']
-
-    def to_representation(self, instance):
-        response = super().to_representation(instance)
-        response['theme'] = ThemeSerializer(instance.theme).data
-        response['comments_count'] = instance.comment_count
-        response['like_count'] = instance.like_count
-        return response
-
-
 class QuestionSerializer(serializers.ModelSerializer):
     tags = TagsSerializer(read_only=True, many=True)
     like_count = serializers.ReadOnlyField()
@@ -174,6 +146,7 @@ class QuestionSerializer(serializers.ModelSerializer):
         response['theme'] = ThemeSerializer(instance.theme).data
         response['is_liked'] = instance.is_liked
         response['comments_count'] = instance.comment_count
+        response['type'] = "QUESTION"
         return response
 
 
@@ -194,21 +167,6 @@ class QuestionWriteSerializer(serializers.ModelSerializer):
             for i in tag:
                 question.tags.add(i)
         return question
-
-
-class QuestionHistorySerializer(serializers.ModelSerializer):
-    tags = TagsSerializer(read_only=True, many=True)
-
-    class Meta:
-        model = Question
-        fields = ['id', 'title', 'type', 'created_at', 'theme', 'description', 'tags', 'view_count']
-
-    def to_representation(self, instance):
-        response = super().to_representation(instance)
-        response['theme'] = ThemeSerializer(instance.theme).data
-        response['comments_count'] = instance.comment_count
-        response['like_count'] = instance.like_count
-        return response
 
 
 class ImageQuestionSerializer(serializers.ModelSerializer):

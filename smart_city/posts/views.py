@@ -359,8 +359,6 @@ class QuestionApiView(ReadWriteSerializerMixin, viewsets.ModelViewSet):
         return queryset
 
     def list(self, request, *args, **kwargs):
-        for i in News.objects.all():
-            i.delete()
         if request.user.is_authenticated:
             queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
                 user_liked__id=request.user.id, id=OuterRef('pk')

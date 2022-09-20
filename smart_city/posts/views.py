@@ -29,15 +29,17 @@ class NewsApiView(ReadWriteSerializerMixin, viewsets.ModelViewSet):
     write_serializer_class = NewsWriteSerializer
 
     def get_queryset(self):
-        for i in News.objects.all():
-            i.delete()
         queryset = self.queryset.prefetch_related("user", 'theme', 'tags')
         return queryset
 
     def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
-            Q(user_liked__id=request.user.id) & Q(id=OuterRef('pk'))
-        ))))
+        if request.user.is_authenticated:
+            queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
+                user_liked__id=request.user.id, id=OuterRef('pk')
+            ))))
+        else:
+            queryset = self.filter_queryset(
+                self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(id=0))))
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
@@ -105,9 +107,13 @@ class SearchNewsView(viewsets.ModelViewSet):
         return queryset
 
     def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
-            Q(user_liked__id=request.user.id) & Q(id=OuterRef('pk'))
-        ))))
+        if request.user.is_authenticated:
+            queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
+                user_liked__id=request.user.id, id=OuterRef('pk')
+            ))))
+        else:
+            queryset = self.filter_queryset(
+                self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(id=0))))
         try:
             key = request.query_params['key']
             news = queryset.filter(
@@ -141,9 +147,13 @@ class SearchArticleView(viewsets.ModelViewSet):
         return queryset
 
     def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
-            Q(user_liked__id=request.user.id) & Q(id=OuterRef('pk'))
-        ))))
+        if request.user.is_authenticated:
+            queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
+                user_liked__id=request.user.id, id=OuterRef('pk')
+            ))))
+        else:
+            queryset = self.filter_queryset(
+                self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(id=0))))
         try:
             articles = queryset.filter(
                 Q(title__icontains=request.query_params['key']) | Q(
@@ -177,11 +187,15 @@ class SearchQuestionView(viewsets.ModelViewSet):
         return queryset
 
     def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
-            Q(user_liked__id=request.user.id) & Q(id=OuterRef('pk'))
-        ))))
+        if request.user.is_authenticated:
+            queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
+                user_liked__id=request.user.id, id=OuterRef('pk')
+            ))))
+        else:
+            queryset = self.filter_queryset(
+                self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(id=0))))
         try:
-            questions = queryset().filter(
+            questions = queryset.filter(
                 Q(title__icontains=request.query_params['key']) | Q(
                     theme__name__icontains=request.query_params['key']) | Q(
                     tags__name=request.query_params['key']))
@@ -241,9 +255,12 @@ class ArticleApiView(ReadWriteSerializerMixin, viewsets.ModelViewSet):
         return queryset
 
     def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
-            Q(user_liked__id=request.user.id) & Q(id=OuterRef('pk'))
-        ))))
+        if request.user.is_authenticated:
+            queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
+                user_liked__id=request.user.id , id=OuterRef('pk')
+            ))))
+        else:
+            queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(id=0))))
 
         page = self.paginate_queryset(queryset)
         if page is not None:
@@ -254,9 +271,13 @@ class ArticleApiView(ReadWriteSerializerMixin, viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def retrieve(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
-            Q(user_liked__id=request.user.id) & Q(id=OuterRef('pk'))
-        ))))
+        if request.user.is_authenticated:
+            queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
+                user_liked__id=request.user.id, id=OuterRef('pk')
+            ))))
+        else:
+            queryset = self.filter_queryset(
+                self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(id=0))))
         try:
             article = queryset.filter(id=int(kwargs['pk'])).first()
             article.view_count += 1
@@ -338,9 +359,15 @@ class QuestionApiView(ReadWriteSerializerMixin, viewsets.ModelViewSet):
         return queryset
 
     def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
-            Q(user_liked__id=request.user.id) & Q(id=OuterRef('pk'))
-        ))))
+        for i in News.objects.all():
+            i.delete()
+        if request.user.is_authenticated:
+            queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
+                user_liked__id=request.user.id, id=OuterRef('pk')
+            ))))
+        else:
+            queryset = self.filter_queryset(
+                self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(id=0))))
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
@@ -350,9 +377,13 @@ class QuestionApiView(ReadWriteSerializerMixin, viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def retrieve(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
-            Q(user_liked__id=request.user.id) & Q(id=OuterRef('pk'))
-        ))))
+        if request.user.is_authenticated:
+            queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
+                user_liked__id=request.user.id, id=OuterRef('pk')
+            ))))
+        else:
+            queryset = self.filter_queryset(
+                self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(id=0))))
         try:
             question = queryset.filter(id=int(kwargs['pk'])).first()
             question.view_count += 1
@@ -662,9 +693,13 @@ class LikeNewsView(viewsets.ModelViewSet):
         return queryset
 
     def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
-            Q(user_liked__id=request.user.id) & Q(id=OuterRef('pk'))
-        ))))
+        if request.user.is_authenticated:
+            queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
+                user_liked__id=request.user.id, id=OuterRef('pk')
+            ))))
+        else:
+            queryset = self.filter_queryset(
+                self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(id=0))))
 
         page = self.paginate_queryset(queryset.order_by('user_liked'))
         if page is not None:
@@ -686,9 +721,13 @@ class ReadNewsView(viewsets.ModelViewSet):
         return queryset
 
     def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
-            Q(user_liked__id=request.user.id) & Q(id=OuterRef('pk'))
-        ))))
+        if request.user.is_authenticated:
+            queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
+                user_liked__id=request.user.id, id=OuterRef('pk')
+            ))))
+        else:
+            queryset = self.filter_queryset(
+                self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(id=0))))
 
         page = self.paginate_queryset(queryset)
         if page is not None:
@@ -710,9 +749,13 @@ class LikeArticlesView(viewsets.ModelViewSet):
         return queryset
 
     def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
-            Q(user_liked__id=request.user.id) & Q(id=OuterRef('pk'))
-        ))))
+        if request.user.is_authenticated:
+            queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
+                user_liked__id=request.user.id, id=OuterRef('pk')
+            ))))
+        else:
+            queryset = self.filter_queryset(
+                self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(id=0))))
 
         page = self.paginate_queryset(queryset.order_by('user_liked'))
         if page is not None:
@@ -735,9 +778,13 @@ class ReadArticlesView(viewsets.ModelViewSet):
         return queryset
 
     def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
-            Q(user_liked__id=request.user.id) & Q(id=OuterRef('pk'))
-        ))))
+        if request.user.is_authenticated:
+            queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
+                user_liked__id=request.user.id, id=OuterRef('pk')
+            ))))
+        else:
+            queryset = self.filter_queryset(
+                self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(id=0))))
 
         page = self.paginate_queryset(queryset)
         if page is not None:
@@ -759,9 +806,13 @@ class LikeQuestionsView(viewsets.ModelViewSet):
         return queryset
 
     def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
-            Q(user_liked__id=request.user.id) & Q(id=OuterRef('pk'))
-        ))))
+        if request.user.is_authenticated:
+            queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
+                user_liked__id=request.user.id, id=OuterRef('pk')
+            ))))
+        else:
+            queryset = self.filter_queryset(
+                self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(id=0))))
 
         page = self.paginate_queryset(queryset.order_by('user_liked'))
         if page is not None:
@@ -784,9 +835,13 @@ class ReadQuestionsView(viewsets.ModelViewSet):
         return queryset
 
     def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
-            Q(user_liked__id=request.user.id) & Q(id=OuterRef('pk'))
-        ))))
+        if request.user.is_authenticated:
+            queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
+                user_liked__id=request.user.id, id=OuterRef('pk')
+            ))))
+        else:
+            queryset = self.filter_queryset(
+                self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(id=0))))
 
         page = self.paginate_queryset(queryset)
         if page is not None:

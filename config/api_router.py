@@ -9,7 +9,7 @@ from smart_city.posts.views import (NewsApiView, ArticleApiView, QuestionApiView
                                     SearchQuestionView, NewsReviewView, ArticleReviewView, QuestionReviewView,
                                     LikeNewsView, ReadNewsView, LikeArticlesView, ReadArticlesView, LikeQuestionsView,
                                     ReadQuestionsView, ThemeGroupNewsView, ThemeGroupArticlesView,
-                                    ThemeGroupQuestionsView, NewsUserSavedCollectionsView, NotificationApiView)
+                                    ThemeGroupQuestionsView, UserSavedCollectionsView, NotificationApiView)
 from smart_city.users.api.views import UserViewSet
 
 from idegovuz.views import IdEgovUzAdapter, oauth2_login
@@ -59,7 +59,6 @@ router.register('questions-history', UserQuestionView, basename='questions-histo
 
 router.register('notifications', NotificationApiView, basename='notifications')
 
-
 router.register('password_reset', ResetPasswordView, basename='password_reset')
 
 app_name = "api"
@@ -78,8 +77,7 @@ urlpatterns += [
     # path('password/reset/', ResetPasswordView.as_view(), name='password_reset'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
-
-    path('saved/', NewsUserSavedCollectionsView.as_view(), name='saved'),
+    path('saved/', UserSavedCollectionsView.as_view(), name='saved'),
 
     # Social Login
     path('social/facebook/', FacebookLogin.as_view(), name='fb_login'),

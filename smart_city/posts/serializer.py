@@ -25,7 +25,7 @@ class NewsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = News
-        exclude = ['user_liked', 'is_delete', 'is_active', 'is_draft']
+        exclude = ['user_liked', 'is_delete', 'is_active', 'is_draft', 'saved_collections']
 
     def to_representation(self, instance):
         response = super().to_representation(instance)
@@ -33,6 +33,7 @@ class NewsSerializer(serializers.ModelSerializer):
         response['theme'] = ThemeSerializer(instance.theme).data
         response['is_liked'] = instance.is_liked
         response['comments_count'] = instance.comment_count
+        response['is_saved'] = instance.is_saved
         response['type'] = "NEWS"
         return response
 
@@ -62,7 +63,7 @@ class ArticleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Article
-        exclude = ['user_liked', 'is_delete', 'is_active', 'is_draft']
+        exclude = ['user_liked', 'is_delete', 'is_active', 'is_draft', 'saved_collections']
 
     def to_representation(self, instance):
         response = super().to_representation(instance)
@@ -70,6 +71,7 @@ class ArticleSerializer(serializers.ModelSerializer):
         response['theme'] = ThemeSerializer(instance.theme).data
         response['is_liked'] = instance.is_liked
         response['comments_count'] = instance.comment_count
+        response['is_saved'] = instance.is_saved
         response['type'] = "ARTICLE"
         return response
 
@@ -99,7 +101,7 @@ class QuestionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Question
-        exclude = ['user_liked', 'is_delete', 'is_active', 'is_draft']
+        exclude = ['user_liked', 'is_delete', 'is_active', 'is_draft', 'saved_collections']
 
     def to_representation(self, instance):
         response = super().to_representation(instance)
@@ -107,6 +109,7 @@ class QuestionSerializer(serializers.ModelSerializer):
         response['theme'] = ThemeSerializer(instance.theme).data
         response['is_liked'] = instance.is_liked
         response['comments_count'] = instance.comment_count
+        response['is_saved'] = instance.is_saved
         response['type'] = "QUESTION"
         return response
 
@@ -175,6 +178,7 @@ class QuestionReviewSerializer(serializers.ModelSerializer):
         response = super().to_representation(instance)
         response['user'] = UserSerializer(instance.user).data
         return response
+
 
 class UserSavedCollectionsSerializer(serializers.Serializer):
     id = serializers.IntegerField()

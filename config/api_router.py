@@ -8,7 +8,8 @@ from smart_city.posts.views import (NewsApiView, ArticleApiView, QuestionApiView
                                     ImageQuestionApiView, TagsApiView, ThemeApiView, SearchNewsView, SearchArticleView,
                                     SearchQuestionView, NewsReviewView, ArticleReviewView, QuestionReviewView,
                                     LikeNewsView, ReadNewsView, LikeArticlesView, ReadArticlesView, LikeQuestionsView,
-                                    ReadQuestionsView,ThemeGroupNewsView, ThemeGroupArticlesView, ThemeGroupQuestionsView)
+                                    ReadQuestionsView, ThemeGroupNewsView, ThemeGroupArticlesView,
+                                    ThemeGroupQuestionsView, NewsUserSavedCollectionsView, NotificationApiView)
 from smart_city.users.api.views import UserViewSet
 
 from idegovuz.views import IdEgovUzAdapter, oauth2_login
@@ -56,6 +57,8 @@ router.register('news-history', UserNewsView, basename='news-history')
 router.register('articles-history', UserArticleView, basename='articles-history')
 router.register('questions-history', UserQuestionView, basename='questions-history')
 
+router.register('notifications', NotificationApiView, basename='notifications')
+
 
 router.register('password_reset', ResetPasswordView, basename='password_reset')
 
@@ -74,6 +77,9 @@ urlpatterns += [
     path('password/change/', PasswordChangeView.as_view(), name='password_change'),
     # path('password/reset/', ResetPasswordView.as_view(), name='password_reset'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+
+
+    path('saved/', NewsUserSavedCollectionsView.as_view(), name='saved'),
 
     # Social Login
     path('social/facebook/', FacebookLogin.as_view(), name='fb_login'),

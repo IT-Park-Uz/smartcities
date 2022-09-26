@@ -1,5 +1,6 @@
 from django.db.models import Q, Count
 from django.shortcuts import get_object_or_404
+from rest_framework.views import APIView
 from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -9,10 +10,11 @@ from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from .serializer import (NewsSerializer, ArticleSerializer, QuestionSerializer, ImageQuestionSerializer,
                          TagsSerializer, ThemeSerializer, NewsReviewSerializer, ArticleReviewSerializer,
                          QuestionReviewSerializer, NewsWriteSerializer, ArticleWriteSerializer,
-                         QuestionWriteSerializer)
+                         QuestionWriteSerializer, UserSavedCollectionsSerializer, UserSerializer,
+                         NotificationSerializer)
 from .mixin import ReadWriteSerializerMixin
 from smart_city.posts.models import (News, Article, Question, ImageQuestion, Tags, Theme, NewsReview, ArticleReview,
-                                     QuestionReview)
+                                     QuestionReview, Notification)
 from django.contrib.auth import get_user_model
 
 from django.db.models import Exists, OuterRef
@@ -80,14 +82,6 @@ class NewsApiView(ReadWriteSerializerMixin, viewsets.ModelViewSet):
             obj.user_liked.add(request.user)
         return Response(status=status.HTTP_200_OK)
 
-    # @action(detail=False, methods=['patch'], url_name='top_like')
-    # def top_like(self, request, *args, **kwargs):
-    #     news = self.get_queryset().order_by('user_liked')
-    #     if news:
-    #         serializer = NewsSerializer(news, many=True)
-    #         return Response(serializer.data, status=status.HTTP_200_OK)
-    #     return Response(status=status.HTTP_204_NO_CONTENT)
-
 
 @extend_schema_view(
     list=extend_schema(parameters=[
@@ -118,13 +112,12 @@ class SearchNewsView(viewsets.ModelViewSet):
             key = request.query_params['key']
             news = queryset.filter(
                 Q(title__icontains=key) | Q(theme__name__icontains=key) | Q(tags__name=key)).order_by('-view_count')
-            if news:
-                page = self.paginate_queryset(news)
-                if page is not None:
-                    serializer = self.get_serializer(page, many=True)
-                    return self.get_paginated_response(serializer.data)
-                serializer = self.get_serializer(news, many=True)
-                return Response(serializer.data, status=status.HTTP_200_OK)
+            page = self.paginate_queryset(news)
+            if page is not None:
+                serializer = self.get_serializer(page, many=True)
+                return self.get_paginated_response(serializer.data)
+            serializer = self.get_serializer(news, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         except:
             return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -137,7 +130,8 @@ class SearchNewsView(viewsets.ModelViewSet):
         description="THE URL USES FOR SEARCHING ARTICLES ")
 )
 class SearchArticleView(viewsets.ModelViewSet):
-    queryset = Article.objects.filter(is_active=True).annotate(comment_count=Count("articlereview")).order_by('-view_count')
+    queryset = Article.objects.filter(is_active=True).annotate(comment_count=Count("articlereview")).order_by(
+        '-view_count')
     serializer_class = ArticleSerializer
     http_method_names = ['get']
     permission_classes = [IsAuthenticatedOrReadOnly]
@@ -177,7 +171,8 @@ class SearchArticleView(viewsets.ModelViewSet):
         description="THE URL USES FOR SEARCHING QUESTIONS ")
 )
 class SearchQuestionView(viewsets.ModelViewSet):
-    queryset = Question.objects.filter(is_active=True).annotate(comment_count=Count("questionreview")).order_by('-view_count')
+    queryset = Question.objects.filter(is_active=True).annotate(comment_count=Count("questionreview")).order_by(
+        '-view_count')
     serializer_class = QuestionSerializer
     http_method_names = ['get']
     permission_classes = [IsAuthenticatedOrReadOnly]
@@ -257,10 +252,11 @@ class ArticleApiView(ReadWriteSerializerMixin, viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
-                user_liked__id=request.user.id , id=OuterRef('pk')
+                user_liked__id=request.user.id, id=OuterRef('pk')
             ))))
         else:
-            queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(id=0))))
+            queryset = self.filter_queryset(
+                self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(id=0))))
 
         page = self.paginate_queryset(queryset)
         if page is not None:
@@ -465,9 +461,9 @@ class ImageQuestionApiView(viewsets.ModelViewSet):
         description="STATUS USES FOR TO GET NEWS OF USER, YOU SHOULD GIVE TRUE OR FALSE IN STATUS")
 )
 class TagsApiView(viewsets.ModelViewSet):
-    queryset = Tags.objects.all()
+    queryset = Tags.objects.filter(is_active=True)
     serializer_class = TagsSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedOrReadOnly]
     http_method_names = ['get', 'post']
 
     def list(self, request, *args, **kwargs):
@@ -475,9 +471,18 @@ class TagsApiView(viewsets.ModelViewSet):
         try:
             tag = self.get_queryset().filter(name__icontains=request.query_params['tag'])
             serializer = TagsSerializer(tag, many=True)
-            return Response({'tag': serializer.data}, status=status.HTTP_200_OK)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         except:
-            return Response({'status': status.HTTP_204_NO_CONTENT})
+            serializer = TagsSerializer(self.get_queryset(), many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        if not Tags.objects.filter(name__iexact=serializer.data['name']).first():
+            Tags.objects.create(name=serializer.data['name'])
+            return Response(status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 @extend_schema_view(
@@ -848,3 +853,70 @@ class ReadQuestionsView(viewsets.ModelViewSet):
 
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+
+
+class NewsUserSavedCollectionsView(APIView):
+    permission_classes = [IsAuthenticated]
+    http_method_names = ['get', 'post']
+
+    def get(self, request, *args, **kwargs):
+        news = News.objects.filter(saved_collections__id=request.user.id)
+        questions = Article.objects.filter(saved_collections__id=request.user.id)
+        articles = Question.objects.filter(saved_collections__id=request.user.id)
+        news_saved = [{"id": i.id, "title": i.title, "user": UserSerializer(i.user, many=False).data} for i in news]
+        articles_saved = [{"id": i.id, "title": i.title, "user": UserSerializer(i.user, many=False).data} for i in
+                          articles]
+        questions_saved = [{"id": i.id, "title": i.title, "user": UserSerializer(i.user, many=False).data} for i in
+                           questions]
+        return Response({
+            "news": news_saved,
+            "articles": articles_saved,
+            "questions": questions_saved}, status=status.HTTP_200_OK)
+
+    def post(self, request, *args, **kwargs):
+        serializer = UserSavedCollectionsSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        obj = None
+        if serializer.data['type'] == "NEWS":
+            obj = News.objects.filter(id=int(serializer.data['id'])).first()
+        elif serializer.data['type'] == "ARTICLE":
+            obj = News.objects.filter(id=int(serializer.data['id'])).first()
+        elif serializer.data['type'] == "QUESTION":
+            obj = News.objects.filter(id=int(serializer.data['id'])).first()
+        if obj is not None:
+            if obj.saved_collections.filter(id=request.user.id).exists():
+                obj.saved_collections.remove(request.user)
+            else:
+                obj.saved_collections.add(request.user)
+            return Response(status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class NotificationApiView(viewsets.ModelViewSet):
+    queryset = Notification.objects.filter(is_active=True)
+    serializer_class = NotificationSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    http_method_names = ['get']
+
+    def list(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            queryset = self.filter_queryset(self.get_queryset().annotate(is_read=Exists(self.get_queryset().filter(
+                user_read__id=request.user.id, id=OuterRef('pk')
+            ))))
+        else:
+            queryset = self.filter_queryset(
+                self.get_queryset().annotate(is_read=Exists(self.get_queryset().filter(id=0))))
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['get'], permission_classes=[permissions.IsAuthenticated])
+    def user_read(self, request, *args, **kwargs):
+        obj = Notification.objects.filter(id=int(kwargs['pk'])).first()
+        if not obj.user_read.filter(id=request.user.id).exists():
+            obj.user_read.add(request.user)
+        return Response(status=status.HTTP_200_OK)

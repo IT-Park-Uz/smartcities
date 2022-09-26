@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from smart_city.posts.models import (News, Article, Question, ImageQuestion, Tags, Theme, NewsReview, ArticleReview,
-                                     QuestionReview)
+                                     QuestionReview, Notification)
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -16,7 +16,7 @@ class UserSerializer(serializers.ModelSerializer):
 class TagsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tags
-        fields = '__all__'
+        exclude = ['is_active']
 
 
 class NewsSerializer(serializers.ModelSerializer):
@@ -139,7 +139,7 @@ class ImageQuestionSerializer(serializers.ModelSerializer):
 class ThemeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Theme
-        fields = ['id', 'name']
+        fields = '__all__'
 
 
 class NewsReviewSerializer(serializers.ModelSerializer):
@@ -174,4 +174,19 @@ class QuestionReviewSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         response = super().to_representation(instance)
         response['user'] = UserSerializer(instance.user).data
+        return response
+
+class UserSavedCollectionsSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    type = serializers.CharField(max_length=10)
+
+
+class NotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notification
+        exclude = ['is_active', 'user_read']
+
+    def to_representation(self, instance):
+        response = super().to_representation(instance)
+        response['is_read'] = instance.is_read
         return response

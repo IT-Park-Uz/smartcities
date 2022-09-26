@@ -1,7 +1,8 @@
 from django.contrib import admin
 from mptt.admin import DraggableMPTTAdmin
 
-from .models import News, Article, Question, Theme, ImageQuestion, QuestionReview, NewsReview, ArticleReview, Tags
+from .models import News, Article, Question, Theme, ImageQuestion, QuestionReview, NewsReview, ArticleReview, Tags, \
+    Notification
 from django.utils.safestring import mark_safe
 
 
@@ -44,6 +45,7 @@ class QuestionAdmin(admin.ModelAdmin):
 admin.site.register(News, NewsAdmin)
 admin.site.register(Question, QuestionAdmin)
 admin.site.register(Article, ArticleAdmin)
+admin.site.register(Notification)
 
 
 @admin.register(Tags)
@@ -54,3 +56,4 @@ class TagsAdmin(admin.ModelAdmin):
 @admin.register(Theme)
 class ThemesAdmin(DraggableMPTTAdmin):
     mptt_level_indent = 20
+

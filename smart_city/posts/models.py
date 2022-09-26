@@ -14,6 +14,7 @@ class News(models.Model):
     description = models.TextField(null=True, blank=True)
     view_count = models.IntegerField(default=0)
     user_liked = models.ManyToManyField(User, related_name="user_liked_n", null=True)
+    saved_collections = models.ManyToManyField(User, related_name="user_saved_n", null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     tags = models.ManyToManyField('Tags', blank=True)
     is_delete = models.BooleanField(default=False)
@@ -63,6 +64,7 @@ class Article(models.Model):
     description = models.TextField(null=True, blank=True)
     view_count = models.IntegerField(default=0)
     user_liked = models.ManyToManyField(User, related_name="user_liked_a", null=True)
+    saved_collections = models.ManyToManyField(User, related_name="user_saved_a", null=True)
     tags = models.ManyToManyField('Tags', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     is_delete = models.BooleanField(default=False)
@@ -118,6 +120,7 @@ class Question(models.Model):
     description = models.TextField(null=True, blank=True)
     view_count = models.IntegerField(default=0)
     user_liked = models.ManyToManyField(User, related_name="user_liked_q", null=True)
+    saved_collections = models.ManyToManyField(User, related_name="user_saved_q", null=True)
     tags = models.ManyToManyField('Tags', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     is_delete = models.BooleanField(default=False)
@@ -174,7 +177,8 @@ class ImageQuestion(models.Model):
 
 
 class Tags(models.Model):
-    name = models.CharField(max_length=50, unique=True)
+    name = models.CharField(max_length=100, unique=True)
+    is_active = models.BooleanField(default=False) #TODO:new part
 
     def __str__(self):
         return f"{self.id} | {self.name}"
@@ -200,10 +204,11 @@ class Theme(MPTTModel):
         verbose_name_plural = _("Категории")
 
 
-# class Notification(models.Model):
-#     title = models.CharField(max_length=255)
-#     description = models.TextField(null=True, blank=True)
-#     is_active = models.BooleanField(default=False)
-#
-#     def __str__(self):
-#         return f"{self.id} | {self.title[:20]}"
+class Notification(models.Model):
+    user_read = models.ManyToManyField(User)
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    is_active = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.id} | {self.title[:20]}"

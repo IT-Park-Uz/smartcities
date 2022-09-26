@@ -56,4 +56,3 @@ class TagsAdmin(admin.ModelAdmin):
 @admin.register(Theme)
 class ThemesAdmin(DraggableMPTTAdmin):
     mptt_level_indent = 20
-

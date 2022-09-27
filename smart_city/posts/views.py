@@ -917,9 +917,9 @@ class UserSavedCollectionsView(APIView):
         if serializer.data['type'] == "NEWS":
             obj = News.objects.filter(id=int(serializer.data['id'])).first()
         elif serializer.data['type'] == "ARTICLE":
-            obj = News.objects.filter(id=int(serializer.data['id'])).first()
+            obj = Article.objects.filter(id=int(serializer.data['id'])).first()
         elif serializer.data['type'] == "QUESTION":
-            obj = News.objects.filter(id=int(serializer.data['id'])).first()
+            obj = Question.objects.filter(id=int(serializer.data['id'])).first()
         if obj is not None:
             if obj.saved_collections.filter(id=request.user.id).exists():
                 obj.saved_collections.remove(request.user)

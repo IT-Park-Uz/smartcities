@@ -31,6 +31,10 @@ class News(models.Model):
         return self.user_liked.count()
 
     @property
+    def saved_count(self):
+        return self.saved_collections.count()
+
+    @property
     def imageURL(self):
         try:
             return self.image.url
@@ -79,6 +83,10 @@ class Article(models.Model):
     @property
     def like_count(self):
         return self.user_liked.count()
+
+    @property
+    def saved_count(self):
+        return self.saved_collections.count()
 
     @property
     def imageURL(self):
@@ -135,6 +143,10 @@ class Question(models.Model):
     @property
     def like_count(self):
         return self.user_liked.count()
+
+    @property
+    def saved_count(self):
+        return self.saved_collections.count()
 
     def __str__(self):
         return f"{self.id} | {self.title[:20]}"

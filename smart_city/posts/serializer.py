@@ -22,6 +22,7 @@ class TagsSerializer(serializers.ModelSerializer):
 class NewsSerializer(serializers.ModelSerializer):
     tags = TagsSerializer(read_only=True, many=True)
     like_count = serializers.ReadOnlyField()
+    saved_count = serializers.ReadOnlyField()
 
     class Meta:
         model = News
@@ -60,6 +61,7 @@ class NewsWriteSerializer(serializers.ModelSerializer):
 class ArticleSerializer(serializers.ModelSerializer):
     tags = TagsSerializer(read_only=True, many=True)
     like_count = serializers.ReadOnlyField()
+    saved_count = serializers.ReadOnlyField()
 
     class Meta:
         model = Article
@@ -98,6 +100,7 @@ class ArticleWriteSerializer(serializers.ModelSerializer):
 class QuestionSerializer(serializers.ModelSerializer):
     tags = TagsSerializer(read_only=True, many=True)
     like_count = serializers.ReadOnlyField()
+    saved_count = serializers.ReadOnlyField()
 
     class Meta:
         model = Question

@@ -40,9 +40,7 @@ class NewsSerializer(serializers.ModelSerializer):
 
 
 class NewsWriteSerializer(serializers.ModelSerializer):
-    tags_ids = serializers.PrimaryKeyRelatedField(
-        many=True, write_only=True, queryset=Tags.objects.all()
-    )
+    tags_ids = serializers.CharField(max_length=50, allow_null=True)
 
     class Meta:
         model = News
@@ -53,8 +51,9 @@ class NewsWriteSerializer(serializers.ModelSerializer):
         validated_data["user"] = self.context["request"].user
         news = News.objects.create(**validated_data)
         if tag:
-            for i in tag:
-                news.tags.add(i)
+            for i in tag.split(","):
+                t = Tags.objects.get(id=int(i))
+                news.tags.add(t)
         return news
 
 
@@ -79,9 +78,7 @@ class ArticleSerializer(serializers.ModelSerializer):
 
 
 class ArticleWriteSerializer(serializers.ModelSerializer):
-    tags_ids = serializers.PrimaryKeyRelatedField(
-        many=True, write_only=True, queryset=Tags.objects.all()
-    )
+    tags_ids = serializers.CharField(max_length=50, allow_null=True)
 
     class Meta:
         model = News
@@ -92,8 +89,9 @@ class ArticleWriteSerializer(serializers.ModelSerializer):
         validated_data["user"] = self.context["request"].user
         article = Article.objects.create(**validated_data)
         if tag:
-            for i in tag:
-                article.tags.add(i)
+            for i in tag.split(","):
+                t = Tags.objects.get(id=int(i))
+                article.tags.add(t)
         return article
 
 
@@ -118,9 +116,7 @@ class QuestionSerializer(serializers.ModelSerializer):
 
 
 class QuestionWriteSerializer(serializers.ModelSerializer):
-    tags_ids = serializers.PrimaryKeyRelatedField(
-        many=True, write_only=True, queryset=Tags.objects.all()
-    )
+    tags_ids = serializers.CharField(max_length=50, allow_null=True)
 
     class Meta:
         model = News
@@ -131,8 +127,9 @@ class QuestionWriteSerializer(serializers.ModelSerializer):
         validated_data["user"] = self.context["request"].user
         question = Question.objects.create(**validated_data)
         if tag:
-            for i in tag:
-                question.tags.add(i)
+            for i in tag.split(","):
+                t = Tags.objects.get(id=int(i))
+                question.tags.add(t)
         return question
 
 

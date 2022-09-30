@@ -549,16 +549,26 @@ class ThemeGroupNewsView(viewsets.ModelViewSet):
             id = int(request.query_params.get('theme_id'))
         except:
             return Response({'message': 'theme_id not fount in params'}, status=status.HTTP_406_NOT_ACCEPTABLE)
-        news = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
-            Q(user_liked__id=request.user.id) & Q(id=OuterRef('pk')))),
-            is_saved=Exists(
-                self.get_queryset().filter(saved_collections__id=request.user.id, id=OuterRef('pk'))))).filter(
-            theme_id=id)
-        page = self.paginate_queryset(news)
+
+        if request.user.is_authenticated:
+            queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
+                user_liked__id=request.user.id, id=OuterRef('pk')
+            )),
+                is_saved=Exists(
+                    self.get_queryset().filter(saved_collections__id=request.user.id, id=OuterRef('pk'))))).filter(
+                theme_id=id)
+        else:
+            queryset = self.filter_queryset(
+                self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(id=0)),
+                                             is_saved=Exists(
+                                                 self.get_queryset().filter(saved_collections__id=0)))).filter(
+                theme_id=id)
+
+        page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = NewsSerializer(page, many=True)
             return self.get_paginated_response(serializer.data)
-        serializer = NewsSerializer(news, many=True)
+        serializer = NewsSerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -587,16 +597,24 @@ class ThemeGroupQuestionsView(viewsets.ModelViewSet):
             id = int(request.query_params.get('theme_id'))
         except:
             return Response({'message': 'theme_id not fount in params'}, status=status.HTTP_406_NOT_ACCEPTABLE)
-        questions = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
-            Q(user_liked__id=request.user.id) & Q(id=OuterRef('pk')))),
-            is_saved=Exists(
-                self.get_queryset().filter(saved_collections__id=request.user.id, id=OuterRef('pk'))))).filter(
-            theme_id=id)
-        page = self.paginate_queryset(questions)
+        if request.user.is_authenticated:
+            queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
+                user_liked__id=request.user.id, id=OuterRef('pk')
+            )),
+                is_saved=Exists(
+                    self.get_queryset().filter(saved_collections__id=request.user.id, id=OuterRef('pk'))))).filter(
+                theme_id=id)
+        else:
+            queryset = self.filter_queryset(
+                self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(id=0)),
+                                             is_saved=Exists(
+                                                 self.get_queryset().filter(saved_collections__id=0)))).filter(
+                theme_id=id)
+        page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = QuestionSerializer(page, many=True)
             return self.get_paginated_response(serializer.data)
-        serializer = QuestionSerializer(questions, many=True)
+        serializer = QuestionSerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -625,16 +643,24 @@ class ThemeGroupArticlesView(viewsets.ModelViewSet):
             id = int(request.query_params.get('theme_id'))
         except:
             return Response({'message': 'theme_id not fount in params'}, status=status.HTTP_406_NOT_ACCEPTABLE)
-        articles = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
-            Q(user_liked__id=request.user.id) & Q(id=OuterRef('pk')))),
-            is_saved=Exists(
-                self.get_queryset().filter(saved_collections__id=request.user.id, id=OuterRef('pk'))))).filter(
-            theme_id=id)
-        page = self.paginate_queryset(articles)
+        if request.user.is_authenticated:
+            queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
+                user_liked__id=request.user.id, id=OuterRef('pk')
+            )),
+                is_saved=Exists(
+                    self.get_queryset().filter(saved_collections__id=request.user.id, id=OuterRef('pk'))))).filter(
+                theme_id=id)
+        else:
+            queryset = self.filter_queryset(
+                self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(id=0)),
+                                             is_saved=Exists(
+                                                 self.get_queryset().filter(saved_collections__id=0)))).filter(
+                theme_id=id)
+        page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = ArticleSerializer(page, many=True)
             return self.get_paginated_response(serializer.data)
-        serializer = ArticleSerializer(articles, many=True)
+        serializer = ArticleSerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 

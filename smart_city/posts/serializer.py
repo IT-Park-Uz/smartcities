@@ -44,7 +44,7 @@ class NewsWriteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = News
-        exclude = ['user_liked', 'is_delete', 'is_active', 'is_draft', 'saved_collections']
+        exclude = ['user_liked', 'is_delete', 'is_active', 'is_draft', 'saved_collections', 'tags']
 
     def create(self, validated_data):
         tag = validated_data.pop("tags_ids", None)
@@ -82,7 +82,7 @@ class ArticleWriteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = News
-        exclude = ['user_liked', 'is_delete', 'is_active', 'is_draft', 'saved_collections']
+        exclude = ['user_liked', 'is_delete', 'is_active', 'is_draft', 'saved_collections', 'tags']
 
     def create(self, validated_data):
         tag = validated_data.pop("tags_ids", None)
@@ -120,7 +120,7 @@ class QuestionWriteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = News
-        exclude = ['user_liked', 'is_delete', 'is_active', 'is_draft', 'saved_collections']
+        exclude = ['user_liked', 'is_delete', 'is_active', 'is_draft', 'saved_collections', 'tags']
 
     def create(self, validated_data):
         tag = validated_data.pop("tags_ids", None)

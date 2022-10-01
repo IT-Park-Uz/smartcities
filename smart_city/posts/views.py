@@ -921,8 +921,8 @@ class UserSavedCollectionsView(APIView):
 
     def get(self, request, *args, **kwargs):
         news = News.objects.filter(saved_collections__id=request.user.id)
-        questions = Article.objects.filter(saved_collections__id=request.user.id)
-        articles = Question.objects.filter(saved_collections__id=request.user.id)
+        questions = Question.objects.filter(saved_collections__id=request.user.id)
+        articles = Article.objects.filter(saved_collections__id=request.user.id)
         news_saved = [{"id": i.id, "title": i.title, "description": i.description,
                        "user": UserSerializer(i.user, many=False).data} for i in news]
         articles_saved = [{"id": i.id, "title": i.title, "description": i.description,

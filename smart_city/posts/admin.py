@@ -1,8 +1,8 @@
 from django.contrib import admin
 from mptt.admin import DraggableMPTTAdmin
 
-from .models import News, Article, Question, Theme, ImageQuestion, QuestionReview, NewsReview, ArticleReview, Tags, \
-    Notification
+from .models import News, Article, Question, Theme, QuestionReview, NewsReview, ArticleReview, Tags, Notification, \
+    UserUploadImage
 from django.utils.safestring import mark_safe
 
 
@@ -24,13 +24,12 @@ class ArticleAdmin(admin.ModelAdmin):
     inlines = [ArticleReviewAdmin]
 
 
-class ImageInline(admin.TabularInline):
-    model = ImageQuestion
-    extra = 0
-    readonly_fields = ('render_image',)
-
-    def render_image(self, obj):
-        return mark_safe("""<img src="%s" width="80" height="80"/>""" % obj.image.url)
+# class ImageInline(admin.TabularInline):
+#     model = ImageQuestion
+#     readonly_fields = ('render_image',)
+#
+#     def render_image(self, obj):
+#         return mark_safe("""<img src="%s" width="80" height="80"/>""" % obj.image.url)
 
 
 class QuestionReviewAdmin(admin.TabularInline):
@@ -39,13 +38,14 @@ class QuestionReviewAdmin(admin.TabularInline):
 
 
 class QuestionAdmin(admin.ModelAdmin):
-    inlines = [ImageInline, QuestionReviewAdmin]
+    inlines = [QuestionReviewAdmin]
 
 
 admin.site.register(News, NewsAdmin)
 admin.site.register(Question, QuestionAdmin)
 admin.site.register(Article, ArticleAdmin)
 admin.site.register(Notification)
+admin.site.register(UserUploadImage)
 
 
 @admin.register(Tags)

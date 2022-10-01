@@ -11,7 +11,7 @@ class News(models.Model):
     theme = models.ForeignKey('Theme', on_delete=models.SET_NULL, null=True)
     title = models.CharField(max_length=200)
     image = models.ImageField(upload_to='News/%y/%m/%d', null=True, blank=True)
-    description = models.TextField(null=True, blank=True)
+    description = RichTextUploadingField()
     view_count = models.IntegerField(default=0)
     user_liked = models.ManyToManyField(User, related_name="user_liked_n", null=True, blank=True)
     saved_collections = models.ManyToManyField(User, related_name="user_saved_n", null=True, blank=True)
@@ -66,7 +66,7 @@ class Article(models.Model):
     theme = models.ForeignKey('Theme', on_delete=models.SET_NULL, null=True)
     title = models.CharField(max_length=200)
     image = models.ImageField(upload_to='Article/%y/%m/%d', null=True, blank=True)
-    description = models.TextField(null=True, blank=True)
+    description = RichTextUploadingField()
     view_count = models.IntegerField(default=0)
     user_liked = models.ManyToManyField(User, related_name="user_liked_a", null=True, blank=True)
     saved_collections = models.ManyToManyField(User, related_name="user_saved_a", null=True)
@@ -124,9 +124,10 @@ class Type_Question(models.IntegerChoices):
 class Question(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     theme = models.ForeignKey('Theme', on_delete=models.SET_NULL, null=True)
+    image = models.ImageField(upload_to='Question/%y/%m/%d', null=True, blank=True)
     type = models.IntegerField(default=Type_Question.EASY, choices=Type_Question.choices)
     title = models.CharField(max_length=200)
-    description = models.TextField(null=True, blank=True)
+    description = RichTextUploadingField()
     view_count = models.IntegerField(default=0)
     user_liked = models.ManyToManyField(User, related_name="user_liked_q", null=True, blank=True)
     saved_collections = models.ManyToManyField(User, related_name="user_saved_q", null=True, blank=True)
@@ -140,6 +141,13 @@ class Question(models.Model):
         ordering = ['-id']
         verbose_name = _("Вопрос")
         verbose_name_plural = _("Вопросы")
+
+    @property
+    def imageURL(self):
+        try:
+            return self.image.url
+        except:
+            return ''
 
     @property
     def like_count(self):
@@ -162,31 +170,6 @@ class QuestionReview(models.Model):
 
     def __str__(self):
         return f"{self.id} | {self.user.username}"
-
-
-class ImageQuestion(models.Model):
-    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='question_images', null=True,
-                                 blank=True)
-    image = models.ImageField(upload_to='QuestionImages/%y/%m/%d', null=True, blank=True)
-    default = models.BooleanField(default=True)
-
-    class Meta:
-        verbose_name = _("Изображения вопроса")
-        verbose_name_plural = _("Изображении вопросов")
-
-    @property
-    def imageURL(self):
-        try:
-            return self.image.url
-        except:
-            return ''
-
-    def __str__(self):
-        return f"{self.id}"
-
-    def delete(self, *args, **kwargs):
-        self.image.delete(save=False)
-        super(ImageQuestion, self).delete(*args, **kwargs)
 
 
 class Tags(models.Model):
@@ -220,8 +203,15 @@ class Theme(MPTTModel):
 class Notification(models.Model):
     user_read = models.ManyToManyField(User)
     title = models.CharField(max_length=255)
-    description = models.TextField()
+    description = RichTextUploadingField()
     is_active = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.id} | {self.title[:20]}"
+
+class UserUploadImage(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    image = models.ImageField(upload_to="UserUploadImage")
+
+    def __str__(self):
+        return self.user.username

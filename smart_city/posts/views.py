@@ -1,5 +1,4 @@
 from django.db.models import Q, Count
-from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action
@@ -7,14 +6,14 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 
-from .serializer import (NewsSerializer, ArticleSerializer, QuestionSerializer, ImageQuestionSerializer,
+from .serializer import (NewsSerializer, ArticleSerializer, QuestionSerializer,
                          TagsSerializer, ThemeSerializer, NewsReviewSerializer, ArticleReviewSerializer,
                          QuestionReviewSerializer, NewsWriteSerializer, ArticleWriteSerializer,
                          QuestionWriteSerializer, UserSavedCollectionsSerializer, UserSerializer,
-                         NotificationSerializer)
+                         NotificationSerializer, UserUploadImageSerializer)
 from .mixin import ReadWriteSerializerMixin
-from smart_city.posts.models import (News, Article, Question, ImageQuestion, Tags, Theme, NewsReview, ArticleReview,
-                                     QuestionReview, Notification)
+from smart_city.posts.models import (News, Article, Question, Tags, Theme, NewsReview, ArticleReview,
+                                     QuestionReview, Notification, UserUploadImage)
 from django.contrib.auth import get_user_model
 
 from django.db.models import Exists, OuterRef
@@ -457,13 +456,6 @@ class UserQuestionView(viewsets.ModelViewSet):
 
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-class ImageQuestionApiView(viewsets.ModelViewSet):
-    queryset = ImageQuestion.objects.all()
-    serializer_class = ImageQuestionSerializer
-    permission_classes = [IsAuthenticated]
-    parser_classes = [MultiPartParser, FormParser, JSONParser]
 
 
 @extend_schema_view(
@@ -983,3 +975,10 @@ class NotificationApiView(viewsets.ModelViewSet):
         if not obj.user_read.filter(id=request.user.id).exists():
             obj.user_read.add(request.user)
         return Response(status=status.HTTP_200_OK)
+
+
+class UserUploadImageView(viewsets.ModelViewSet):
+    queryset = UserUploadImage.objects.all()
+    serializer_class = UserUploadImageSerializer
+    permission_classes = [IsAuthenticated]
+    http_method_names = ['get', 'post', 'delete']

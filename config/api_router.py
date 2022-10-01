@@ -4,12 +4,12 @@ from rest_framework.routers import DefaultRouter, SimpleRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from smart_city.posts.views import (NewsApiView, ArticleApiView, QuestionApiView, UserNewsView,
-                                    UserArticleView, UserQuestionView,
-                                    ImageQuestionApiView, TagsApiView, ThemeApiView, SearchNewsView, SearchArticleView,
-                                    SearchQuestionView, NewsReviewView, ArticleReviewView, QuestionReviewView,
+                                    UserArticleView, UserQuestionView, TagsApiView, ThemeApiView, SearchNewsView,
+                                    SearchArticleView, SearchQuestionView, NewsReviewView, ArticleReviewView,
+                                    QuestionReviewView, NotificationApiView,
                                     LikeNewsView, ReadNewsView, LikeArticlesView, ReadArticlesView, LikeQuestionsView,
                                     ReadQuestionsView, ThemeGroupNewsView, ThemeGroupArticlesView,
-                                    ThemeGroupQuestionsView, UserSavedCollectionsView, NotificationApiView)
+                                    ThemeGroupQuestionsView, UserSavedCollectionsView, UserUploadImageView)
 from smart_city.users.api.views import UserViewSet
 
 from idegovuz.views import IdEgovUzAdapter, oauth2_login
@@ -29,7 +29,6 @@ router.register("users", UserViewSet)
 router.register('news', NewsApiView, basename='news')
 router.register('article', ArticleApiView, basename='article')
 router.register('question', QuestionApiView, basename='question')
-router.register('question-image', ImageQuestionApiView, basename='question-image')
 router.register('tags', TagsApiView, basename='tags')
 router.register('theme', ThemeApiView, basename='theme')
 
@@ -58,6 +57,7 @@ router.register('articles-history', UserArticleView, basename='articles-history'
 router.register('questions-history', UserQuestionView, basename='questions-history')
 
 router.register('notifications', NotificationApiView, basename='notifications')
+router.register('user-uploads', UserUploadImageView, basename='user-uploads')
 
 router.register('password_reset', ResetPasswordView, basename='password_reset')
 

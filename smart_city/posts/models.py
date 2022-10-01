@@ -20,6 +20,7 @@ class News(models.Model):
     is_delete = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
     is_draft = models.BooleanField(default=False)
+    extra_data = models.JSONField(null=True, blank=True)
 
     class Meta:
         ordering = ['-id']

@@ -10,6 +10,7 @@ from smart_city.posts.views import (NewsApiView, ArticleApiView, QuestionApiView
                                     LikeNewsView, ReadNewsView, LikeArticlesView, ReadArticlesView, LikeQuestionsView,
                                     ReadQuestionsView, ThemeGroupNewsView, ThemeGroupArticlesView,
                                     ThemeGroupQuestionsView, UserSavedCollectionsView, UserUploadImageView)
+from smart_city.social_auth.views import GoogleSocialAuthView, FacebookSocialAuthView, TwitterSocialAuthView
 from smart_city.users.api.views import UserViewSet
 
 from idegovuz.views import IdEgovUzAdapter, oauth2_login
@@ -79,14 +80,20 @@ urlpatterns += [
 
     path('saved/', UserSavedCollectionsView.as_view(), name='saved'),
 
+    # SOCIAL AUTH
+
+    path('social/google/', GoogleSocialAuthView.as_view()),
+    path('social/facebook/', FacebookSocialAuthView.as_view()),
+    path('social/twitter/', TwitterSocialAuthView.as_view()),
+
     # Social Login
-    path('social/facebook/', FacebookLogin.as_view(), name='fb_login'),
-    path('social/github/', GitHubLogin.as_view(), name='github_login'),
-    path('social/google/', GoogleLogin.as_view(), name='google_login'),
-    path('social/idegovuz/', oauth2_login, name='google_login'),
+    # path('social/facebook/', FacebookLogin.as_view(), name='fb_login'),
+    # path('social/github/', GitHubLogin.as_view(), name='github_login'),
+    # path('social/google/', GoogleLogin.as_view(), name='google_login'),
+    # path('social/idegovuz/', oauth2_login, name='google_login'),
 
     # Social connect
-    path('social/facebook/connect/', FacebookConnect.as_view(), name='fb_connect'),
-    path('social/github/connect/', GithubConnect.as_view(), name='github_connect'),
-    path('social/google/connect/', GoogleLogin.as_view(), name='google_connect'),
+    # path('social/facebook/connect/', FacebookConnect.as_view(), name='fb_connect'),
+    # path('social/github/connect/', GithubConnect.as_view(), name='github_connect'),
+    # path('social/google/connect/', GoogleLogin.as_view(), name='google_connect'),
 ]

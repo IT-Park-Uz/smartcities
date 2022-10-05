@@ -116,6 +116,7 @@ LOCAL_APPS = [
     "smart_city.posts",
     "smart_city.chats",
     "smart_city.itpark",
+    "smart_city.social_auth",
     # Your stuff: custom apps go here
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
@@ -418,7 +419,7 @@ SPECTACULAR_SETTINGS = {
 }
 # Your stuff...
 # ------------------------------------------------------------------------------
-
+import os
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': datetime.timedelta(minutes=55),
@@ -426,3 +427,12 @@ SIMPLE_JWT = {
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True
 }
+
+GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
+GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET')
+
+TWITTER_API_KEY = os.environ.get('TWITTER_API_KEY')
+TWITTER_CONSUMER_SECRET = os.environ.get('TWITTER_CONSUMER_SECRET')
+
+FACEBOOK_SECRET_KEY = os.environ.get('FACEBOOK_SECRET_KEY')
+FACEBOOK_SOCIAL_SECRET = os.environ.get('FACEBOOK_SOCIAL_SECRET')

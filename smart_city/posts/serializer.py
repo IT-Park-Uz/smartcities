@@ -1,6 +1,6 @@
 from rest_framework import serializers
-from smart_city.posts.models import (News, Article, Question, ImageQuestion, Tags, Theme, NewsReview, ArticleReview,
-                                     QuestionReview, Notification)
+from smart_city.posts.models import (News, Article, Question, Tags, Theme, NewsReview, ArticleReview,
+                                     QuestionReview, Notification, UserUploadImage)
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -81,7 +81,7 @@ class ArticleWriteSerializer(serializers.ModelSerializer):
     tags_ids = serializers.CharField(max_length=50, allow_null=True)
 
     class Meta:
-        model = News
+        model = Article
         exclude = ['user_liked', 'is_delete', 'is_active', 'is_draft', 'saved_collections', 'tags']
 
     def create(self, validated_data):
@@ -119,7 +119,7 @@ class QuestionWriteSerializer(serializers.ModelSerializer):
     tags_ids = serializers.CharField(max_length=50, allow_null=True)
 
     class Meta:
-        model = News
+        model = Question
         exclude = ['user_liked', 'is_delete', 'is_active', 'is_draft', 'saved_collections', 'tags']
 
     def create(self, validated_data):
@@ -131,12 +131,6 @@ class QuestionWriteSerializer(serializers.ModelSerializer):
                 t = Tags.objects.get(id=int(i))
                 question.tags.add(t)
         return question
-
-
-class ImageQuestionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ImageQuestion
-        fields = '__all__'
 
 
 class ThemeSerializer(serializers.ModelSerializer):
@@ -194,3 +188,9 @@ class NotificationSerializer(serializers.ModelSerializer):
         response = super().to_representation(instance)
         response['is_read'] = instance.is_read
         return response
+
+
+class UserUploadImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserUploadImage
+        fields = '__all__'

@@ -10,6 +10,8 @@ from rest_framework.authtoken.views import obtain_auth_token
 from rest_framework_simplejwt.views import (TokenObtainPairView, TokenRefreshView, TokenVerifyView
 )
 
+from smart_city import social_auth
+
 urlpatterns = [
     path("", TemplateView.as_view(template_name="pages/main_menu.html"), name="home"),
     path("dev/", TemplateView.as_view(template_name="pages/home.html"), name="dev"),

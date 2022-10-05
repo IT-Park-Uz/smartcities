@@ -81,7 +81,7 @@ class ArticleWriteSerializer(serializers.ModelSerializer):
     tags_ids = serializers.CharField(max_length=50, allow_null=True)
 
     class Meta:
-        model = News
+        model = Article
         exclude = ['user_liked', 'is_delete', 'is_active', 'is_draft', 'saved_collections', 'tags']
 
     def create(self, validated_data):
@@ -119,7 +119,7 @@ class QuestionWriteSerializer(serializers.ModelSerializer):
     tags_ids = serializers.CharField(max_length=50, allow_null=True)
 
     class Meta:
-        model = News
+        model = Question
         exclude = ['user_liked', 'is_delete', 'is_active', 'is_draft', 'saved_collections', 'tags']
 
     def create(self, validated_data):

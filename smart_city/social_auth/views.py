@@ -13,6 +13,9 @@ class GoogleSocialAuthView(GenericAPIView):
     permission_classes = [AllowAny]
     serializer_class = GoogleSocialAuthSerializer
 
+    # def list(self, request, *args, **kwargs):
+    #     return Response(status=status.HTTP_200_OK)
+
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)

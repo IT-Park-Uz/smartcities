@@ -33,7 +33,6 @@ class GoogleSocialAuthSerializer(serializers.Serializer):
     auth_token = serializers.CharField()
 
     def validate_auth_token(self, auth_token):
-        print(auth_token)
         user_data = google.Google.validate(auth_token)
         try:
             user_data['sub']
@@ -41,17 +40,16 @@ class GoogleSocialAuthSerializer(serializers.Serializer):
             raise serializers.ValidationError(
                 'The token is invalid or expired. Please login again.'
             )
-        print(user_data['aud'] != settings.GOOGLE_CLIENT_ID)
         if user_data['aud'] != settings.GOOGLE_CLIENT_ID:
             raise AuthenticationFailed('oops, who are you?')
-
         user_id = user_data['sub']
         email = user_data['email']
+        first_name = user_data['given_name']
+        last_name = user_data['family_name']
         name = user_data['name']
         provider = 'google'
-
         return register_social_user(
-            provider=provider, user_id=user_id, email=email, name=name)
+            provider=provider, user_id=user_id, email=email, name=name, first_name=first_name, last_name=last_name)
 
 
 class TwitterAuthSerializer(serializers.Serializer):

@@ -42,8 +42,23 @@ class QuestionAdmin(admin.ModelAdmin):
 
 
 admin.site.register(News, NewsAdmin)
-admin.site.register(Question, QuestionAdmin)
-admin.site.register(Article, ArticleAdmin)
+
+
+@admin.register(News)
+class NewsAdmin(admin.ModelAdmin):
+    list_display = ["title", "is_active"]
+
+
+@admin.register(Question)
+class NewsAdmin(admin.ModelAdmin):
+    list_display = ["title", "is_active"]
+
+
+@admin.register(Article)
+class NewsAdmin(admin.ModelAdmin):
+    list_display = ["title", "is_active"]
+
+
 admin.site.register(Notification)
 admin.site.register(UserUploadImage)
 

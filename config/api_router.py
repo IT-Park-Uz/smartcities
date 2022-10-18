@@ -18,8 +18,7 @@ from idegovuz.views import IdEgovUzAdapter, oauth2_login
 from smart_city.users.views import (
     RegisterAPIView, VerifyCodeView, LogoutView, ResetPasswordView,
 )
-from smart_city.users.views import (FacebookLogin, GitHubLogin, GoogleLogin, FacebookConnect, GithubConnect,
-                                    PasswordChangeView)
+from smart_city.users.views import (PasswordChangeView)
 
 if settings.DEBUG:
     router = DefaultRouter()
@@ -81,7 +80,6 @@ urlpatterns += [
     path('saved/', UserSavedCollectionsView.as_view(), name='saved'),
 
     # SOCIAL AUTH
-
     path('social/google', GoogleSocialAuthView.as_view()),
     path('social/facebook', FacebookSocialAuthView.as_view()),
     path('social/twitter', TwitterSocialAuthView.as_view()),

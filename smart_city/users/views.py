@@ -76,41 +76,41 @@ class UserRedirectView(LoginRequiredMixin, RedirectView):
 user_redirect_view = UserRedirectView.as_view()
 
 
-class FacebookLogin(SocialLoginView):
-    adapter_class = FacebookOAuth2Adapter
+# class FacebookLogin(SocialLoginView):
+#     adapter_class = FacebookOAuth2Adapter
     # callback_url = 'CALLBACK_URL_YOU_SET_ON_GITHUB'
     # client_class = OAuth2Client
 
 
-class GitHubLogin(SocialLoginView):
-    adapter_class = GitHubOAuth2Adapter
-    # callback_url = 'CALLBACK_URL_YOU_SET_ON_GITHUB'
-    client_class = OAuth2Client
+# class GitHubLogin(SocialLoginView):
+#     adapter_class = GitHubOAuth2Adapter
+#     # callback_url = 'CALLBACK_URL_YOU_SET_ON_GITHUB'
+#     client_class = OAuth2Client
 
-
-class GoogleLogin(SocialLoginView):  # if you want to use Authorization Code Grant, use this
-    adapter_class = GoogleOAuth2Adapter
-    # callback_url = 'CALLBACK_URL_YOU_SET_ON_GOOGLE'
-    client_class = OAuth2Client
+#
+# class GoogleLogin(SocialLoginView):  # if you want to use Authorization Code Grant, use this
+#     adapter_class = GoogleOAuth2Adapter
+#     # callback_url = 'CALLBACK_URL_YOU_SET_ON_GOOGLE'
+#     client_class = OAuth2Client
 
 
 # Connect to Social
-class FacebookConnect(SocialConnectView):
-    adapter_class = FacebookOAuth2Adapter
+# class FacebookConnect(SocialConnectView):
+#     adapter_class = FacebookOAuth2Adapter
     # callback_url = 'CALLBACK_URL_YOU_SET_ON_GITHUB'
     # client_class = OAuth2Client
 
-
-class GithubConnect(SocialConnectView):
-    adapter_class = GitHubOAuth2Adapter
+#
+# class GithubConnect(SocialConnectView):
+#     adapter_class = GitHubOAuth2Adapter
     # callback_url = 'CALLBACK_URL_YOU_SET_ON_GITHUB'
-    client_class = OAuth2Client
-
-
-class GoogleConnect(SocialConnectView):
-    adapter_class = GoogleOAuth2Adapter
-    # callback_url = 'CALLBACK_URL_YOU_SET_ON_GITHUB'
-    client_class = OAuth2Client
+#     client_class = OAuth2Client
+#
+#
+# # class GoogleConnect(SocialConnectView):
+# #     adapter_class = GoogleOAuth2Adapter
+#     # callback_url = 'CALLBACK_URL_YOU_SET_ON_GITHUB'
+#     client_class = OAuth2Client
 
 
 class RegisterAPIView(generics.GenericAPIView):

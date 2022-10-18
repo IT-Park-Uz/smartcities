@@ -38,7 +38,7 @@ def register_social_user(provider, user_id, email, name, first_name, last_name):
             }
         else:
             raise AuthenticationFailed(
-                detail='Please continue your login using ' + provider)
+                detail='Your data is not match to login using ' + provider)
     else:
         user = {
             'username': generate_username(name), 'email': email,

@@ -93,11 +93,11 @@ THIRD_PARTY_APPS = [
     "allauth.account",
     'dj_rest_auth.registration',
 
-    "allauth.socialaccount",
-    'allauth.socialaccount.providers.facebook',
-    'allauth.socialaccount.providers.google',
-    'allauth.socialaccount.providers.github',
-    'allauth.socialaccount.providers.linkedin_oauth2',
+    # "allauth.socialaccount",
+    # 'allauth.socialaccount.providers.facebook',
+    # 'allauth.socialaccount.providers.google',
+    # 'allauth.socialaccount.providers.github',
+    # 'allauth.socialaccount.providers.linkedin_oauth2',
     'idegovuz',
 
     'rest_framework_simplejwt',
@@ -422,12 +422,12 @@ SPECTACULAR_SETTINGS = {
 import os
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(minutes=55),
+    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(minutes=5),
     'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
     # 'ALGORITHM': 'HS256',
-    
+
 }
 
 GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')

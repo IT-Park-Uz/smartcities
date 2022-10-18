@@ -50,9 +50,15 @@ class NewsApiView(ReadWriteSerializerMixin, viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def retrieve(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.queryset.filter(
-            Q(user_liked__id=request.user.id) & Q(id=OuterRef('pk')))),
-            is_saved=Exists(self.get_queryset().filter(saved_collections__id=request.user.id, id=OuterRef('pk')))))
+        if request.user.is_authenticated:
+            queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
+                user_liked__id=request.user.id, id=OuterRef('pk')
+            )),
+                is_saved=Exists(self.get_queryset().filter(saved_collections__id=request.user.id, id=OuterRef('pk')))))
+        else:
+            queryset = self.filter_queryset(
+                self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(id=0)),
+                                             is_saved=Exists(self.get_queryset().filter(saved_collections__id=0))))
         try:
             new = queryset.filter(id=int(kwargs['pk'])).first()
             new.view_count += 1

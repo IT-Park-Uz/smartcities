@@ -41,9 +41,24 @@ class QuestionAdmin(admin.ModelAdmin):
     inlines = [QuestionReviewAdmin]
 
 
-admin.site.register(News, NewsAdmin)
-admin.site.register(Question, QuestionAdmin)
-admin.site.register(Article, ArticleAdmin)
+@admin.register(News)
+class NewsAdmin(admin.ModelAdmin):
+    list_display = ["title", "is_active"]
+    raw_id_fields = ["user", "theme"]
+
+
+@admin.register(Question)
+class NewsAdmin(admin.ModelAdmin):
+    list_display = ["title", "is_active"]
+    raw_id_fields = ["user", "theme"]
+
+
+@admin.register(Article)
+class NewsAdmin(admin.ModelAdmin):
+    list_display = ["title", "is_active"]
+    raw_id_fields = ["user", "theme"]
+
+
 admin.site.register(Notification)
 admin.site.register(UserUploadImage)
 

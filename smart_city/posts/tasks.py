@@ -36,5 +36,7 @@ def get_posts_from_it_park():
         with File(open(image_path, 'rb')) as img:
             news_obj = News(**data)
             news_obj.image.save(image_name, img)
+            news_obj.is_active = True
+            news_obj.save()
 
     return True

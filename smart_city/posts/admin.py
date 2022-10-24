@@ -44,8 +44,8 @@ class QuestionAdmin(admin.ModelAdmin):
 @admin.register(News)
 class NewsAdmin(admin.ModelAdmin):
     list_display = ["title", "is_active"]
-    raw_id_fields = ["user", "theme"]
-
+    raw_id_fields = ["user", "theme", "tags", "user_liked", "saved_collections"]
+    search_fields = ["user__first_name", "user__last_name", "title"]
 
 @admin.register(Question)
 class NewsAdmin(admin.ModelAdmin):
@@ -65,7 +65,7 @@ admin.site.register(UserUploadImage)
 
 @admin.register(Tags)
 class TagsAdmin(admin.ModelAdmin):
-    pass
+    list_display = ["name", "is_active"]
 
 
 @admin.register(Theme)

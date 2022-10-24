@@ -1,6 +1,6 @@
 from config import celery_app
 import requests
-from smart_city.posts.models import News
+from smart_city.posts.models import News, Tags, Theme
 import urllib.request
 from django.core.files import File
 from django.conf import settings
@@ -16,12 +16,15 @@ response_data: list = response.json()["data"]
 def get_posts_from_it_park():
     """Get posts from IT-Park every 1 minute."""
     itpark_user = User.objects.filter(username="itpark").first()
+    itpark_tag = Tags.objects.filter(name="IT Park").first()
+    itpark_category = Theme.objects.filter(name="Администрирование").first()
     for news in response_data:
         news: dict
         data = {
             "title": news.get("ru")["title"],
             "description": news.get("ru")["content"],
             "extra_data": {"itpark_id": news.get("id")},
+            "theme": itpark_category,
             "user": itpark_user if itpark_user else User.objects.all().first()
         }
         if News.objects.filter(
@@ -38,5 +41,6 @@ def get_posts_from_it_park():
             news_obj.image.save(image_name, img)
             news_obj.is_active = True
             news_obj.save()
+            news_obj.tags.add(itpark_tag)
 
     return True

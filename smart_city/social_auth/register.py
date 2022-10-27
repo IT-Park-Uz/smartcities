@@ -21,11 +21,6 @@ def generate_username(name):
 
 
 def register_social_user(provider, user_id, email, name, first_name, last_name):
-    # if provider=='facebook':
-    #     password = settings.FACEBOOK_SOCIAL_SECRET
-    # elif provider=='google':
-    #     password = settings.GOOGLE_CLIENT_SECRET
-
     email_check = User.objects.filter(email=email).first()
     if email_check is not None:
         registered_user = authenticate(

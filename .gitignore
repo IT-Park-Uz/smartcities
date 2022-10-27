@@ -331,3 +331,4 @@ smart_city/media/
 
 .pytest_cache/
 .env
+.idea/

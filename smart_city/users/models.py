@@ -12,6 +12,11 @@ class User(AbstractUser):
     work_name = models.CharField(_('work name'), max_length=255, null=True, blank=True)
     bio = models.TextField(null=True, blank=True, verbose_name=_('Bio'))
     is_verified = models.BooleanField(_('is verified'), default=False)
+    gender = models.BooleanField(_('gender'), default=True)
+    country = models.CharField(_('country'), max_length=255, null=True)
+    country_code = models.CharField(_('country code'), max_length=255, null=True)
+    phone = models.CharField(_('phone'), max_length=255, null=True)
+    birthday_date = models.DateField(null=True)
 
     def get_absolute_url(self):
         return reverse("users:detail", kwargs={"username": self.username})

@@ -7,9 +7,27 @@ User = get_user_model()
 
 
 class UserSerializer(serializers.ModelSerializer):
+    birthday_date = serializers.DateField(format="%Y-%m-%d")
+    image = serializers.ImageField(required=False)
+
     class Meta:
         model = User
-        fields = ["id", "username", "first_name", "last_name", "email"]
+        fields = [
+            "id",
+            "username",
+            "first_name",
+            "last_name",
+            "email",
+            "image",
+            "organization_name",
+            "work_name",
+            "bio",
+            "gender",
+            "country",
+            "country_code",
+            "phone",
+            "birthday_date",
+        ]
 
         extra_kwargs = {
             "url": {"view_name": "api:user-detail", "lookup_field": "username"}

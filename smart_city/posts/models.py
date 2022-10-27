@@ -10,6 +10,7 @@ class News(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     theme = models.ForeignKey('Theme', on_delete=models.SET_NULL, null=True)
     title = models.CharField(max_length=200)
+    subtitle = RichTextUploadingField(null=True)
     image = models.ImageField(upload_to='News/%y/%m/%d', null=True, blank=True)
     description = RichTextUploadingField()
     view_count = models.IntegerField(default=0)
@@ -65,6 +66,7 @@ class Article(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     theme = models.ForeignKey('Theme', on_delete=models.SET_NULL, null=True)
     title = models.CharField(max_length=200)
+    subtitle = RichTextUploadingField(null=True)
     image = models.ImageField(upload_to='Article/%y/%m/%d', null=True, blank=True)
     description = RichTextUploadingField()
     view_count = models.IntegerField(default=0)
@@ -127,6 +129,7 @@ class Question(models.Model):
     image = models.ImageField(upload_to='Question/%y/%m/%d', null=True, blank=True)
     type = models.IntegerField(default=Type_Question.EASY, choices=Type_Question.choices)
     title = models.CharField(max_length=200)
+    subtitle = RichTextUploadingField(null=True)
     description = RichTextUploadingField()
     view_count = models.IntegerField(default=0)
     user_liked = models.ManyToManyField(User, related_name="user_liked_q", null=True, blank=True)
@@ -186,7 +189,12 @@ class Tags(models.Model):
 
 class Theme(MPTTModel):
     parent = TreeForeignKey('self', on_delete=models.CASCADE, related_name='children', null=True, blank=True)
-    name = models.CharField(max_length=50, unique=True)
+    name = models.CharField("Name in english", max_length=50, unique=True)
+    name_uz = models.CharField("Name in uzbek", max_length=50, null=True)
+    name_tu = models.CharField("Name in turkish", max_length=50, null=True)
+    name_az = models.CharField("Name in azerbaijanian", max_length=50, null=True)
+    name_kz = models.CharField("Name in kazakhian", max_length=50, null=True)
+    name_kr = models.CharField("Name in kyrgyzian", max_length=50, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class MPTTMeta:

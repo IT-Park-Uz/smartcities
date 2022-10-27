@@ -81,8 +81,8 @@ urlpatterns += [
 
     # SOCIAL AUTH
     path('social/google', GoogleSocialAuthView.as_view()),
-    path('social/facebook', FacebookSocialAuthView.as_view()),
-    path('social/twitter', TwitterSocialAuthView.as_view()),
+    path('social/linked', FacebookSocialAuthView.as_view()),
+    path('social/github', TwitterSocialAuthView.as_view()),
 
     # Social Login
     # path('social/facebook/', FacebookLogin.as_view(), name='fb_login'),

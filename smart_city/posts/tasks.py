@@ -15,6 +15,7 @@ response_data: list = response.json()["data"]
 @celery_app.task()
 def get_posts_from_it_park():
     """Get posts from IT-Park every 1 minute."""
+    added_news = []
     itpark_user = User.objects.filter(username="itpark").first()
     itpark_tag = Tags.objects.filter(name="IT Park").first()
     itpark_category = Theme.objects.filter(name="Администрирование").first()
@@ -42,5 +43,5 @@ def get_posts_from_it_park():
             news_obj.is_active = True
             news_obj.save()
             news_obj.tags.add(itpark_tag)
-
-    return True
+            added_news.append(news_obj)
+    return added_news

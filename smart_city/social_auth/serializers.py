@@ -69,7 +69,7 @@ class LinkedInSocialAuthSerializer(serializers.Serializer):
             }
         ).json()
         if access_token.get('error') is not None:
-            raise serializers.ValidationError({'detail': 'Token expired'})
+            raise serializers.ValidationError({'detail': access_token.get('error')})
         access_token = access_token['access_token']
         user_sso_data = requests.get(
             'https://api.linkedin.com/v2/me',
@@ -85,7 +85,7 @@ class LinkedInSocialAuthSerializer(serializers.Serializer):
                 }
             ).json()
             if user_email.get('serviceErrorCode') is not None:
-                raise serializers.ValidationError({'detail': 'Your LinkedIn account has not an email or SSO has bad configuration'})
+                raise serializers.ValidationError({'detail': user_email.get('serviceErrorCode')})
             user_email = user_email['elements'][0]['handle~'].get('emailAddress')
             if user_email is None:
                 raise serializers.ValidationError({'detail': 'Your LinkedIn account has not an email or SSO has bad configuration'})

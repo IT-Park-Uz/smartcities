@@ -23,7 +23,6 @@ class UserSerializer(serializers.ModelSerializer):
             "work_name",
             "bio",
             "gender",
-            "country",
             "country_code",
             "phone",
             "birthday_date",

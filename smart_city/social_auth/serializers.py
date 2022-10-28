@@ -1,3 +1,4 @@
+import requests
 from django.conf import settings
 from rest_framework import serializers
 from . import google, facebook, twitterhelper
@@ -50,6 +51,54 @@ class GoogleSocialAuthSerializer(serializers.Serializer):
         provider = 'google'
         return register_social_user(
             provider=provider, user_id=user_id, email=email, name=name, first_name=first_name, last_name=last_name)
+
+
+class LinkedInSocialAuthSerializer(serializers.Serializer):
+    auth_token = serializers.CharField()
+
+    def validate_auth_token(self, auth_token_for_linkedin_obtain_access_token):
+        # Getting an access token
+        access_token = requests.post(
+            'https://www.linkedin.com/oauth/v2/accessToken',
+            data={
+                'client_id': '7854iw2a91d5ru',
+                'client_secret': 'uIOjYkbST9m2CXzd',
+                'redirect_uri': 'https://hub.smartcities.uz',
+                'code': auth_token_for_linkedin_obtain_access_token,
+                'grant_type': 'authorization_code'
+            }
+        ).json()
+        if access_token.get('error') is not None:
+            raise serializers.ValidationError({'detail': 'Token expired'})
+        access_token = access_token['access_token']
+        user_sso_data = requests.get(
+            'https://api.linkedin.com/v2/me',
+            headers={
+                'Authorization': f"Bearer {access_token}"
+            }
+        ).json()
+        try:
+            user_email = requests.get(
+                'https://api.linkedin.com/v2/emailAddress?q=members&projection=(elements*(handle~))',
+                headers={
+                    'Authorization': f"Bearer {access_token}"
+                }
+            ).json()
+            if user_email.get('serviceErrorCode') is not None:
+                raise serializers.ValidationError({'detail': 'Your LinkedIn account has not an email or SSO has bad configuration'})
+            user_email = user_email['elements'][0]['handle~'].get('emailAddress')
+            if user_email is None:
+                raise serializers.ValidationError({'detail': 'Your LinkedIn account has not an email or SSO has bad configuration'})
+            return register_social_user(
+                provider='linkedin',
+                user_id=user_sso_data['id'],
+                email=user_email,
+                name=user_sso_data['id'],
+                first_name=user_sso_data.get('localizedFirstName'),
+                last_name=user_sso_data.get('localizedLastName')
+            )
+        except (IndexError, KeyError) as e:
+            raise serializers.ValidationError({'detail': 'Your LinkedIn account has not an email or SSO has bad configuration'})
 
 
 class TwitterAuthSerializer(serializers.Serializer):

@@ -10,7 +10,7 @@ from smart_city.posts.views import (NewsApiView, ArticleApiView, QuestionApiView
                                     LikeNewsView, ReadNewsView, LikeArticlesView, ReadArticlesView, LikeQuestionsView,
                                     ReadQuestionsView, ThemeGroupNewsView, ThemeGroupArticlesView,
                                     ThemeGroupQuestionsView, UserSavedCollectionsView, UserUploadImageView)
-from smart_city.social_auth.views import GoogleSocialAuthView, FacebookSocialAuthView, TwitterSocialAuthView
+from smart_city.social_auth.views import GoogleSocialAuthView, FacebookSocialAuthView, TwitterSocialAuthView, LinkedInSocialAuthView
 from smart_city.users.api.views import UserViewSet
 
 from idegovuz.views import IdEgovUzAdapter, oauth2_login
@@ -83,6 +83,7 @@ urlpatterns += [
     path('social/google', GoogleSocialAuthView.as_view()),
     path('social/linked', FacebookSocialAuthView.as_view()),
     path('social/github', TwitterSocialAuthView.as_view()),
+    path('social/linked-in', LinkedInSocialAuthView.as_view()),
 
     # Social Login
     # path('social/facebook/', FacebookLogin.as_view(), name='fb_login'),

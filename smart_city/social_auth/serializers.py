@@ -22,7 +22,9 @@ class FacebookSocialAuthSerializer(serializers.Serializer):
                 provider=provider,
                 user_id=user_id,
                 email=email,
-                name=name
+                name=name,
+                first_name=name,
+                last_name=''
             )
         except Exception as identifier:
             raise serializers.ValidationError(

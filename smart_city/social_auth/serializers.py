@@ -63,7 +63,7 @@ class LinkedInSocialAuthSerializer(serializers.Serializer):
             data={
                 'client_id': '7854iw2a91d5ru',
                 'client_secret': 'uIOjYkbST9m2CXzd',
-                'redirect_uri': 'https://hub.smartcities.uz',
+                'redirect_uri': 'https://hub.smartcities.uz/linkedin',
                 'code': auth_token_for_linkedin_obtain_access_token,
                 'grant_type': 'authorization_code'
             }

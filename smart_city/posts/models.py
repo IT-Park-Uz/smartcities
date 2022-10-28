@@ -195,6 +195,7 @@ class Theme(MPTTModel):
     name_az = models.CharField("Name in azerbaijanian", max_length=50, null=True)
     name_kz = models.CharField("Name in kazakhian", max_length=50, null=True)
     name_kr = models.CharField("Name in kyrgyzian", max_length=50, null=True)
+    icon = models.FileField("Icon", upload_to='Themes/%y/%m/%d', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class MPTTMeta:

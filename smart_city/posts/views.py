@@ -117,8 +117,14 @@ class SearchNewsView(viewsets.ModelViewSet):
                     self.get_queryset().filter(saved_collections__id=0))))
         try:
             key = request.query_params['key']
-            news = queryset.filter(
-                Q(title__icontains=key) | Q(theme__name__icontains=key) | Q(tags__name=key)).order_by('-view_count')
+            tags = request.query_params.get('tags')
+            if tags is not None:
+                tags = tags.split(',')
+                news = queryset.filter(tags__id__in=tags).filter(
+                    Q(title__icontains=key) | Q(theme__name__icontains=key) | Q(tags__name=key)).order_by('-view_count')
+            else:
+                news = queryset.filter(
+                    Q(title__icontains=key) | Q(theme__name__icontains=key) | Q(tags__name=key)).order_by('-view_count')
             page = self.paginate_queryset(news)
             if page is not None:
                 serializer = self.get_serializer(page, many=True)
@@ -157,10 +163,18 @@ class SearchArticleView(viewsets.ModelViewSet):
                 self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(id=0)),
                                              is_saved=Exists(self.get_queryset().filter(saved_collections__id=0))))
         try:
-            articles = queryset.filter(
-                Q(title__icontains=request.query_params['key']) | Q(
-                    theme__name__icontains=request.query_params['key']) | Q(
-                    tags__name=request.query_params['key']))
+            tags = request.query_params.get('tags')
+            if tags is not None:
+                tags = tags.split(',')
+                articles = queryset.filter(tags__id__in=tags).filter(
+                    Q(title__icontains=request.query_params['key']) | Q(
+                        theme__name__icontains=request.query_params['key']) | Q(
+                        tags__name=request.query_params['key']))
+            else:
+                articles = queryset.filter(
+                    Q(title__icontains=request.query_params['key']) | Q(
+                        theme__name__icontains=request.query_params['key']) | Q(
+                        tags__name=request.query_params['key']))
             page = self.paginate_queryset(articles)
             if page is not None:
                 serializer = self.get_serializer(page, many=True)
@@ -199,10 +213,18 @@ class SearchQuestionView(viewsets.ModelViewSet):
                 self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(id=0)),
                                              is_saved=Exists(self.get_queryset().filter(saved_collections__id=0))))
         try:
-            questions = queryset.filter(
-                Q(title__icontains=request.query_params['key']) | Q(
-                    theme__name__icontains=request.query_params['key']) | Q(
-                    tags__name=request.query_params['key']))
+            tags = request.query_params.get('tags')
+            if tags is not None:
+                tags = tags.split(',')
+                questions = queryset.filter(tags__id__in=tags).filter(
+                    Q(title__icontains=request.query_params['key']) | Q(
+                        theme__name__icontains=request.query_params['key']) | Q(
+                        tags__name=request.query_params['key']))
+            else:
+                questions = queryset.filter(
+                    Q(title__icontains=request.query_params['key']) | Q(
+                        theme__name__icontains=request.query_params['key']) | Q(
+                        tags__name=request.query_params['key']))
             page = self.paginate_queryset(questions)
             if page is not None:
                 serializer = self.get_serializer(page, many=True)

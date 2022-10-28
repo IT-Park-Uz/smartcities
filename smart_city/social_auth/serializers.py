@@ -67,20 +67,26 @@ class LinkedInSocialAuthSerializer(serializers.Serializer):
                 'code': auth_token_for_linkedin_obtain_access_token,
                 'grant_type': 'authorization_code'
             }
-        ).json()['access_token']
-        user_sso_data = requests.post(
+        ).json()
+        if access_token.get('error') is not None:
+            raise serializers.ValidationError({'detail': 'Token expired'})
+        access_token = access_token['access_token']
+        user_sso_data = requests.get(
             'https://api.linkedin.com/v2/me',
             headers={
                 'Authorization': f"Bearer {access_token}"
             }
         ).json()
         try:
-            user_email = requests.post(
+            user_email = requests.get(
                 'https://api.linkedin.com/v2/emailAddress?q=members&projection=(elements*(handle~))',
                 headers={
                     'Authorization': f"Bearer {access_token}"
                 }
-            ).json()['elements'][0]['handle~'].get('emailAddress')
+            ).json()
+            if user_email.get('serviceErrorCode') is not None:
+                raise serializers.ValidationError({'detail': 'Your LinkedIn account has not an email or SSO has bad configuration'})
+            user_email = user_email['elements'][0]['handle~'].get('emailAddress')
             if user_email is None:
                 raise serializers.ValidationError({'detail': 'Your LinkedIn account has not an email or SSO has bad configuration'})
             return register_social_user(

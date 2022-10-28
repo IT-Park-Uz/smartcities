@@ -10,7 +10,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'first_name', 'last_name', 'image', 'username', 'email', 'organization_name', 'work_name',
-                  'bio']
+                  'bio', 'country_code']
 
 
 class TagsSerializer(serializers.ModelSerializer):

@@ -93,7 +93,7 @@ THIRD_PARTY_APPS = [
     "allauth.account",
     'dj_rest_auth.registration',
 
-    # "allauth.socialaccount",
+    "allauth.socialaccount",
     # 'allauth.socialaccount.providers.facebook',
     # 'allauth.socialaccount.providers.google',
     # 'allauth.socialaccount.providers.github',

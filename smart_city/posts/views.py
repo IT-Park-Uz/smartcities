@@ -28,8 +28,10 @@ class NewsApiView(ReadWriteSerializerMixin, viewsets.ModelViewSet):
     parser_classes = [MultiPartParser, FormParser, JSONParser]
     read_serializer_class = NewsSerializer
     write_serializer_class = NewsWriteSerializer
+    # prefetch_related_tuple = ("user", "theme", "tags")
 
     def get_queryset(self):
+        # queryset = self.queryset.prefetch_related(*self.prefetch_related_tuple)
         queryset = self.queryset.prefetch_related("user", 'theme', 'tags')
         return queryset
 
@@ -235,13 +237,6 @@ class SearchQuestionView(viewsets.ModelViewSet):
             return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-@extend_schema_view(
-    list=extend_schema(parameters=[
-        OpenApiParameter(name='status',
-                         description="status is required in params")
-    ],
-        description="STATUS USES FOR TO GET NEWS OF USER, YOU SHOULD GIVE TRUE OR FALSE IN STATUS")
-)
 class UserNewsView(viewsets.ModelViewSet):
     queryset = News.objects.filter(is_delete=False).annotate(comment_count=Count("newsreview")).order_by('-created_at')
     permission_classes = [IsAuthenticated]
@@ -253,11 +248,7 @@ class UserNewsView(viewsets.ModelViewSet):
         return queryset
 
     def list(self, request, *args, **kwargs):
-        try:
-            stat = request.query_params['status']
-        except:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-        queryset = self.filter_queryset(self.get_queryset().filter(user=request.user, is_active=stat).annotate(
+        queryset = self.filter_queryset(self.get_queryset().filter(user=request.user).annotate(
             is_liked=Exists(self.get_queryset().filter(Q(user_liked__id=request.user.id) & Q(id=OuterRef('pk')))),
             is_saved=Exists(self.get_queryset().filter(saved_collections__id=request.user.id, id=OuterRef('pk')))))
         page = self.paginate_queryset(queryset)
@@ -338,13 +329,6 @@ class ArticleApiView(ReadWriteSerializerMixin, viewsets.ModelViewSet):
         return Response(status=status.HTTP_200_OK)
 
 
-@extend_schema_view(
-    list=extend_schema(parameters=[
-        OpenApiParameter(name='status',
-                         description="status is required in params")
-    ],
-        description="STATUS USES FOR TO GET ARTICLES OF USER, YOU SHOULD GIVE TRUE OR FALSE IN STATUS")
-)
 class UserArticleView(viewsets.ModelViewSet):
     queryset = Article.objects.filter(is_delete=False).annotate(comment_count=Count("articlereview")).order_by(
         '-created_at')
@@ -357,12 +341,8 @@ class UserArticleView(viewsets.ModelViewSet):
         return queryset
 
     def list(self, request, *args, **kwargs):
-        try:
-            stat = request.query_params['status']
-        except:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
         queryset = self.filter_queryset(
-            self.get_queryset().filter(user=request.user, is_active=stat).annotate(
+            self.get_queryset().filter(user=request.user).annotate(
                 is_liked=Exists(self.get_queryset().filter(
                     Q(user_liked__id=request.user.id) & Q(id=OuterRef('pk'))
                 )),
@@ -447,13 +427,6 @@ class QuestionApiView(ReadWriteSerializerMixin, viewsets.ModelViewSet):
         return Response(status=status.HTTP_200_OK)
 
 
-@extend_schema_view(
-    list=extend_schema(parameters=[
-        OpenApiParameter(name='status',
-                         description="status is required in params")
-    ],
-        description="STATUS USES FOR TO GET QUESTIONS OF USER, YOU SHOULD GIVE TRUE OR FALSE IN STATUS")
-)
 class UserQuestionView(viewsets.ModelViewSet):
     queryset = Question.objects.filter(is_delete=False).annotate(comment_count=Count("questionreview")).order_by(
         '-created_at')
@@ -466,12 +439,8 @@ class UserQuestionView(viewsets.ModelViewSet):
         return queryset
 
     def list(self, request, *args, **kwargs):
-        try:
-            stat = request.query_params['status']
-        except:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
         queryset = self.filter_queryset(
-            self.get_queryset().filter(user=request.user, is_active=stat).annotate(
+            self.get_queryset().filter(user=request.user).annotate(
                 is_liked=Exists(self.get_queryset().filter(
                     Q(user_liked__id=request.user.id) & Q(id=OuterRef('pk'))
                 )),

@@ -26,7 +26,7 @@ class NewsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = News
-        exclude = ['user_liked', 'is_delete', 'is_active', 'is_draft', 'saved_collections']
+        exclude = ['user_liked', 'is_delete', 'is_draft', 'saved_collections']
 
     def to_representation(self, instance):
         response = super().to_representation(instance)
@@ -64,7 +64,7 @@ class ArticleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Article
-        exclude = ['user_liked', 'is_delete', 'is_active', 'is_draft', 'saved_collections']
+        exclude = ['user_liked', 'is_delete', 'is_draft', 'saved_collections']
 
     def to_representation(self, instance):
         response = super().to_representation(instance)
@@ -102,7 +102,7 @@ class QuestionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Question
-        exclude = ['user_liked', 'is_delete', 'is_active', 'is_draft', 'saved_collections']
+        exclude = ['user_liked', 'is_delete', 'is_draft', 'saved_collections']
 
     def to_representation(self, instance):
         response = super().to_representation(instance)

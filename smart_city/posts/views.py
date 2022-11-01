@@ -28,11 +28,10 @@ class NewsApiView(ReadWriteSerializerMixin, viewsets.ModelViewSet):
     parser_classes = [MultiPartParser, FormParser, JSONParser]
     read_serializer_class = NewsSerializer
     write_serializer_class = NewsWriteSerializer
-    # prefetch_related_tuple = ("user", "theme", "tags")
+    prefetch_related_tuple = ("user", "theme", "tags")
 
     def get_queryset(self):
-        # queryset = self.queryset.prefetch_related(*self.prefetch_related_tuple)
-        queryset = self.queryset.prefetch_related("user", 'theme', 'tags')
+        queryset = self.queryset.prefetch_related(*self.prefetch_related_tuple)
         return queryset
 
     def list(self, request, *args, **kwargs):
@@ -118,7 +117,7 @@ class SearchNewsView(viewsets.ModelViewSet):
                 self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(id=0)), is_saved=Exists(
                     self.get_queryset().filter(saved_collections__id=0))))
         try:
-            key = request.query_params['key']
+            key = request.query_params.get('key')
             tags = request.query_params.get('tags')
             if tags is not None:
                 tags = tags.split(',')

@@ -71,7 +71,7 @@ class Article(models.Model):
     description = RichTextUploadingField()
     view_count = models.IntegerField(default=0)
     user_liked = models.ManyToManyField(User, related_name="user_liked_a", null=True, blank=True)
-    saved_collections = models.ManyToManyField(User, related_name="user_saved_a", null=True)
+    saved_collections = models.ManyToManyField(User, related_name="user_saved_a", null=True, blank=True)
     tags = models.ManyToManyField('Tags', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     is_delete = models.BooleanField(default=False)

@@ -19,6 +19,39 @@ class TagsSerializer(serializers.ModelSerializer):
         exclude = ['is_active']
 
 
+class NewsPartSerializer(serializers.ModelSerializer):
+    tags = TagsSerializer(read_only=True, many=True)
+    like_count = serializers.ReadOnlyField()
+    saved_count = serializers.ReadOnlyField()
+
+    class Meta:
+        model = News
+        exclude = ['user_liked', 'is_delete', 'is_draft', 'saved_collections', 'description']
+
+    def to_representation(self, instance):
+        response = super().to_representation(instance)
+        response['user'] = UserSerializer(instance.user).data
+        response['theme'] = ThemeSerializer(instance.theme).data
+        response['is_liked'] = instance.is_liked
+        response['comments_count'] = instance.comment_count
+        response['is_saved'] = instance.is_saved
+        response['type'] = "NEWS"
+        return response
+
+class NewsSideBarSerializer(serializers.ModelSerializer):
+    like_count = serializers.ReadOnlyField()
+
+    class Meta:
+        model = News
+        fields = ["id", "title", "like_count", "view_count"]
+
+    def to_representation(self, instance):
+        response = super().to_representation(instance)
+        response['is_liked'] = instance.is_liked
+        response['comments_count'] = instance.comment_count
+        response['type'] = "NEWS"
+        return response
+
 class NewsSerializer(serializers.ModelSerializer):
     tags = TagsSerializer(read_only=True, many=True)
     like_count = serializers.ReadOnlyField()
@@ -57,6 +90,39 @@ class NewsWriteSerializer(serializers.ModelSerializer):
         return news
 
 
+class ArticlePartSerializer(serializers.ModelSerializer):
+    tags = TagsSerializer(read_only=True, many=True)
+    like_count = serializers.ReadOnlyField()
+    saved_count = serializers.ReadOnlyField()
+
+    class Meta:
+        model = Article
+        exclude = ['user_liked', 'is_delete', 'is_draft', 'saved_collections', 'description']
+
+    def to_representation(self, instance):
+        response = super().to_representation(instance)
+        response['user'] = UserSerializer(instance.user).data
+        response['theme'] = ThemeSerializer(instance.theme).data
+        response['is_liked'] = instance.is_liked
+        response['comments_count'] = instance.comment_count
+        response['is_saved'] = instance.is_saved
+        response['type'] = "ARTICLE"
+        return response
+
+class ArticleSideBarSerializer(serializers.ModelSerializer):
+    like_count = serializers.ReadOnlyField()
+
+    class Meta:
+        model = Article
+        fields = ["id", "title", "like_count", "view_count"]
+
+    def to_representation(self, instance):
+        response = super().to_representation(instance)
+        response['is_liked'] = instance.is_liked
+        response['comments_count'] = instance.comment_count
+        response['type'] = "ARTICLE"
+        return response
+
 class ArticleSerializer(serializers.ModelSerializer):
     tags = TagsSerializer(read_only=True, many=True)
     like_count = serializers.ReadOnlyField()
@@ -94,6 +160,40 @@ class ArticleWriteSerializer(serializers.ModelSerializer):
                 article.tags.add(t)
         return article
 
+
+
+class QuestionPartSerializer(serializers.ModelSerializer):
+    tags = TagsSerializer(read_only=True, many=True)
+    like_count = serializers.ReadOnlyField()
+    saved_count = serializers.ReadOnlyField()
+
+    class Meta:
+        model = Question
+        exclude = ['user_liked', 'is_delete', 'is_draft', 'saved_collections', 'description']
+
+    def to_representation(self, instance):
+        response = super().to_representation(instance)
+        response['user'] = UserSerializer(instance.user).data
+        response['theme'] = ThemeSerializer(instance.theme).data
+        response['is_liked'] = instance.is_liked
+        response['comments_count'] = instance.comment_count
+        response['is_saved'] = instance.is_saved
+        response['type'] = "QUESTION"
+        return response
+
+class QuestionSideBarSerializer(serializers.ModelSerializer):
+    like_count = serializers.ReadOnlyField()
+
+    class Meta:
+        model = Question
+        fields = ["id", "title", "like_count", "view_count"]
+
+    def to_representation(self, instance):
+        response = super().to_representation(instance)
+        response['is_liked'] = instance.is_liked
+        response['comments_count'] = instance.comment_count
+        response['type'] = "QUESTION"
+        return response
 
 class QuestionSerializer(serializers.ModelSerializer):
     tags = TagsSerializer(read_only=True, many=True)

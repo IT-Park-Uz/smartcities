@@ -12,6 +12,11 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['id', 'first_name', 'last_name', 'image', 'username', 'email', 'organization_name', 'work_name',
                   'bio', 'country_code']
 
+class UserDataSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'first_name', 'last_name', 'image', 'username', 'country_code']
+
 
 class TagsSerializer(serializers.ModelSerializer):
     class Meta:
@@ -30,7 +35,7 @@ class NewsPartSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         response = super().to_representation(instance)
-        response['user'] = UserSerializer(instance.user).data
+        response['user'] = UserDataSerializer(instance.user).data
         response['theme'] = ThemeSerializer(instance.theme).data
         response['is_liked'] = instance.is_liked
         response['comments_count'] = instance.comment_count
@@ -64,7 +69,7 @@ class NewsSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         response = super().to_representation(instance)
-        response['user'] = UserSerializer(instance.user).data
+        response['user'] = UserDataSerializer(instance.user).data
         response['theme'] = ThemeSerializer(instance.theme).data
         response['is_liked'] = instance.is_liked
         response['comments_count'] = instance.comment_count
@@ -102,7 +107,7 @@ class ArticlePartSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         response = super().to_representation(instance)
-        response['user'] = UserSerializer(instance.user).data
+        response['user'] = UserDataSerializer(instance.user).data
         response['theme'] = ThemeSerializer(instance.theme).data
         response['is_liked'] = instance.is_liked
         response['comments_count'] = instance.comment_count
@@ -136,7 +141,7 @@ class ArticleSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         response = super().to_representation(instance)
-        response['user'] = UserSerializer(instance.user).data
+        response['user'] = UserDataSerializer(instance.user).data
         response['theme'] = ThemeSerializer(instance.theme).data
         response['is_liked'] = instance.is_liked
         response['comments_count'] = instance.comment_count
@@ -175,7 +180,7 @@ class QuestionPartSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         response = super().to_representation(instance)
-        response['user'] = UserSerializer(instance.user).data
+        response['user'] = UserDataSerializer(instance.user).data
         response['theme'] = ThemeSerializer(instance.theme).data
         response['is_liked'] = instance.is_liked
         response['comments_count'] = instance.comment_count
@@ -209,7 +214,7 @@ class QuestionSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         response = super().to_representation(instance)
-        response['user'] = UserSerializer(instance.user).data
+        response['user'] = UserDataSerializer(instance.user).data
         response['theme'] = ThemeSerializer(instance.theme).data
         response['is_liked'] = instance.is_liked
         response['comments_count'] = instance.comment_count
@@ -251,7 +256,7 @@ class NewsReviewSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         response = super().to_representation(instance)
-        response['user'] = UserSerializer(instance.user).data
+        response['user'] = UserDataSerializer(instance.user).data
         return response
 
 
@@ -262,7 +267,7 @@ class ArticleReviewSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         response = super().to_representation(instance)
-        response['user'] = UserSerializer(instance.user).data
+        response['user'] = UserDataSerializer(instance.user).data
         return response
 
 
@@ -273,7 +278,7 @@ class QuestionReviewSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         response = super().to_representation(instance)
-        response['user'] = UserSerializer(instance.user).data
+        response['user'] = UserDataSerializer(instance.user).data
         return response
 
 
@@ -297,3 +302,35 @@ class UserUploadImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserUploadImage
         fields = '__all__'
+
+
+
+class UserAccountNewsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = News
+        fields = ["id", "title", "created_at"]
+
+    def to_representation(self, instance):
+        response = super().to_representation(instance)
+        response['type'] = "NEWS"
+        return response
+
+class UserAccountArticleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Article
+        fields = ["id", "title", "created_at"]
+
+    def to_representation(self, instance):
+        response = super().to_representation(instance)
+        response['type'] = "ARTICLE"
+        return response
+
+class UserAccountQuestionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Question
+        fields = ["id", "title", "created_at"]
+
+    def to_representation(self, instance):
+        response = super().to_representation(instance)
+        response['type'] = "QUESTION"
+        return response

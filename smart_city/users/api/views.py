@@ -8,7 +8,7 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 
 from .serializers import UserSerializer
-
+from rest_framework.permissions import DjangoModelPermissionsOrAnonReadOnly
 User = get_user_model()
 
 
@@ -16,12 +16,13 @@ class UserViewSet(RetrieveModelMixin, ListModelMixin, UpdateModelMixin, GenericV
     serializer_class = UserSerializer
     queryset = User.objects.all()
     lookup_field = "username"
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (DjangoModelPermissionsOrAnonReadOnly,)
+    filterset_fields = ("username", "first_name", "last_name")
     parser_classes = (MultiPartParser, FormParser, JSONParser)
 
     def get_queryset(self, *args, **kwargs):
         assert isinstance(self.request.user.id, int)
-        return self.queryset.filter(id=self.request.user.id)
+        return self.queryset
 
     @action(detail=False)
     def me(self, request):

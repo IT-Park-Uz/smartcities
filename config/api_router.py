@@ -52,10 +52,6 @@ router.register('search-news', SearchNewsView, basename='search-news')
 router.register('search-articles', SearchArticleView, basename='search-articles')
 router.register('search-questions', SearchQuestionView, basename='search-questions')
 
-router.register('news-history', UserNewsView, basename='news-history')
-router.register('articles-history', UserArticleView, basename='articles-history')
-router.register('questions-history', UserQuestionView, basename='questions-history')
-
 router.register('notifications', NotificationApiView, basename='notifications')
 router.register('user-uploads', UserUploadImageView, basename='user-uploads')
 
@@ -78,6 +74,11 @@ urlpatterns += [
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
     path('saved/', UserSavedCollectionsView.as_view(), name='saved'),
+
+    path('news-history/', UserNewsView.as_view(), name='news-history'),
+    path('articles-history/', UserArticleView.as_view(), name='articles-history'),
+    path('questions-history/', UserQuestionView.as_view(), name='questions-history'),
+
 
     # SOCIAL AUTH
     path('social/google', GoogleSocialAuthView.as_view()),

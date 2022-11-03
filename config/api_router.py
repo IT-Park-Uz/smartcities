@@ -9,7 +9,9 @@ from smart_city.posts.views import (NewsApiView, ArticleApiView, QuestionApiView
                                     QuestionReviewView, NotificationApiView,
                                     LikeNewsView, ReadNewsView, LikeArticlesView, ReadArticlesView, LikeQuestionsView,
                                     ReadQuestionsView, ThemeGroupNewsView, ThemeGroupArticlesView,
-                                    ThemeGroupQuestionsView, UserSavedCollectionsView, UserUploadImageView)
+                                    ThemeGroupQuestionsView, UserSavedCollectionsView, UserUploadImageView,
+                                    UserAccountPostView, SearchNewsByTagView, SearchArticleByTagView,
+                                    SearchQuestionByTagView)
 from smart_city.social_auth.views import GoogleSocialAuthView, FacebookSocialAuthView, TwitterSocialAuthView, LinkedInSocialAuthView
 from smart_city.users.api.views import UserViewSet
 
@@ -52,6 +54,10 @@ router.register('search-news', SearchNewsView, basename='search-news')
 router.register('search-articles', SearchArticleView, basename='search-articles')
 router.register('search-questions', SearchQuestionView, basename='search-questions')
 
+router.register('search/news', SearchNewsByTagView, basename='search-news')
+router.register('search/article', SearchArticleByTagView, basename='search-article')
+router.register('search/question', SearchQuestionByTagView, basename='search-question')
+
 router.register('notifications', NotificationApiView, basename='notifications')
 router.register('user-uploads', UserUploadImageView, basename='user-uploads')
 
@@ -74,6 +80,7 @@ urlpatterns += [
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
     path('saved/', UserSavedCollectionsView.as_view(), name='saved'),
+    path('user/publications', UserAccountPostView.as_view(), name='user/publications'),
 
     path('news-history/', UserNewsView.as_view(), name='news-history'),
     path('articles-history/', UserArticleView.as_view(), name='articles-history'),

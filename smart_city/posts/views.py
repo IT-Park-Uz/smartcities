@@ -14,7 +14,8 @@ from .serializer import (NewsSerializer, ArticleSerializer, QuestionSerializer,
                          NotificationSerializer, UserUploadImageSerializer,
                          NewsPartSerializer, NewsSideBarSerializer,
                          ArticlePartSerializer, ArticleSideBarSerializer,
-                         QuestionPartSerializer, QuestionSideBarSerializer, )
+                         QuestionPartSerializer, QuestionSideBarSerializer, UserDataSerializer,
+                         UserAccountNewsSerializer, UserAccountArticleSerializer, UserAccountQuestionSerializer, )
 from .mixin import ReadWriteSerializerMixin
 from smart_city.posts.models import (News, Article, Question, Tags, Theme, NewsReview, ArticleReview,
                                      QuestionReview, Notification, UserUploadImage)
@@ -331,6 +332,7 @@ class UserArticleView(ListAPIView):
         '-created_at')
     serializer_class = ArticleSideBarSerializer
     permission_classes = [IsAuthenticated]
+
     # http_method_names = ['get']
 
     def get(self, request, *args, **kwargs):
@@ -861,13 +863,13 @@ class UserSavedCollectionsView(APIView):
         news = News.objects.filter(saved_collections__id=request.user.id)
         questions = Question.objects.filter(saved_collections__id=request.user.id)
         articles = Article.objects.filter(saved_collections__id=request.user.id)
-        news_saved = [{"id": i.id, "title": i.title, "description": i.description,
-                       "user": UserSerializer(i.user, many=False).data} for i in news]
-        articles_saved = [{"id": i.id, "title": i.title, "description": i.description,
-                           "user": UserSerializer(i.user, many=False).data} for i in
+        news_saved = [{"id": i.id, "title": i.title,
+                       "user": UserDataSerializer(i.user, many=False).data} for i in news]
+        articles_saved = [{"id": i.id, "title": i.title,
+                           "user": UserDataSerializer(i.user, many=False).data} for i in
                           articles]
-        questions_saved = [{"id": i.id, "title": i.title, "description": i.description,
-                            "user": UserSerializer(i.user, many=False).data} for i in
+        questions_saved = [{"id": i.id, "title": i.title,
+                            "user": UserDataSerializer(i.user, many=False).data} for i in
                            questions]
         return Response({
             "news": news_saved,
@@ -928,3 +930,164 @@ class UserUploadImageView(viewsets.ModelViewSet):
     serializer_class = UserUploadImageSerializer
     permission_classes = [IsAuthenticated]
     http_method_names = ['get', 'post', 'delete']
+
+
+class UserAccountPostView(ListAPIView):
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    serializer_class = UserAccountNewsSerializer
+
+    def get(self, request, *args, **kwargs):
+        queryset = {}
+        username = request.query_params.get('username')
+        type = request.query_params.get('type')
+        if not (username and type):
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        if type == 'news':
+            queryset = News.objects.filter(user__username=username)
+        elif type == 'article':
+            self.serializer_class = UserAccountArticleSerializer
+            queryset = Article.objects.filter(user__username=username)
+        elif type == 'question':
+            queryset = Question.objects.filter(user__username=username)
+            self.serializer_class = UserAccountQuestionSerializer
+        if not queryset:
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        query = queryset.order_by('-created_at')
+        page = self.paginate_queryset(query)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(query, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@extend_schema_view(
+    list=extend_schema(parameters=[
+        OpenApiParameter(name='tag',
+                         description="tag is required in params")
+    ],
+        description="THE URL USES FOR SEARCHING NEWS ")
+)
+class SearchNewsByTagView(viewsets.ModelViewSet):
+    queryset = News.objects.filter(is_active=True).annotate(comment_count=Count("newsreview")).order_by('-created_at')
+    serializer_class = NewsPartSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    http_method_names = ['get']
+
+    def get_queryset(self):
+        queryset = self.queryset.prefetch_related("user", 'theme', 'tags')
+        return queryset
+
+    def list(self, request, *args, **kwargs):
+        tag = request.query_params.get('tag')
+        if not tag:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        query = self.get_queryset().filter(tags__id=int(tag))
+        if not query:
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        if request.user.is_authenticated:
+            queryset = self.filter_queryset(query.annotate(is_liked=Exists(query.filter(
+                user_liked__id=request.user.id, id=OuterRef('pk'))),
+                is_saved=Exists(query.filter(saved_collections__id=request.user.id, id=OuterRef('pk')))))
+        else:
+            queryset = self.filter_queryset(
+                query.annotate(is_liked=Exists(query.filter(id=0)), is_saved=Exists(
+                    query.filter(saved_collections__id=0))))
+        try:
+            page = self.paginate_queryset(queryset)
+            if page is not None:
+                serializer = self.get_serializer(page, many=True)
+                return self.get_paginated_response(serializer.data)
+            serializer = self.get_serializer(queryset, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except:
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@extend_schema_view(
+    list=extend_schema(parameters=[
+        OpenApiParameter(name='tag',
+                         description="tag is required in params")
+    ],
+        description="THE URL USES FOR SEARCHING ARTICLES ")
+)
+class SearchArticleByTagView(viewsets.ModelViewSet):
+    queryset = Article.objects.filter(is_active=True).annotate(comment_count=Count("articlereview")).order_by(
+        '-created_at')
+    serializer_class = ArticlePartSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    http_method_names = ['get']
+
+    def get_queryset(self):
+        queryset = self.queryset.prefetch_related("user", 'theme', 'tags')
+        return queryset
+
+    def list(self, request, *args, **kwargs):
+        tag = request.query_params.get('tag')
+        if not tag:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        query = self.get_queryset().filter(tags__id=int(tag))
+        if not query:
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        if request.user.is_authenticated:
+            queryset = self.filter_queryset(query.annotate(is_liked=Exists(query.filter(
+                user_liked__id=request.user.id, id=OuterRef('pk'))),
+                is_saved=Exists(query.filter(saved_collections__id=request.user.id, id=OuterRef('pk')))))
+        else:
+            queryset = self.filter_queryset(
+                query.annotate(is_liked=Exists(query.filter(id=0)), is_saved=Exists(
+                    query.filter(saved_collections__id=0))))
+        try:
+            page = self.paginate_queryset(queryset)
+            if page is not None:
+                serializer = self.get_serializer(page, many=True)
+                return self.get_paginated_response(serializer.data)
+            serializer = self.get_serializer(queryset, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except:
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@extend_schema_view(
+    list=extend_schema(parameters=[
+        OpenApiParameter(name='tag',
+                         description="tag is required in params")
+    ],
+        description="THE URL USES FOR SEARCHING QUESTIONS ")
+)
+class SearchQuestionByTagView(viewsets.ModelViewSet):
+    queryset = Question.objects.filter(is_active=True).annotate(comment_count=Count("questionreview")).order_by(
+        '-created_at')
+    serializer_class = QuestionPartSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    http_method_names = ['get']
+
+    def get_queryset(self):
+        queryset = self.queryset.prefetch_related("user", 'theme', 'tags')
+        return queryset
+
+    def list(self, request, *args, **kwargs):
+        tag = request.query_params.get('tag')
+        if not tag:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        query = self.get_queryset().filter(tags__id=int(tag))
+        if not query:
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        if request.user.is_authenticated:
+            queryset = self.filter_queryset(query.annotate(is_liked=Exists(query.filter(
+                user_liked__id=request.user.id, id=OuterRef('pk'))),
+                is_saved=Exists(query.filter(saved_collections__id=request.user.id, id=OuterRef('pk')))))
+        else:
+            queryset = self.filter_queryset(
+                query.annotate(is_liked=Exists(query.filter(id=0)), is_saved=Exists(
+                    query.filter(saved_collections__id=0))))
+        try:
+            page = self.paginate_queryset(queryset)
+            if page is not None:
+                serializer = self.get_serializer(page, many=True)
+                return self.get_paginated_response(serializer.data)
+            serializer = self.get_serializer(queryset, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except:
+            return Response(status=status.HTTP_204_NO_CONTENT)

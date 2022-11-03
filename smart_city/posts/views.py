@@ -1,4 +1,5 @@
 from django.db.models import Q, Count
+from rest_framework.generics import ListAPIView
 from rest_framework.views import APIView
 from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action
@@ -239,13 +240,12 @@ class SearchQuestionView(viewsets.ModelViewSet):
             return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class UserNewsView(viewsets.ModelViewSet):
+class UserNewsView(ListAPIView):
     queryset = News.objects.filter(is_delete=False).annotate(comment_count=Count("newsreview")).order_by('-created_at')
     permission_classes = [IsAuthenticated]
     serializer_class = NewsSideBarSerializer
-    http_method_names = ['get']
 
-    def list(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset().filter(user=request.user).annotate(
             is_liked=Exists(self.get_queryset().filter(Q(user_liked__id=request.user.id) & Q(id=OuterRef('pk'))))))
         page = self.paginate_queryset(queryset)
@@ -326,14 +326,14 @@ class ArticleApiView(ReadWriteSerializerMixin, viewsets.ModelViewSet):
         return Response(status=status.HTTP_200_OK)
 
 
-class UserArticleView(viewsets.ModelViewSet):
+class UserArticleView(ListAPIView):
     queryset = Article.objects.filter(is_delete=False).annotate(comment_count=Count("articlereview")).order_by(
         '-created_at')
     serializer_class = ArticleSideBarSerializer
     permission_classes = [IsAuthenticated]
-    http_method_names = ['get']
+    # http_method_names = ['get']
 
-    def list(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         queryset = self.filter_queryset(
             self.get_queryset().filter(user=request.user).annotate(
                 is_liked=Exists(self.get_queryset().filter(
@@ -419,14 +419,13 @@ class QuestionApiView(ReadWriteSerializerMixin, viewsets.ModelViewSet):
         return Response(status=status.HTTP_200_OK)
 
 
-class UserQuestionView(viewsets.ModelViewSet):
+class UserQuestionView(ListAPIView):
     queryset = Question.objects.filter(is_delete=False).annotate(comment_count=Count("questionreview")).order_by(
         '-created_at')
     serializer_class = QuestionSideBarSerializer
     permission_classes = [IsAuthenticated]
-    http_method_names = ['get']
 
-    def list(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         queryset = self.filter_queryset(
             self.get_queryset().filter(user=request.user).annotate(
                 is_liked=Exists(self.get_queryset().filter(

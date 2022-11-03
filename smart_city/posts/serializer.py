@@ -49,6 +49,7 @@ class NewsSideBarSerializer(serializers.ModelSerializer):
         response = super().to_representation(instance)
         response['is_liked'] = instance.is_liked
         response['comments_count'] = instance.comment_count
+        response['description'] = None
         response['type'] = "NEWS"
         return response
 
@@ -120,6 +121,7 @@ class ArticleSideBarSerializer(serializers.ModelSerializer):
         response = super().to_representation(instance)
         response['is_liked'] = instance.is_liked
         response['comments_count'] = instance.comment_count
+        response['description'] = None
         response['type'] = "ARTICLE"
         return response
 
@@ -192,6 +194,7 @@ class QuestionSideBarSerializer(serializers.ModelSerializer):
         response = super().to_representation(instance)
         response['is_liked'] = instance.is_liked
         response['comments_count'] = instance.comment_count
+        response['description'] = None
         response['type'] = "QUESTION"
         return response
 

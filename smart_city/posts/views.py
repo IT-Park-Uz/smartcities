@@ -102,7 +102,7 @@ class NewsApiView(ReadWriteSerializerMixin, viewsets.ModelViewSet):
 )
 class SearchNewsView(viewsets.ModelViewSet):
     queryset = News.objects.filter(is_active=True).annotate(comment_count=Count("newsreview")).order_by('-view_count')
-    serializer_class = NewsSerializer
+    serializer_class = NewsPartSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
     http_method_names = ['get']
 
@@ -149,7 +149,7 @@ class SearchNewsView(viewsets.ModelViewSet):
 class SearchArticleView(viewsets.ModelViewSet):
     queryset = Article.objects.filter(is_active=True).annotate(comment_count=Count("articlereview")).order_by(
         '-view_count')
-    serializer_class = ArticleSerializer
+    serializer_class = ArticlePartSerializer
     http_method_names = ['get']
     permission_classes = [IsAuthenticatedOrReadOnly]
 
@@ -199,7 +199,7 @@ class SearchArticleView(viewsets.ModelViewSet):
 class SearchQuestionView(viewsets.ModelViewSet):
     queryset = Question.objects.filter(is_active=True).annotate(comment_count=Count("questionreview")).order_by(
         '-view_count')
-    serializer_class = QuestionSerializer
+    serializer_class = QuestionPartSerializer
     http_method_names = ['get']
     permission_classes = [IsAuthenticatedOrReadOnly]
 
@@ -242,17 +242,12 @@ class SearchQuestionView(viewsets.ModelViewSet):
 class UserNewsView(viewsets.ModelViewSet):
     queryset = News.objects.filter(is_delete=False).annotate(comment_count=Count("newsreview")).order_by('-created_at')
     permission_classes = [IsAuthenticated]
-    serializer_class = NewsPartSerializer
+    serializer_class = NewsSideBarSerializer
     http_method_names = ['get']
-
-    def get_queryset(self):
-        queryset = self.queryset.prefetch_related("user", 'theme', 'tags')
-        return queryset
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset().filter(user=request.user).annotate(
-            is_liked=Exists(self.get_queryset().filter(Q(user_liked__id=request.user.id) & Q(id=OuterRef('pk')))),
-            is_saved=Exists(self.get_queryset().filter(saved_collections__id=request.user.id, id=OuterRef('pk')))))
+            is_liked=Exists(self.get_queryset().filter(Q(user_liked__id=request.user.id) & Q(id=OuterRef('pk'))))))
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
@@ -334,21 +329,16 @@ class ArticleApiView(ReadWriteSerializerMixin, viewsets.ModelViewSet):
 class UserArticleView(viewsets.ModelViewSet):
     queryset = Article.objects.filter(is_delete=False).annotate(comment_count=Count("articlereview")).order_by(
         '-created_at')
-    serializer_class = ArticlePartSerializer
+    serializer_class = ArticleSideBarSerializer
     permission_classes = [IsAuthenticated]
     http_method_names = ['get']
-
-    def get_queryset(self):
-        queryset = self.queryset.prefetch_related("user", 'theme', 'tags')
-        return queryset
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(
             self.get_queryset().filter(user=request.user).annotate(
                 is_liked=Exists(self.get_queryset().filter(
                     Q(user_liked__id=request.user.id) & Q(id=OuterRef('pk'))
-                )),
-                is_saved=Exists(self.get_queryset().filter(saved_collections__id=request.user.id, id=OuterRef('pk')))))
+                ))))
 
         page = self.paginate_queryset(queryset)
         if page is not None:
@@ -432,21 +422,16 @@ class QuestionApiView(ReadWriteSerializerMixin, viewsets.ModelViewSet):
 class UserQuestionView(viewsets.ModelViewSet):
     queryset = Question.objects.filter(is_delete=False).annotate(comment_count=Count("questionreview")).order_by(
         '-created_at')
-    serializer_class = QuestionSerializer
+    serializer_class = QuestionSideBarSerializer
     permission_classes = [IsAuthenticated]
     http_method_names = ['get']
-
-    def get_queryset(self):
-        queryset = self.queryset.prefetch_related("user", 'theme', 'tags')
-        return queryset
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(
             self.get_queryset().filter(user=request.user).annotate(
                 is_liked=Exists(self.get_queryset().filter(
                     Q(user_liked__id=request.user.id) & Q(id=OuterRef('pk'))
-                )),
-                is_saved=Exists(self.get_queryset().filter(saved_collections__id=request.user.id, id=OuterRef('pk')))))
+                ))))
 
         page = self.paginate_queryset(queryset)
         if page is not None:
@@ -525,7 +510,7 @@ class ThemeApiView(viewsets.ModelViewSet):
 class ThemeGroupNewsView(viewsets.ModelViewSet):
     queryset = News.objects.filter(is_active=True).annotate(comment_count=Count("newsreview")).order_by(
         '-created_at')
-    serializer_class = NewsSerializer
+    serializer_class = NewsPartSerializer
     http_method_names = ['get']
 
     def get_serializer_class(self):
@@ -557,9 +542,9 @@ class ThemeGroupNewsView(viewsets.ModelViewSet):
 
         page = self.paginate_queryset(queryset)
         if page is not None:
-            serializer = NewsSerializer(page, many=True)
+            serializer = NewsPartSerializer(page, many=True)
             return self.get_paginated_response(serializer.data)
-        serializer = NewsSerializer(queryset, many=True)
+        serializer = NewsPartSerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -573,7 +558,7 @@ class ThemeGroupNewsView(viewsets.ModelViewSet):
 class ThemeGroupQuestionsView(viewsets.ModelViewSet):
     queryset = Question.objects.filter(is_active=True).annotate(comment_count=Count("questionreview")).order_by(
         '-created_at')
-    serializer_class = QuestionSerializer
+    serializer_class = QuestionPartSerializer
     http_method_names = ['get']
 
     def get_serializer_class(self):
@@ -603,9 +588,9 @@ class ThemeGroupQuestionsView(viewsets.ModelViewSet):
                 theme_id=id)
         page = self.paginate_queryset(queryset)
         if page is not None:
-            serializer = QuestionSerializer(page, many=True)
+            serializer = QuestionPartSerializer(page, many=True)
             return self.get_paginated_response(serializer.data)
-        serializer = QuestionSerializer(queryset, many=True)
+        serializer = QuestionPartSerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -619,7 +604,7 @@ class ThemeGroupQuestionsView(viewsets.ModelViewSet):
 class ThemeGroupArticlesView(viewsets.ModelViewSet):
     queryset = Article.objects.filter(is_active=True).annotate(comment_count=Count("articlereview")).order_by(
         '-created_at')
-    serializer_class = ArticleSerializer
+    serializer_class = ArticlePartSerializer
     http_method_names = ['get']
 
     def get_serializer_class(self):
@@ -649,9 +634,9 @@ class ThemeGroupArticlesView(viewsets.ModelViewSet):
                 theme_id=id)
         page = self.paginate_queryset(queryset)
         if page is not None:
-            serializer = ArticleSerializer(page, many=True)
+            serializer = ArticlePartSerializer(page, many=True)
             return self.get_paginated_response(serializer.data)
-        serializer = ArticleSerializer(queryset, many=True)
+        serializer = ArticlePartSerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 

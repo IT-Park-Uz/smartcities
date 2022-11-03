@@ -1,0 +1,41 @@
+name: Develop Django deploy smartcities
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Repozitoriydan git pull qilinishi
+      uses: appleboy/scp-action@master
+      env:
+        HOST: ${{ secrets.HOST }}
+        USERNAME: ${{ secrets.USERNAME }}
+        PORT: ${{ secrets.PORT }}
+        KEY: ${{ secrets.SSHKEY }}
+      with:
+        source: "."
+        target: "/root/develop/smartcities"
+
+    - name: Komandalar terilishi @@@@@@@@@@
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        USERNAME: ${{ secrets.USERNAME }}
+        PORT: ${{ secrets.PORT }}
+        KEY: ${{ secrets.SSHKEY }}
+        script_stop: true
+        script: |
+          /root/develop/smartcities/venv/bin/pip install -r /root/develop/smartcities/requirements/production.txt
+          /root/develop/smartcities/venv/bin/python /root/develop/smartcities/manage_prod.py migrate
+          /root/develop/smartcities/venv/bin/python /root/develop/smartcities/manage_prod.py compilemessages
+          /root/develop/smartcities/venv/bin/python /root/develop/smartcities/manage_prod.py collectstatic --noinput
+          systemctl restart devsmartcities.service
+          sh /root/deploy_msg_dev_back.sh "${{ github.event.head_commit.message }}"

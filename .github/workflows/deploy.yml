@@ -39,3 +39,4 @@ jobs:
           /root/smartcities/venv/bin/python /root/smartcities/manage_prod.py collectstatic --noinput
           systemctl daemon-reload
           systemctl restart gunicorn.service
+          sh /root/deploy_msg_back.sh "${{ github.event.head_commit.message }}"

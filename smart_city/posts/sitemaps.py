@@ -14,7 +14,7 @@ class ArticleSitemap(Sitemap):
         return obj.created_at
 
     def location(self, obj):
-        return '/article/%s' % obj.id
+        return '/article/%s?lang=gb' % obj.id
 
 
 class NewsSitemap(Sitemap):
@@ -29,7 +29,7 @@ class NewsSitemap(Sitemap):
         return obj.created_at
 
     def location(self, obj):
-        return '/news/%s' % obj.id
+        return '/news/%s?lang=gb' % obj.id
 
 
 class QuestionSitemap(Sitemap):
@@ -44,4 +44,4 @@ class QuestionSitemap(Sitemap):
         return obj.created_at
 
     def location(self, obj):
-        return '/question/%s' % obj.id
+        return '/question/%s?lang=gb' % obj.id

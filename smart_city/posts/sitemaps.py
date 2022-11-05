@@ -2,10 +2,18 @@ from django.contrib.sitemaps import Sitemap
 from .models import Article, News, Question
 
 
+class Site:
+    domain = 'hub.smartcities.uz'
+
+
 class ArticleSitemap(Sitemap):
     changefreq = "weekly"
     priority = 0.6
     protocol = 'https'
+
+    def get_urls(self, site=None, **kwargs):
+        site = Site()
+        return super(ArticleSitemap, self).get_urls(site=site, **kwargs)
 
     def items(self):
         return Article.objects.filter(is_active=True)
@@ -22,6 +30,10 @@ class NewsSitemap(Sitemap):
     priority = 0.6
     protocol = 'https'
 
+    def get_urls(self, site=None, **kwargs):
+        site = Site()
+        return super(NewsSitemap, self).get_urls(site=site, **kwargs)
+
     def items(self):
         return News.objects.filter(is_active=True)
 
@@ -36,6 +48,10 @@ class QuestionSitemap(Sitemap):
     changefreq = "weekly"
     priority = 0.8
     protocol = 'https'
+
+    def get_urls(self, site=None, **kwargs):
+        site = Site()
+        return super(QuestionSitemap, self).get_urls(site=site, **kwargs)
 
     def items(self):
         return Question.objects.filter(is_active=True)

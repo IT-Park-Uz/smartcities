@@ -439,3 +439,14 @@ TWITTER_CONSUMER_SECRET = os.environ.get('TWITTER_CONSUMER_SECRET')
 
 FACEBOOK_SECRET_KEY = os.environ.get('FACEBOOK_SECRET_KEY')
 FACEBOOK_SOCIAL_SECRET = os.environ.get('FACEBOOK_SOCIAL_SECRET')
+
+#CACHE
+CACHE_TTL = 60 * 60 * 6
+CACHE_HOST='127.0.0.1'
+CACHE_PORT=8000
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
+        'LOCATION': f'{CACHE_HOST}:{CACHE_PORT}',
+    }
+}

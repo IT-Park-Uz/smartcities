@@ -11,7 +11,7 @@ from config.settings.base import CACHE_TTL
 from .serializer import (NewsSerializer, ArticleSerializer, QuestionSerializer,
                          TagsSerializer, ThemeSerializer, NewsReviewSerializer, ArticleReviewSerializer,
                          QuestionReviewSerializer, NewsWriteSerializer, ArticleWriteSerializer,
-                         QuestionWriteSerializer, UserSavedCollectionsSerializer, UserSerializer,
+                         QuestionWriteSerializer, UserSavedCollectionsSerializer,
                          NotificationSerializer, UserUploadImageSerializer,
                          NewsPartSerializer, NewsSideBarSerializer,
                          ArticlePartSerializer, ArticleSideBarSerializer,
@@ -27,7 +27,7 @@ from drf_spectacular.utils import extend_schema_view, extend_schema, OpenApiPara
 
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
-from django.views.decorators.vary import vary_on_cookie, vary_on_headers
+from django.views.decorators.vary import vary_on_cookie
 
 User = get_user_model()
 
@@ -62,6 +62,8 @@ class NewsApiView(ReadWriteSerializerMixin, viewsets.ModelViewSet):
         serializer = NewsPartSerializer(queryset, many=True)
         return Response(serializer.data)
 
+    @method_decorator(vary_on_cookie)
+    @method_decorator(cache_page(CACHE_TTL))
     def retrieve(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
@@ -92,6 +94,8 @@ class NewsApiView(ReadWriteSerializerMixin, viewsets.ModelViewSet):
             return Response(status=status.HTTP_200_OK)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+    @method_decorator(vary_on_cookie)
+    @method_decorator(cache_page(CACHE_TTL))
     @action(detail=True, methods=['get'], permission_classes=[permissions.IsAuthenticated])
     def user_like(self, request, *args, **kwargs):
         obj = News.objects.filter(id=int(kwargs['pk'])).first()
@@ -312,6 +316,8 @@ class ArticleApiView(ReadWriteSerializerMixin, viewsets.ModelViewSet):
         serializer = ArticlePartSerializer(queryset, many=True)
         return Response(serializer.data)
 
+    @method_decorator(vary_on_cookie)
+    @method_decorator(cache_page(CACHE_TTL))
     def retrieve(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
@@ -341,6 +347,8 @@ class ArticleApiView(ReadWriteSerializerMixin, viewsets.ModelViewSet):
             return Response(status=status.HTTP_200_OK)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+    @method_decorator(vary_on_cookie)
+    @method_decorator(cache_page(CACHE_TTL))
     @action(detail=True, methods=['get'], permission_classes=[permissions.IsAuthenticated])
     def user_like(self, request, *args, **kwargs):
         obj = Article.objects.filter(id=int(kwargs['pk'])).first()
@@ -413,6 +421,8 @@ class QuestionApiView(ReadWriteSerializerMixin, viewsets.ModelViewSet):
         serializer = QuestionPartSerializer(queryset, many=True)
         return Response(serializer.data)
 
+    @method_decorator(vary_on_cookie)
+    @method_decorator(cache_page(CACHE_TTL))
     def retrieve(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
@@ -443,6 +453,8 @@ class QuestionApiView(ReadWriteSerializerMixin, viewsets.ModelViewSet):
             return Response(status=status.HTTP_200_OK)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+    @method_decorator(vary_on_cookie)
+    @method_decorator(cache_page(CACHE_TTL))
     @action(detail=True, methods=['get'], permission_classes=[permissions.IsAuthenticated])
     def user_like(self, request, *args, **kwargs):
         obj = Question.objects.filter(id=int(kwargs['pk'])).first()
@@ -983,6 +995,8 @@ class NotificationApiView(viewsets.ModelViewSet):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
+    @method_decorator(vary_on_cookie)
+    @method_decorator(cache_page(CACHE_TTL))
     @action(detail=True, methods=['get'], permission_classes=[permissions.IsAuthenticated])
     def user_read(self, request, *args, **kwargs):
         obj = Notification.objects.filter(id=int(kwargs['pk'])).first()

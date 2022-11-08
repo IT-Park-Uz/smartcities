@@ -1,7 +1,5 @@
 import random
-
 from dj_rest_auth.serializers import PasswordChangeSerializer
-from dj_rest_auth.views import sensitive_post_parameters_m
 from django.contrib.auth import get_user_model, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
@@ -9,29 +7,13 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView, RedirectView, UpdateView
 from allauth.account.models import EmailAddress
-
-# Facebook
-from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
-from allauth.socialaccount.providers.oauth2.client import OAuth2Client
-
-# GitHub
-from allauth.socialaccount.providers.github.views import GitHubOAuth2Adapter
-from dj_rest_auth.registration.views import SocialLoginView
-
-# Google
-from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
-
-# Connect with SocialLogin
-from dj_rest_auth.registration.views import SocialConnectView
 from rest_framework import generics, status, viewsets
-from rest_framework.generics import GenericAPIView, UpdateAPIView
+from rest_framework.generics import UpdateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import AllowAny
-
-from smart_city.users.api.permessions import IsOwnerOrReadOnly
 from smart_city.users.api.serializers import RegisterSerializer, CodeSerializer, GetEmailSerializer
 from smart_city.users.models import Code, ChangedPassword
 from smart_city.users.serializer import LogOutSerializer
@@ -40,7 +22,7 @@ from smart_city.users.utils import send_email
 User = get_user_model()
 
 
-class UserDetailView(LoginRequiredMixin, DetailView):
+class UserDetailView(DetailView):
     model = User
     slug_field = "username"
     slug_url_kwarg = "username"

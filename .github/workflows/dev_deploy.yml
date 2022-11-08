@@ -1,9 +1,9 @@
-name: Django deploy smartcities
+name: Develop Django deploy smartcities
 
 on:
   push:
     branches:
-      - master
+      - dev
 
 jobs:
   build:
@@ -22,7 +22,7 @@ jobs:
         KEY: ${{ secrets.SSHKEY }}
       with:
         source: "."
-        target: "/root/smartcities"
+        target: "/root/develop/smartcities"
 
     - name: Komandalar terilishi @@@@@@@@@@
       uses: appleboy/ssh-action@master
@@ -33,10 +33,9 @@ jobs:
         KEY: ${{ secrets.SSHKEY }}
         script_stop: true
         script: |
-          /root/smartcities/venv/bin/pip install -r /root/smartcities/requirements/production.txt
-          /root/smartcities/venv/bin/python /root/smartcities/manage_prod.py migrate
-          /root/smartcities/venv/bin/python /root/smartcities/manage_prod.py compilemessages
-          /root/smartcities/venv/bin/python /root/smartcities/manage_prod.py collectstatic --noinput
-          systemctl daemon-reload
-          systemctl restart gunicorn.service
-          sh /root/deploy_msg_back.sh "${{ github.event.head_commit.message }}"
+          /root/develop/smartcities/venv/bin/pip install -r /root/develop/smartcities/requirements/production.txt
+          /root/develop/smartcities/venv/bin/python /root/develop/smartcities/manage_prod.py migrate
+          /root/develop/smartcities/venv/bin/python /root/develop/smartcities/manage_prod.py compilemessages
+          /root/develop/smartcities/venv/bin/python /root/develop/smartcities/manage_prod.py collectstatic --noinput
+          systemctl restart devsmartcities.service
+          sh /root/deploy_msg_dev_back.sh "${{ github.event.head_commit.message }}"

@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
+from django.contrib.sitemaps.views import sitemap
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.urls import include, path
 from django.views import defaults as default_views
@@ -9,12 +10,20 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from rest_framework.authtoken.views import obtain_auth_token
 from rest_framework_simplejwt.views import (TokenObtainPairView, TokenRefreshView, TokenVerifyView
 )
+from smart_city.posts.sitemaps import ArticleSitemap, NewsSitemap, QuestionSitemap
 
 from smart_city import social_auth
+
+sitemaps = {
+    "question": QuestionSitemap,
+    "news": NewsSitemap,
+    "article": ArticleSitemap
+}
 
 urlpatterns = [
     path("", TemplateView.as_view(template_name="pages/main_menu.html"), name="home"),
     path("dev/", TemplateView.as_view(template_name="pages/home.html"), name="dev"),
+    path("sitemap.xml", sitemap, {"sitemaps": sitemaps}, name="django.contrib.sitemaps.views.sitemap"),
     path(
         "about/", TemplateView.as_view(template_name="pages/about.html"), name="about"
     ),

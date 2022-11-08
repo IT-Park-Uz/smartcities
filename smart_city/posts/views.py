@@ -249,6 +249,13 @@ class UserNewsView(ListAPIView):
     def get(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset().filter(user=request.user).annotate(
             is_liked=Exists(self.get_queryset().filter(Q(user_liked__id=request.user.id) & Q(id=OuterRef('pk'))))))
+        status = request.query_params.get('status')
+        if not status:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        if status=='true':
+            queryset = queryset.filter(is_active=True)
+        elif status=='false':
+            queryset = queryset.filter(is_active=False)
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
@@ -341,7 +348,13 @@ class UserArticleView(ListAPIView):
                 is_liked=Exists(self.get_queryset().filter(
                     Q(user_liked__id=request.user.id) & Q(id=OuterRef('pk'))
                 ))))
-
+        status = request.query_params.get('status')
+        if not status:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        if status=='true':
+            queryset = queryset.filter(is_active=True)
+        elif status=='false':
+            queryset = queryset.filter(is_active=False)
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
@@ -433,7 +446,13 @@ class UserQuestionView(ListAPIView):
                 is_liked=Exists(self.get_queryset().filter(
                     Q(user_liked__id=request.user.id) & Q(id=OuterRef('pk'))
                 ))))
-
+        status = request.query_params.get('status')
+        if not status:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        if status=='true':
+            queryset = queryset.filter(is_active=True)
+        elif status=='false':
+            queryset = queryset.filter(is_active=False)
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)

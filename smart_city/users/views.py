@@ -31,6 +31,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import AllowAny
 
+from smart_city.users.api.permessions import IsOwnerOrReadOnly
 from smart_city.users.api.serializers import RegisterSerializer, CodeSerializer, GetEmailSerializer
 from smart_city.users.models import Code, ChangedPassword
 from smart_city.users.serializer import LogOutSerializer
@@ -74,43 +75,6 @@ class UserRedirectView(LoginRequiredMixin, RedirectView):
 
 
 user_redirect_view = UserRedirectView.as_view()
-
-
-# class FacebookLogin(SocialLoginView):
-#     adapter_class = FacebookOAuth2Adapter
-    # callback_url = 'CALLBACK_URL_YOU_SET_ON_GITHUB'
-    # client_class = OAuth2Client
-
-
-# class GitHubLogin(SocialLoginView):
-#     adapter_class = GitHubOAuth2Adapter
-#     # callback_url = 'CALLBACK_URL_YOU_SET_ON_GITHUB'
-#     client_class = OAuth2Client
-
-#
-# class GoogleLogin(SocialLoginView):  # if you want to use Authorization Code Grant, use this
-#     adapter_class = GoogleOAuth2Adapter
-#     # callback_url = 'CALLBACK_URL_YOU_SET_ON_GOOGLE'
-#     client_class = OAuth2Client
-
-
-# Connect to Social
-# class FacebookConnect(SocialConnectView):
-#     adapter_class = FacebookOAuth2Adapter
-    # callback_url = 'CALLBACK_URL_YOU_SET_ON_GITHUB'
-    # client_class = OAuth2Client
-
-#
-# class GithubConnect(SocialConnectView):
-#     adapter_class = GitHubOAuth2Adapter
-    # callback_url = 'CALLBACK_URL_YOU_SET_ON_GITHUB'
-#     client_class = OAuth2Client
-#
-#
-# # class GoogleConnect(SocialConnectView):
-# #     adapter_class = GoogleOAuth2Adapter
-#     # callback_url = 'CALLBACK_URL_YOU_SET_ON_GITHUB'
-#     client_class = OAuth2Client
 
 
 class RegisterAPIView(generics.GenericAPIView):

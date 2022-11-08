@@ -31,8 +31,8 @@ class UserViewSet(RetrieveModelMixin, ListAPIView, UpdateModelMixin, GenericView
     #     assert isinstance(self.request.user.id, int)
     #     return self.queryset
 
-    @method_decorator(vary_on_cookie)
     @method_decorator(cache_page(CACHE_TTL))
+    @method_decorator(vary_on_cookie)
     def list(self, request, *args, **kwargs):
         username = request.query_params.get("username")
         if not username:
@@ -41,8 +41,8 @@ class UserViewSet(RetrieveModelMixin, ListAPIView, UpdateModelMixin, GenericView
         serializer = self.get_serializer(user, many=False)
         return Response(serializer.data,status=status.HTTP_200_OK)
 
-    @method_decorator(vary_on_cookie)
     @method_decorator(cache_page(CACHE_TTL))
+    @method_decorator(vary_on_cookie)
     @action(detail=False)
     def me(self, request):
         if request.user.is_authenticated:

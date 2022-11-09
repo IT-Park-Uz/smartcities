@@ -62,8 +62,6 @@ class NewsApiView(ReadWriteSerializerMixin, viewsets.ModelViewSet):
         serializer = NewsPartSerializer(queryset, many=True)
         return Response(serializer.data)
 
-    @method_decorator(cache_page(CACHE_TTL))
-    @method_decorator(vary_on_cookie)
     def retrieve(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
@@ -123,8 +121,6 @@ class SearchNewsView(viewsets.ModelViewSet):
         queryset = self.queryset.prefetch_related("user", 'theme', 'tags')
         return queryset
 
-    @method_decorator(cache_page(CACHE_TTL))
-    @method_decorator(vary_on_cookie)
     def list(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
@@ -172,8 +168,6 @@ class SearchArticleView(viewsets.ModelViewSet):
         queryset = self.queryset.prefetch_related("user", 'theme', 'tags')
         return queryset
 
-    @method_decorator(cache_page(CACHE_TTL))
-    @method_decorator(vary_on_cookie)
     def list(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
@@ -224,8 +218,6 @@ class SearchQuestionView(viewsets.ModelViewSet):
         queryset = self.queryset.prefetch_related("user", 'theme', 'tags')
         return queryset
 
-    @method_decorator(cache_page(CACHE_TTL))
-    @method_decorator(vary_on_cookie)
     def list(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
@@ -316,8 +308,6 @@ class ArticleApiView(ReadWriteSerializerMixin, viewsets.ModelViewSet):
         serializer = ArticlePartSerializer(queryset, many=True)
         return Response(serializer.data)
 
-    @method_decorator(cache_page(CACHE_TTL))
-    @method_decorator(vary_on_cookie)
     def retrieve(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
@@ -421,8 +411,6 @@ class QuestionApiView(ReadWriteSerializerMixin, viewsets.ModelViewSet):
         serializer = QuestionPartSerializer(queryset, many=True)
         return Response(serializer.data)
 
-    @method_decorator(cache_page(CACHE_TTL))
-    @method_decorator(vary_on_cookie)
     def retrieve(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(

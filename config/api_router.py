@@ -13,7 +13,7 @@ from smart_city.posts.views import (NewsApiView, ArticleApiView, QuestionApiView
                                     UserAccountPostView, SearchNewsByTagView, SearchArticleByTagView,
                                     SearchQuestionByTagView)
 from smart_city.social_auth.views import GoogleSocialAuthView, FacebookSocialAuthView, TwitterSocialAuthView, LinkedInSocialAuthView
-from smart_city.users.api.views import UserViewSet
+from smart_city.users.api.views import UserViewSet, SearchUserViewSet
 
 from idegovuz.views import IdEgovUzAdapter, oauth2_login
 
@@ -85,6 +85,7 @@ urlpatterns += [
     path('news-history/', UserNewsView.as_view(), name='news-history'),
     path('articles-history/', UserArticleView.as_view(), name='articles-history'),
     path('questions-history/', UserQuestionView.as_view(), name='questions-history'),
+    path('search-user', SearchUserViewSet.as_view(), name='search-user'),
 
 
     # SOCIAL AUTH

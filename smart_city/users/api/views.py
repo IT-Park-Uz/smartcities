@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.db.models import Q
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from django.views.decorators.vary import vary_on_cookie
@@ -13,7 +14,9 @@ from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from config.settings.base import CACHE_TTL
 from .permessions import IsOwnerOrReadOnly
 from .serializers import UserSerializer
-from rest_framework.permissions import IsAuthenticated , IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
+
+from ...posts.serializer import UserDataSerializer, UsersSerializer
 
 User = get_user_model()
 
@@ -47,3 +50,25 @@ class UserViewSet(RetrieveModelMixin, ListAPIView, UpdateModelMixin, GenericView
             serializer = UserSerializer(request.user, context={"request": request})
             return Response(status=status.HTTP_200_OK, data=serializer.data)
         return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+class SearchUserViewSet(ListAPIView):
+    serializer_class = UsersSerializer
+    queryset = User.objects.all()
+    lookup_field = "username"
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    @method_decorator(cache_page(CACHE_TTL))
+    @method_decorator(vary_on_cookie)
+    def list(self, request, *args, **kwargs):
+        key = request.query_params.get("q")
+        if key:
+            users = self.get_queryset().filter(
+                Q(first_name__icontains=key) | Q(last_name__icontains=key) | Q(email__icontains=key) | Q(
+                    username__icontains=key))
+            page = self.paginate_queryset(users)
+            if page is not None:
+                serializer = self.get_serializer(page, many=True)
+                return self.get_paginated_response(serializer.data)
+            serializer = self.get_serializer(users, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_204_NO_CONTENT)

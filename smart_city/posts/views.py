@@ -44,8 +44,8 @@ class NewsApiView(ReadWriteSerializerMixin, viewsets.ModelViewSet):
         queryset = self.queryset.prefetch_related(*self.prefetch_related_tuple)
         return queryset
 
-    @method_decorator(vary_on_cookie)
     @method_decorator(cache_page(CACHE_TTL))
+    @method_decorator(vary_on_cookie)
     def list(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
@@ -62,8 +62,8 @@ class NewsApiView(ReadWriteSerializerMixin, viewsets.ModelViewSet):
         serializer = NewsPartSerializer(queryset, many=True)
         return Response(serializer.data)
 
-    @method_decorator(vary_on_cookie)
     @method_decorator(cache_page(CACHE_TTL))
+    @method_decorator(vary_on_cookie)
     def retrieve(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
@@ -94,8 +94,8 @@ class NewsApiView(ReadWriteSerializerMixin, viewsets.ModelViewSet):
             return Response(status=status.HTTP_200_OK)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @method_decorator(vary_on_cookie)
     @method_decorator(cache_page(CACHE_TTL))
+    @method_decorator(vary_on_cookie)
     @action(detail=True, methods=['get'], permission_classes=[permissions.IsAuthenticated])
     def user_like(self, request, *args, **kwargs):
         obj = News.objects.filter(id=int(kwargs['pk'])).first()
@@ -123,8 +123,8 @@ class SearchNewsView(viewsets.ModelViewSet):
         queryset = self.queryset.prefetch_related("user", 'theme', 'tags')
         return queryset
 
-    @method_decorator(vary_on_cookie)
     @method_decorator(cache_page(CACHE_TTL))
+    @method_decorator(vary_on_cookie)
     def list(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
@@ -172,8 +172,8 @@ class SearchArticleView(viewsets.ModelViewSet):
         queryset = self.queryset.prefetch_related("user", 'theme', 'tags')
         return queryset
 
-    @method_decorator(vary_on_cookie)
     @method_decorator(cache_page(CACHE_TTL))
+    @method_decorator(vary_on_cookie)
     def list(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
@@ -224,8 +224,8 @@ class SearchQuestionView(viewsets.ModelViewSet):
         queryset = self.queryset.prefetch_related("user", 'theme', 'tags')
         return queryset
 
-    @method_decorator(vary_on_cookie)
     @method_decorator(cache_page(CACHE_TTL))
+    @method_decorator(vary_on_cookie)
     def list(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
@@ -263,17 +263,17 @@ class UserNewsView(ListAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = NewsSideBarSerializer
 
-    @method_decorator(vary_on_cookie)
     @method_decorator(cache_page(CACHE_TTL))
+    @method_decorator(vary_on_cookie)
     def get(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset().filter(user=request.user).annotate(
             is_liked=Exists(self.get_queryset().filter(Q(user_liked__id=request.user.id) & Q(id=OuterRef('pk'))))))
         status = request.query_params.get('status')
         if not status:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        if status=='true':
+        if status == 'true':
             queryset = queryset.filter(is_active=True)
-        elif status=='false':
+        elif status == 'false':
             queryset = queryset.filter(is_active=False)
         page = self.paginate_queryset(queryset)
         if page is not None:
@@ -296,8 +296,8 @@ class ArticleApiView(ReadWriteSerializerMixin, viewsets.ModelViewSet):
         queryset = self.queryset.prefetch_related("user", 'theme', 'tags')
         return queryset
 
-    @method_decorator(vary_on_cookie)
     @method_decorator(cache_page(CACHE_TTL))
+    @method_decorator(vary_on_cookie)
     def list(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
@@ -316,8 +316,8 @@ class ArticleApiView(ReadWriteSerializerMixin, viewsets.ModelViewSet):
         serializer = ArticlePartSerializer(queryset, many=True)
         return Response(serializer.data)
 
-    @method_decorator(vary_on_cookie)
     @method_decorator(cache_page(CACHE_TTL))
+    @method_decorator(vary_on_cookie)
     def retrieve(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
@@ -347,8 +347,8 @@ class ArticleApiView(ReadWriteSerializerMixin, viewsets.ModelViewSet):
             return Response(status=status.HTTP_200_OK)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @method_decorator(vary_on_cookie)
     @method_decorator(cache_page(CACHE_TTL))
+    @method_decorator(vary_on_cookie)
     @action(detail=True, methods=['get'], permission_classes=[permissions.IsAuthenticated])
     def user_like(self, request, *args, **kwargs):
         obj = Article.objects.filter(id=int(kwargs['pk'])).first()
@@ -376,9 +376,9 @@ class UserArticleView(ListAPIView):
         status = request.query_params.get('status')
         if not status:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        if status=='true':
+        if status == 'true':
             queryset = queryset.filter(is_active=True)
-        elif status=='false':
+        elif status == 'false':
             queryset = queryset.filter(is_active=False)
         page = self.paginate_queryset(queryset)
         if page is not None:
@@ -401,8 +401,8 @@ class QuestionApiView(ReadWriteSerializerMixin, viewsets.ModelViewSet):
         queryset = self.queryset.prefetch_related("user", 'theme', 'tags')
         return queryset
 
-    @method_decorator(vary_on_cookie)
     @method_decorator(cache_page(CACHE_TTL))
+    @method_decorator(vary_on_cookie)
     def list(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
@@ -421,8 +421,8 @@ class QuestionApiView(ReadWriteSerializerMixin, viewsets.ModelViewSet):
         serializer = QuestionPartSerializer(queryset, many=True)
         return Response(serializer.data)
 
-    @method_decorator(vary_on_cookie)
     @method_decorator(cache_page(CACHE_TTL))
+    @method_decorator(vary_on_cookie)
     def retrieve(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
@@ -453,8 +453,8 @@ class QuestionApiView(ReadWriteSerializerMixin, viewsets.ModelViewSet):
             return Response(status=status.HTTP_200_OK)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @method_decorator(vary_on_cookie)
     @method_decorator(cache_page(CACHE_TTL))
+    @method_decorator(vary_on_cookie)
     @action(detail=True, methods=['get'], permission_classes=[permissions.IsAuthenticated])
     def user_like(self, request, *args, **kwargs):
         obj = Question.objects.filter(id=int(kwargs['pk'])).first()
@@ -471,8 +471,8 @@ class UserQuestionView(ListAPIView):
     serializer_class = QuestionSideBarSerializer
     permission_classes = [IsAuthenticated]
 
-    @method_decorator(vary_on_cookie)
     @method_decorator(cache_page(CACHE_TTL))
+    @method_decorator(vary_on_cookie)
     def get(self, request, *args, **kwargs):
         queryset = self.filter_queryset(
             self.get_queryset().filter(user=request.user).annotate(
@@ -482,9 +482,9 @@ class UserQuestionView(ListAPIView):
         status = request.query_params.get('status')
         if not status:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        if status=='true':
+        if status == 'true':
             queryset = queryset.filter(is_active=True)
-        elif status=='false':
+        elif status == 'false':
             queryset = queryset.filter(is_active=False)
         page = self.paginate_queryset(queryset)
         if page is not None:
@@ -508,8 +508,8 @@ class TagsApiView(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly]
     http_method_names = ['get', 'post']
 
-    @method_decorator(vary_on_cookie)
     @method_decorator(cache_page(CACHE_TTL))
+    @method_decorator(vary_on_cookie)
     def list(self, request, *args, **kwargs):
         # TODO: search fields: tag
         try:
@@ -542,8 +542,8 @@ class ThemeApiView(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly]
     http_method_names = ['get']
 
-    @method_decorator(vary_on_cookie)
     @method_decorator(cache_page(CACHE_TTL))
+    @method_decorator(vary_on_cookie)
     def list(self, request, *args, **kwargs):
         if not request.query_params:
             themes = self.get_queryset().filter(parent=None)
@@ -577,8 +577,8 @@ class ThemeGroupNewsView(viewsets.ModelViewSet):
         queryset = self.queryset.prefetch_related("user", 'theme', 'tags')
         return queryset
 
-    @method_decorator(vary_on_cookie)
     @method_decorator(cache_page(CACHE_TTL))
+    @method_decorator(vary_on_cookie)
     def list(self, request, *args, **kwargs):
         try:
             id = int(request.query_params.get('theme_id'))
@@ -627,8 +627,8 @@ class ThemeGroupQuestionsView(viewsets.ModelViewSet):
         queryset = self.queryset.prefetch_related("user", 'theme', 'tags')
         return queryset
 
-    @method_decorator(vary_on_cookie)
     @method_decorator(cache_page(CACHE_TTL))
+    @method_decorator(vary_on_cookie)
     def list(self, request, *args, **kwargs):
         try:
             id = int(request.query_params.get('theme_id'))
@@ -675,8 +675,8 @@ class ThemeGroupArticlesView(viewsets.ModelViewSet):
         queryset = self.queryset.prefetch_related("user", 'theme', 'tags')
         return queryset
 
-    @method_decorator(vary_on_cookie)
     @method_decorator(cache_page(CACHE_TTL))
+    @method_decorator(vary_on_cookie)
     def list(self, request, *args, **kwargs):
         try:
             id = int(request.query_params.get('theme_id'))
@@ -829,8 +829,8 @@ class LikeArticlesView(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly]
     http_method_names = ['get']
 
-    @method_decorator(vary_on_cookie)
     @method_decorator(cache_page(CACHE_TTL))
+    @method_decorator(vary_on_cookie)
     def list(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
@@ -856,8 +856,8 @@ class ReadArticlesView(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly]
     http_method_names = ['get']
 
-    @method_decorator(vary_on_cookie)
     @method_decorator(cache_page(CACHE_TTL))
+    @method_decorator(vary_on_cookie)
     def list(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
@@ -882,8 +882,8 @@ class LikeQuestionsView(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly]
     http_method_names = ['get']
 
-    @method_decorator(vary_on_cookie)
     @method_decorator(cache_page(CACHE_TTL))
+    @method_decorator(vary_on_cookie)
     def list(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
@@ -909,8 +909,8 @@ class ReadQuestionsView(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly]
     http_method_names = ['get']
 
-    @method_decorator(vary_on_cookie)
     @method_decorator(cache_page(CACHE_TTL))
+    @method_decorator(vary_on_cookie)
     def list(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             queryset = self.filter_queryset(self.get_queryset().annotate(is_liked=Exists(self.get_queryset().filter(
@@ -933,8 +933,8 @@ class UserSavedCollectionsView(APIView):
     permission_classes = [IsAuthenticated]
     http_method_names = ['get', 'post']
 
-    @method_decorator(vary_on_cookie)
     @method_decorator(cache_page(CACHE_TTL))
+    @method_decorator(vary_on_cookie)
     def get(self, request, *args, **kwargs):
         news = News.objects.filter(saved_collections__id=request.user.id)
         questions = Question.objects.filter(saved_collections__id=request.user.id)
@@ -977,8 +977,8 @@ class NotificationApiView(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly]
     http_method_names = ['get']
 
-    @method_decorator(vary_on_cookie)
     @method_decorator(cache_page(CACHE_TTL))
+    @method_decorator(vary_on_cookie)
     def list(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             queryset = self.filter_queryset(self.get_queryset().annotate(is_read=Exists(self.get_queryset().filter(
@@ -995,8 +995,8 @@ class NotificationApiView(viewsets.ModelViewSet):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
-    @method_decorator(vary_on_cookie)
     @method_decorator(cache_page(CACHE_TTL))
+    @method_decorator(vary_on_cookie)
     @action(detail=True, methods=['get'], permission_classes=[permissions.IsAuthenticated])
     def user_read(self, request, *args, **kwargs):
         obj = Notification.objects.filter(id=int(kwargs['pk'])).first()
@@ -1016,8 +1016,8 @@ class UserAccountPostView(ListAPIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
     serializer_class = UserAccountNewsSerializer
 
-    @method_decorator(vary_on_cookie)
     @method_decorator(cache_page(CACHE_TTL))
+    @method_decorator(vary_on_cookie)
     def get(self, request, *args, **kwargs):
         queryset = {}
         username = request.query_params.get('username')
@@ -1061,8 +1061,8 @@ class SearchNewsByTagView(viewsets.ModelViewSet):
         queryset = self.queryset.prefetch_related("user", 'theme', 'tags')
         return queryset
 
-    @method_decorator(vary_on_cookie)
     @method_decorator(cache_page(CACHE_TTL))
+    @method_decorator(vary_on_cookie)
     def list(self, request, *args, **kwargs):
         tag = request.query_params.get('tag')
         if not tag:
@@ -1107,8 +1107,8 @@ class SearchArticleByTagView(viewsets.ModelViewSet):
         queryset = self.queryset.prefetch_related("user", 'theme', 'tags')
         return queryset
 
-    @method_decorator(vary_on_cookie)
     @method_decorator(cache_page(CACHE_TTL))
+    @method_decorator(vary_on_cookie)
     def list(self, request, *args, **kwargs):
         tag = request.query_params.get('tag')
         if not tag:
@@ -1153,8 +1153,8 @@ class SearchQuestionByTagView(viewsets.ModelViewSet):
         queryset = self.queryset.prefetch_related("user", 'theme', 'tags')
         return queryset
 
-    @method_decorator(vary_on_cookie)
     @method_decorator(cache_page(CACHE_TTL))
+    @method_decorator(vary_on_cookie)
     def list(self, request, *args, **kwargs):
         tag = request.query_params.get('tag')
         if not tag:

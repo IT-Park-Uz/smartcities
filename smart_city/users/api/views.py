@@ -13,7 +13,7 @@ from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from config.settings.base import CACHE_TTL
 from .permessions import IsOwnerOrReadOnly
 from .serializers import UserSerializer
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated , IsAuthenticatedOrReadOnly
 
 User = get_user_model()
 
@@ -23,7 +23,7 @@ class UserViewSet(RetrieveModelMixin, ListAPIView, UpdateModelMixin, GenericView
     queryset = User.objects.all()
     lookup_field = "username"
     # permission_classes = (DjangoModelPermissionsOrAnonReadOnly,)
-    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
     filterset_fields = ("username", "first_name", "last_name")
     parser_classes = (MultiPartParser, FormParser, JSONParser)
 
@@ -31,18 +31,16 @@ class UserViewSet(RetrieveModelMixin, ListAPIView, UpdateModelMixin, GenericView
     #     assert isinstance(self.request.user.id, int)
     #     return self.queryset
 
-    @method_decorator(vary_on_cookie)
     @method_decorator(cache_page(CACHE_TTL))
+    @method_decorator(vary_on_cookie)
     def list(self, request, *args, **kwargs):
         username = request.query_params.get("username")
         if not username:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         user = self.get_queryset().filter(username=username).first()
         serializer = self.get_serializer(user, many=False)
-        return Response(serializer.data,status=status.HTTP_200_OK)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
-    @method_decorator(vary_on_cookie)
-    @method_decorator(cache_page(CACHE_TTL))
     @action(detail=False)
     def me(self, request):
         if request.user.is_authenticated:

@@ -3,7 +3,7 @@ from .models import Article, News, Question
 
 
 class Site:
-    domain = 'hub.smartcities.uz'
+    domain = 'smartcities.uz'
 
 
 class ArticleSitemap(Sitemap):

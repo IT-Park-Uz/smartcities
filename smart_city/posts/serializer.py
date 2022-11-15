@@ -12,6 +12,7 @@ class UsersSerializer(serializers.ModelSerializer):
         fields = ['id', 'first_name', 'last_name', 'image', 'username', 'email', 'organization_name', 'work_name',
                   'bio', 'country_code']
 
+
 class UserDataSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -26,8 +27,8 @@ class TagsSerializer(serializers.ModelSerializer):
 
 class NewsPartSerializer(serializers.ModelSerializer):
     tags = TagsSerializer(read_only=True, many=True)
-    like_count = serializers.ReadOnlyField()
-    saved_count = serializers.ReadOnlyField()
+    like_count = serializers.IntegerField(read_only=True)
+    saved_count = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = News
@@ -43,8 +44,9 @@ class NewsPartSerializer(serializers.ModelSerializer):
         response['type'] = "NEWS"
         return response
 
+
 class NewsSideBarSerializer(serializers.ModelSerializer):
-    like_count = serializers.ReadOnlyField()
+    like_count = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = News
@@ -58,10 +60,11 @@ class NewsSideBarSerializer(serializers.ModelSerializer):
         response['type'] = "NEWS"
         return response
 
+
 class NewsSerializer(serializers.ModelSerializer):
     tags = TagsSerializer(read_only=True, many=True)
-    like_count = serializers.ReadOnlyField()
-    saved_count = serializers.ReadOnlyField()
+    like_count = serializers.IntegerField(read_only=True)
+    saved_count = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = News
@@ -98,8 +101,8 @@ class NewsWriteSerializer(serializers.ModelSerializer):
 
 class ArticlePartSerializer(serializers.ModelSerializer):
     tags = TagsSerializer(read_only=True, many=True)
-    like_count = serializers.ReadOnlyField()
-    saved_count = serializers.ReadOnlyField()
+    like_count = serializers.IntegerField(read_only=True)
+    saved_count = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Article
@@ -115,8 +118,9 @@ class ArticlePartSerializer(serializers.ModelSerializer):
         response['type'] = "ARTICLE"
         return response
 
+
 class ArticleSideBarSerializer(serializers.ModelSerializer):
-    like_count = serializers.ReadOnlyField()
+    like_count = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Article
@@ -128,12 +132,14 @@ class ArticleSideBarSerializer(serializers.ModelSerializer):
         response['comments_count'] = instance.comment_count
         response['description'] = None
         response['type'] = "ARTICLE"
+        response['like_count'] = instance.like_count
         return response
+
 
 class ArticleSerializer(serializers.ModelSerializer):
     tags = TagsSerializer(read_only=True, many=True)
-    like_count = serializers.ReadOnlyField()
-    saved_count = serializers.ReadOnlyField()
+    like_count = serializers.IntegerField(read_only=True)
+    saved_count = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Article
@@ -168,11 +174,10 @@ class ArticleWriteSerializer(serializers.ModelSerializer):
         return article
 
 
-
 class QuestionPartSerializer(serializers.ModelSerializer):
     tags = TagsSerializer(read_only=True, many=True)
-    like_count = serializers.ReadOnlyField()
-    saved_count = serializers.ReadOnlyField()
+    like_count = serializers.IntegerField(read_only=True)
+    saved_count = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Question
@@ -183,13 +188,15 @@ class QuestionPartSerializer(serializers.ModelSerializer):
         response['user'] = UserDataSerializer(instance.user).data
         response['theme'] = ThemeSerializer(instance.theme).data
         response['is_liked'] = instance.is_liked
+        response['like_count'] = instance.like_count
         response['comments_count'] = instance.comment_count
         response['is_saved'] = instance.is_saved
         response['type'] = "QUESTION"
         return response
 
+
 class QuestionSideBarSerializer(serializers.ModelSerializer):
-    like_count = serializers.ReadOnlyField()
+    like_count = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Question
@@ -203,10 +210,11 @@ class QuestionSideBarSerializer(serializers.ModelSerializer):
         response['type'] = "QUESTION"
         return response
 
+
 class QuestionSerializer(serializers.ModelSerializer):
     tags = TagsSerializer(read_only=True, many=True)
-    like_count = serializers.ReadOnlyField()
-    saved_count = serializers.ReadOnlyField()
+    like_count = serializers.IntegerField(read_only=True)
+    saved_count = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Question
@@ -304,7 +312,6 @@ class UserUploadImageSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-
 class UserAccountNewsSerializer(serializers.ModelSerializer):
     class Meta:
         model = News
@@ -315,6 +322,7 @@ class UserAccountNewsSerializer(serializers.ModelSerializer):
         response['type'] = "NEWS"
         return response
 
+
 class UserAccountArticleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Article
@@ -324,6 +332,7 @@ class UserAccountArticleSerializer(serializers.ModelSerializer):
         response = super().to_representation(instance)
         response['type'] = "ARTICLE"
         return response
+
 
 class UserAccountQuestionSerializer(serializers.ModelSerializer):
     class Meta:

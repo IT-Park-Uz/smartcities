@@ -11,18 +11,14 @@ class NewsReviewAdmin(admin.TabularInline):
     extra = 0
 
 
-class NewsAdmin(admin.ModelAdmin):
-    inlines = [NewsReviewAdmin]
-
-
 class ArticleReviewAdmin(admin.TabularInline):
     model = ArticleReview
     extra = 0
 
 
-class ArticleAdmin(admin.ModelAdmin):
-    inlines = [ArticleReviewAdmin]
-
+class QuestionReviewAdmin(admin.TabularInline):
+    model = QuestionReview
+    extra = 0
 
 # class ImageInline(admin.TabularInline):
 #     model = ImageQuestion
@@ -32,35 +28,36 @@ class ArticleAdmin(admin.ModelAdmin):
 #         return mark_safe("""<img src="%s" width="80" height="80"/>""" % obj.image.url)
 
 
-class QuestionReviewAdmin(admin.TabularInline):
-    model = QuestionReview
-    extra = 0
-
-
-class QuestionAdmin(admin.ModelAdmin):
-    inlines = [QuestionReviewAdmin]
-
-
 @admin.register(News)
 class NewsAdmin(admin.ModelAdmin):
+    inlines = [NewsReviewAdmin]
     list_display = ["title", "is_active"]
     raw_id_fields = ["user", "theme", "tags", "user_liked", "saved_collections"]
     search_fields = ["user__first_name", "user__last_name", "title"]
 
+
 @admin.register(Question)
-class NewsAdmin(admin.ModelAdmin):
+class QuestionAdmin(admin.ModelAdmin):
+    inlines = [QuestionReviewAdmin]
     list_display = ["title", "is_active"]
     raw_id_fields = ["user", "theme"]
 
 
 @admin.register(Article)
-class NewsAdmin(admin.ModelAdmin):
+class ArticleAdmin(admin.ModelAdmin):
+    inlines = [ArticleReviewAdmin]
     list_display = ["title", "is_active"]
     raw_id_fields = ["user", "theme"]
 
 
-admin.site.register(Notification)
-admin.site.register(UserUploadImage)
+@admin.register(Notification)
+class NotificationAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(UserUploadImage)
+class UserUploadImageAdmin(admin.ModelAdmin):
+    pass
 
 
 @admin.register(Tags)

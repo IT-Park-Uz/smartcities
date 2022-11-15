@@ -1,4 +1,5 @@
 from django.db.models import Q, Count
+from drf_spectacular.types import OpenApiTypes
 from rest_framework.generics import ListAPIView
 from rest_framework.views import APIView
 from rest_framework import viewsets, status, permissions
@@ -636,10 +637,9 @@ class ThemeGroupQuestionsView(viewsets.ModelViewSet):
                                                  self.get_queryset().filter(saved_collections__id=0)))).filter(
                 theme_id=id)
         page = self.paginate_queryset(queryset)
+        serializer = QuestionPartSerializer(page, many=True)
         if page is not None:
-            serializer = QuestionPartSerializer(page, many=True)
             return self.get_paginated_response(serializer.data)
-        serializer = QuestionPartSerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -694,12 +694,16 @@ class ThemeGroupArticlesView(viewsets.ModelViewSet):
 @extend_schema_view(
     list=extend_schema(parameters=[
         OpenApiParameter(name='id',
-                         description="id is required in params")
+                         description="id is required in params",
+                         type=OpenApiTypes.INT,
+                         required=True)
     ],
-        description="ID IS REQUIRED FOR TO GET A NEWS'S COMMENTS , YOU SHOULD GIVE IT AS A INTEGER ALSO CAN POST A COMMENT")
+        description="ID IS REQUIRED FOR TO GET A NEWS'S COMMENTS , YOU SHOULD GIVE IT AS A INTEGER "
+                    "ALSO CAN POST A COMMENT")
 )
 class NewsReviewView(viewsets.ModelViewSet):
     serializer_class = NewsReviewSerializer  # noqa F405
+    queryset = NewsReview.objects.all()
     permission_classes = [IsAuthenticatedOrReadOnly]
     http_method_names = ['get', 'post']
 
@@ -725,6 +729,7 @@ class ArticleReviewView(viewsets.ModelViewSet):
     serializer_class = ArticleReviewSerializer  # noqa F405
     permission_classes = [IsAuthenticatedOrReadOnly]
     http_method_names = ['get', 'post']
+    queryset = ArticleReview.objects.all()
 
     def get_queryset(self):
         queryset = ArticleReview.objects.all().order_by('-created_at')
@@ -748,6 +753,7 @@ class QuestionReviewView(viewsets.ModelViewSet):
     serializer_class = QuestionReviewSerializer  # noqa F405
     permission_classes = [IsAuthenticatedOrReadOnly]
     http_method_names = ['get', 'post']
+    queryset = QuestionReview.objects.all()
 
     def get_queryset(self):
         queryset = QuestionReview.objects.all().order_by('-created_at')

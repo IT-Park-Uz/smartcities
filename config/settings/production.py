@@ -127,6 +127,7 @@ EMAIL_HOST_PASSWORD = env("DJANGO_EMAIL_PASSWORD")
 # ------------------------------------------------------------------------------
 # Django Admin URL regex.
 ADMIN_URL = env("DJANGO_ADMIN_URL")
+API_DOCS_URL = env("DJANGO_API_DOCS_URL")
 #
 # # Anymail
 # # ------------------------------------------------------------------------------

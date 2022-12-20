@@ -22,17 +22,15 @@ sitemaps = {
 
 urlpatterns = [
     path("", TemplateView.as_view(template_name="pages/main_menu.html"), name="home"),
-    path("dev/", TemplateView.as_view(template_name="pages/home.html"), name="dev"),
     path("sitemap.xml", sitemap, {"sitemaps": sitemaps}, name="django.contrib.sitemaps.views.sitemap"),
     path(
         "about/", TemplateView.as_view(template_name="pages/about.html"), name="about"
     ),
-    # Django Admin, use {% url 'admin:index' %}
     path(settings.ADMIN_URL, admin.site.urls),
+    path(settings.API_DOCS_URL, include('rest_framework.urls')),
     # User management
     path("accounts/", include("allauth.urls")),
     path("ckeditor/", include('ckeditor_uploader.urls')),
-    path('api-auth/', include('rest_framework.urls')),
     path("users/", include("smart_city.users.urls", namespace="users")),
     path("itpark/", include("smart_city.itpark.urls", namespace="itpark")),
     # Your stuff: custom urls includes go here

@@ -27,7 +27,6 @@ urlpatterns = [
         "about/", TemplateView.as_view(template_name="pages/about.html"), name="about"
     ),
     path(settings.ADMIN_URL, admin.site.urls),
-    path(settings.API_DOCS_URL, include('rest_framework.urls')),
     # User management
     path("accounts/", include("allauth.urls")),
     path("ckeditor/", include('ckeditor_uploader.urls')),
@@ -46,7 +45,7 @@ urlpatterns += [
     # DRF auth token
     path("api/schema/", SpectacularAPIView.as_view(), name="api-schema"),
     path(
-        "api/docs/",
+        settings.API_DOCS_URL,
         SpectacularSwaggerView.as_view(url_name="api-schema"),
         name="api-docs",
     ),

@@ -207,3 +207,4 @@ sentry_sdk.init(
 
 # # Your stuff...
 # # ------------------------------------------------------------------------------
+REST_FRAMEWORK["DEFAULT_RENDERER_CLASSES"] = ("rest_framework.renderers.JSONRenderer",) # noqa F405
